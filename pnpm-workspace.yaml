@@ -1,0 +1,8 @@
+packages:
+  - '.'
+allowBuilds:
+  oracledb: set this to true or false
+  sqlite3: set this to true or false
+onlyBuiltDependencies:
+  - oracledb
+  - sqlite3

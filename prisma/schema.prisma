@@ -1,0 +1,245 @@
+// Prisma Schema for AgroSaaS Platform
+// This schema will be generated dynamically to support MySQL, SQL Server, and Oracle.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql" // We'll update this dynamically in the backend based on the client configuration
+  url      = env("DATABASE_URL")
+}
+
+// ==============================
+// 1. ESTRUCTURA GEOGRÁFICA
+// ==============================
+
+model Sector {
+  id            String   @id @default(uuid())
+  codigo        String
+  name          String
+  type          String   @default("Sector")
+  plantaCliente String?
+  fincas        Finca[]
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+model Finca {
+  id        String   @id @default(uuid())
+  codigo    String?
+  name      String
+  type      String   @default("Finca")
+  sectorId  String
+  sector    Sector   @relation(fields: [sectorId], references: [id], onDelete: Cascade)
+  lotes     Lote[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Lote {
+  id        String   @id @default(uuid())
+  codigo    String?
+  name      String
+  type      String   @default("Lote")
+  fincaId   String
+  finca     Finca    @relation(fields: [fincaId], references: [id], onDelete: Cascade)
+  suertes   Suerte[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Suerte {
+  id                    String   @id @default(uuid())
+  codigo                String?
+  name                  String
+  type                  String   @default("Suerte")
+  hectareas             Float?
+  plantas               Int?
+  tareas                Float?
+  toneladas             Float?
+  cultivo               String?
+  estado                String   @default("Activo")
+  estadoProductivo      String?
+  edadSuerteDias        Int?     @default(0)
+  edadUltimaCosechaDias Int?     @default(0)
+  geometria             Json?
+  loteId                String
+  lote                  Lote     @relation(fields: [loteId], references: [id], onDelete: Cascade)
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
+}
+
+// ==============================
+// 2. MAESTROS Y CONFIGURACIONES
+// ==============================
+
+model Cultivo {
+  id        String   @id @default(uuid())
+  codigo    String?
+  name      String
+  estado    String   @default("Activo")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Unidad {
+  id        String   @id @default(uuid())
+  codigo    String
+  name      String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model GrupoActividad {
+  id          String      @id @default(uuid())
+  codigo      String?
+  name        String
+  actividades Actividad[]
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+}
+
+model Actividad {
+  id                String          @id @default(uuid())
+  code              String?
+  name              String
+  groupId           String?
+  grupo             GrupoActividad? @relation(fields: [groupId], references: [id])
+  cultivo           String?
+  tipo              String?
+  clasificacion     String?
+  unidadProduccion  String?
+  unidadMedida      String?
+  tarifaBase        Float           @default(0)
+  productosEstandar Json? // Array of Product IDs
+  createdAt         DateTime        @default(now())
+  updatedAt         DateTime        @updatedAt
+}
+
+model TipoProducto {
+  id        String     @id @default(uuid())
+  nombre    String
+  productos Producto[]
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+}
+
+model Producto {
+  id            String       @id @default(uuid())
+  codigo        String?
+  nombre        String
+  tipoId        String
+  tipo          TipoProducto @relation(fields: [tipoId], references: [id])
+  unidadMedida  String
+  stockActual   Float        @default(0)
+  costoUnitario Float        @default(0)
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
+}
+
+model Proveedor {
+  id        String   @id @default(uuid())
+  nombre    String
+  tipo      String
+  contacto  String?
+  telefono  String?
+  email     String?
+  estado    String   @default("Activo")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// ==============================
+// 3. PERSONAL Y MAQUINARIA
+// ==============================
+
+model Cuadrilla {
+  id           String       @id @default(uuid())
+  codigo       String?
+  nombre       String
+  jefeId       String?
+  trabajadores Trabajador[]
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
+}
+
+model Trabajador {
+  id             String     @id @default(uuid())
+  identificacion String
+  nombre         String
+  apellido       String
+  cargo          String
+  estado         String     @default("Activo")
+  cuadrillaId    String?
+  cuadrilla      Cuadrilla? @relation(fields: [cuadrillaId], references: [id])
+  createdAt      DateTime   @default(now())
+  updatedAt      DateTime   @updatedAt
+}
+
+model TipoMaquinaria {
+  id          String       @id @default(uuid())
+  nombre      String
+  maquinarias Maquinaria[]
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+}
+
+model Maquinaria {
+  id                       String         @id @default(uuid())
+  codigo                   String
+  name                     String
+  tipoId                   String
+  tipo                     TipoMaquinaria @relation(fields: [tipoId], references: [id])
+  status                   String         @default("Operativo")
+  propiaAlquilada          String
+  tarifa                   Float          @default(0)
+  horometroActual          Float          @default(0)
+  ultimoMantenimientoHoras Float?
+  createdAt                DateTime       @default(now())
+  updatedAt                DateTime       @updatedAt
+}
+
+// ==============================
+// 4. PLANIFICACIÓN Y EJECUCIÓN
+// ==============================
+
+model Planificacion {
+  id                  String   @id @default(uuid())
+  ordenCode           String?
+  estado              String   @default("Borrador")
+  actividadId         String
+  actividadNombre     String
+  estructuraId        String
+  estructuraNombre    String
+  hectareasPlaneadas  Float
+  hectareasEjecutadas Float    @default(0)
+  cultivo             String?
+  prioridad           String?
+  notas               String?
+  insumosJson         Json?
+  ejecucionesJson     Json? // Stored as JSON to simplify complex relational syncing in phase 1
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+}
+
+model MovimientoInventario {
+  id            String   @id @default(uuid())
+  fecha         DateTime @default(now())
+  productoId    String
+  tipo          String // Entrada | Salida
+  cantidad      Float
+  motivo        String?
+  costoUnitario Float    @default(0)
+}
+
+// ==============================
+// 5. CONFIGURACIÓN CLIENTE
+// ==============================
+
+model ClienteConfig {
+  id     String  @id @default(uuid())
+  clave  String  @unique
+  valor  Json
+  modulo String?
+}
