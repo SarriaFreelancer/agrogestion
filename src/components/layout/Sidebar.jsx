@@ -88,15 +88,15 @@ const Sidebar = ({ currentView, onNavClick, isMobileMenuOpen, setIsMobileMenuOpe
         </div>
 
         {/* Instancia Activa */}
-        <div className="p-4 mb-6 bg-background/50 border border-white/10 rounded-xl shadow-inner">
+        <div className="p-4 mb-6 bg-[var(--input-bg)] border border-white/10 rounded-xl shadow-inner">
           <label className="text-[10px] font-extrabold tracking-wider text-[var(--sidebar-text-muted)] uppercase block mb-2">Instancia Activa</label>
           <select 
-            className="w-full p-2.5 rounded-lg border border-white/10 bg-surface text-[var(--sidebar-text)] text-xs font-bold focus:outline-none focus:ring-2 focus:ring-primary transition-all cursor-pointer"
+            className="w-full p-2.5 rounded-lg border border-white/10 bg-[var(--input-bg)] text-[var(--sidebar-text)] text-xs font-bold focus:outline-none focus:ring-2 focus:ring-primary transition-all cursor-pointer"
             value={Object.keys(clients).find(k => clients[k].id === currentClient.id) || ''}
             onChange={(e) => handleClientSwitch(e.target.value)}
           >
             {Object.entries(clients).map(([key, c]) => (
-              <option key={key} value={key} disabled={c.status === 'Suspendido'} className="bg-surface text-[var(--sidebar-text)] font-medium">
+              <option key={key} value={key} disabled={c.status === 'Suspendido'} className="bg-[var(--input-bg)] text-[var(--sidebar-text)] font-medium">
                 {c.name}{c.status === 'Suspendido' ? ' (Suspendido)' : ''}
               </option>
             ))}
@@ -138,7 +138,7 @@ const Sidebar = ({ currentView, onNavClick, isMobileMenuOpen, setIsMobileMenuOpe
               <div className="relative">
                 <span className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--sidebar-text-muted)]">🏢</span>
                 <select 
-                  className="w-full bg-background border border-white/10 rounded-xl px-9 py-2.5 text-xs text-[var(--sidebar-text)] appearance-none focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all"
+                  className="w-full bg-[var(--input-bg)] border border-white/10 rounded-xl px-9 py-2.5 text-xs text-[var(--sidebar-text)] appearance-none focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all"
                   value={globalPlanta} 
                   onChange={e => setGlobalPlanta(e.target.value)}
                 >
@@ -154,7 +154,7 @@ const Sidebar = ({ currentView, onNavClick, isMobileMenuOpen, setIsMobileMenuOpe
               <div className="relative">
                 <span className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--sidebar-text-muted)]">🌱</span>
                 <select 
-                  className="w-full bg-background border border-white/10 rounded-xl px-9 py-2.5 text-xs text-[var(--sidebar-text)] appearance-none focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all"
+                  className="w-full bg-[var(--input-bg)] border border-white/10 rounded-xl px-9 py-2.5 text-xs text-[var(--sidebar-text)] appearance-none focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all"
                   value={globalCultivo} 
                   onChange={e => setGlobalCultivo(e.target.value)}
                 >
@@ -168,7 +168,7 @@ const Sidebar = ({ currentView, onNavClick, isMobileMenuOpen, setIsMobileMenuOpe
         )}
 
         <div className="mt-6 pt-5 border-t border-white/10">
-          <div className="flex items-center justify-between p-3 rounded-xl bg-background border border-white/5 hover:border-white/10 transition-colors cursor-pointer group">
+          <div className="flex items-center justify-between p-3 rounded-xl bg-[var(--input-bg)] border border-white/5 hover:border-white/10 transition-colors cursor-pointer group">
             <div className="flex items-center gap-3">
               <div className="w-9 h-9 rounded-full bg-primary/20 flex items-center justify-center text-primary font-bold shadow-inner">
                 {currentUser?.nombre?.[0] || 'U'}

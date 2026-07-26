@@ -11,7 +11,7 @@ const THEME_CONFIG = {
   'Púrpura Real': { primary: '#6A1B9A', light: '#9C27B0', dark: '#4A148C', bg: 'linear-gradient(135deg, #090d16 0%, #150a1e 100%)', text: '#F9FAFB', muted: '#9CA3AF', glass: 'rgba(18, 25, 38, 0.75)', border: 'rgba(255, 255, 255, 0.08)', input: 'rgba(255, 255, 255, 0.04)' },
   'Naranja Atardecer': { primary: '#E65100', light: '#FF9800', dark: '#BF360C', bg: 'linear-gradient(135deg, #090d16 0%, #1c0e06 100%)', text: '#F9FAFB', muted: '#9CA3AF', glass: 'rgba(18, 25, 38, 0.75)', border: 'rgba(255, 255, 255, 0.08)', input: 'rgba(255, 255, 255, 0.04)' },
   'Gris Carbón': { primary: '#263238', light: '#455A64', dark: '#102027', bg: 'linear-gradient(135deg, #090d16 0%, #111619 100%)', text: '#F9FAFB', muted: '#9CA3AF', glass: 'rgba(18, 25, 38, 0.75)', border: 'rgba(255, 255, 255, 0.08)', input: 'rgba(255, 255, 255, 0.04)' },
-  'Modo Nocturno': { primary: '#10B981', light: '#34D399', dark: '#059669', bg: '#000000', text: '#ffffff', muted: '#aaaaaa', glass: 'rgba(25, 25, 25, 0.95)', border: 'rgba(255,255,255,0.15)', input: '#1a1a1a' },
+  'Modo Nocturno': { primary: '#4F46E5', light: '#818CF8', dark: '#3730A3', bg: '#000000', text: '#ffffff', muted: '#aaaaaa', glass: 'rgba(25, 25, 25, 0.95)', border: 'rgba(255,255,255,0.15)', input: '#1a1a1a' },
   'Noche Clásica': { primary: '#000000', light: '#1a1a1a', dark: '#000000', bg: '#000000', text: '#F9FAFB', muted: '#9CA3AF', glass: '#050505', border: 'rgba(255, 255, 255, 0.1)', input: 'rgba(255, 255, 255, 0.05)' },
   'Blanco Completo': { primary: '#000000', light: '#333333', dark: '#000000', bg: '#ffffff', text: '#000000', muted: '#6B7280', glass: 'rgba(255, 255, 255, 0.95)', border: 'rgba(0, 0, 0, 0.1)', input: 'rgba(0, 0, 0, 0.05)' },
   'Tema Principal': { primary: '#1565C0', light: '#42A5F5', dark: '#0D47A1', bg: 'linear-gradient(135deg, #090d16 0%, #111827 100%)', text: '#F9FAFB', muted: '#9CA3AF', glass: 'rgba(17, 24, 39, 0.75)', border: 'rgba(255, 255, 255, 0.08)', input: 'rgba(255, 255, 255, 0.04)' }
@@ -1096,26 +1096,29 @@ export function AgroProvider({ children }) {
       const isPizarra = currentClient.theme === 'Tema Principal';
 
       if (isBlanco) {
-        document.documentElement.style.setProperty('--bg-gradient', isLightMode ? '#f3f4f6' : '#09090b');
+        document.documentElement.style.setProperty('--primary-rgb', isLightMode ? '15, 23, 42' : '255, 255, 255');
+        document.documentElement.style.setProperty('--primary-light-rgb', isLightMode ? '30, 41, 59' : '200, 200, 200');
+        document.documentElement.style.setProperty('--bg-gradient', isLightMode ? '#ffffff' : '#000000');
+        document.documentElement.style.setProperty('--sidebar-bg', isLightMode ? '#f9fafb' : '#050505');
+        document.documentElement.style.setProperty('--glass-bg', isLightMode ? 'rgba(255, 255, 255, 0.9)' : 'rgba(10, 10, 10, 0.8)');
+        document.documentElement.style.setProperty('--glass-border', isLightMode ? 'rgba(0, 0, 0, 0.15)' : 'rgba(255, 255, 255, 0.15)');
+        document.documentElement.style.setProperty('--input-bg', isLightMode ? '#ffffff' : 'rgba(255, 255, 255, 0.05)');
+        document.documentElement.style.setProperty('--text-main', isLightMode ? '#000000' : '#ffffff');
+        document.documentElement.style.setProperty('--text-muted', isLightMode ? '#4b5563' : '#9ca3af');
+        document.documentElement.style.setProperty('--sidebar-text', isLightMode ? '#000000' : '#ffffff');
+        document.documentElement.style.setProperty('--sidebar-text-muted', isLightMode ? '#4b5563' : '#9ca3af');
+      } else if (isNoche) {
+        document.documentElement.style.setProperty('--primary-rgb', isLightMode ? '15, 23, 42' : '0, 0, 0');
+        document.documentElement.style.setProperty('--primary-light-rgb', isLightMode ? '30, 41, 59' : '26, 26, 26');
+        document.documentElement.style.setProperty('--bg-gradient', isLightMode ? '#e5e7eb' : '#000000');
         document.documentElement.style.setProperty('--sidebar-bg', isLightMode ? '#ffffff' : '#000000');
-        document.documentElement.style.setProperty('--glass-bg', isLightMode ? 'rgba(255, 255, 255, 0.8)' : 'rgba(18, 25, 38, 0.75)');
-        document.documentElement.style.setProperty('--glass-border', isLightMode ? 'rgba(0, 0, 0, 0.1)' : 'rgba(255, 255, 255, 0.08)');
-        document.documentElement.style.setProperty('--input-bg', isLightMode ? 'rgba(255, 255, 255, 1)' : 'rgba(255, 255, 255, 0.04)');
-        document.documentElement.style.setProperty('--text-main', isLightMode ? '#374151' : '#F9FAFB');
+        document.documentElement.style.setProperty('--glass-bg', isLightMode ? 'rgba(255, 255, 255, 0.7)' : '#050505');
+        document.documentElement.style.setProperty('--glass-border', isLightMode ? 'rgba(0, 0, 0, 0.1)' : 'rgba(255, 255, 255, 0.1)');
+        document.documentElement.style.setProperty('--input-bg', isLightMode ? 'rgba(255, 255, 255, 0.9)' : 'rgba(255, 255, 255, 0.05)');
+        document.documentElement.style.setProperty('--text-main', isLightMode ? '#111827' : '#F9FAFB');
         document.documentElement.style.setProperty('--text-muted', isLightMode ? '#6b7280' : '#9ca3af');
         document.documentElement.style.setProperty('--sidebar-text', isLightMode ? '#111827' : '#ffffff');
-        document.documentElement.style.setProperty('--sidebar-text-muted', isLightMode ? '#6b7280' : '#9ca3af');
-      } else if (isNoche) {
-        // Noche Clásica forces pure black everywhere
-        document.documentElement.style.setProperty('--bg-gradient', '#000000');
-        document.documentElement.style.setProperty('--sidebar-bg', '#000000');
-        document.documentElement.style.setProperty('--glass-bg', '#050505');
-        document.documentElement.style.setProperty('--glass-border', 'rgba(255, 255, 255, 0.1)');
-        document.documentElement.style.setProperty('--input-bg', 'rgba(255, 255, 255, 0.05)');
-        document.documentElement.style.setProperty('--text-main', '#F9FAFB');
-        document.documentElement.style.setProperty('--text-muted', '#9ca3af');
-        document.documentElement.style.setProperty('--sidebar-text', '#ffffff');
-        document.documentElement.style.setProperty('--sidebar-text-muted', 'rgba(255, 255, 255, 0.7)');
+        document.documentElement.style.setProperty('--sidebar-text-muted', isLightMode ? '#4b5563' : 'rgba(255, 255, 255, 0.7)');
       } else {
         if (isLightMode) {
           // Soft primary background, strong primary sidebar
