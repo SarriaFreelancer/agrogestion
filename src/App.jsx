@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import './index.css';
-import { AgroProvider, useAgro } from '@/providers/AgroContext';
+import { GlobalProvider } from '@/providers';
+import { useAgro } from '@/providers/AgroContext';
 
 // Import components
 import Dashboard from '@/modules/core/presentation/dashboard/Dashboard';
@@ -133,9 +134,9 @@ function AppContent() {
 
 function App() {
   return (
-    <AgroProvider>
+    <GlobalProvider>
       <AppContent />
-    </AgroProvider>
+    </GlobalProvider>
   );
 }
 

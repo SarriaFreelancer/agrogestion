@@ -942,17 +942,7 @@ export function AgroProvider({ children }) {
     lastSync
   ]);
 
-  const switchClient = (clientKey) => {
-    const newClient = clients[clientKey] ? normalizeClient(clients[clientKey]) : null;
-    if (newClient) {
-      if (newClient.status === 'Suspendido') {
-        alert('Esta instancia está suspendida por falta de pago.');
-        return;
-      }
-      setCurrentUser(null);
-      setCurrentClient(newClient);
-    }
-  };
+  
 
   const addClient = (key, clientData) => {
     const modules = PLAN_CONFIG[clientData.plan] || PLAN_CONFIG['Estándar'];
@@ -1045,42 +1035,7 @@ export function AgroProvider({ children }) {
     }
   };
 
-  const hasPermission = (moduleName) => {
-    if (currentClient.status === 'Suspendido' && !isSuperAdminUser(currentUser)) return false;
-
-    // 'GestionClientes' (ahora Gestión Empresas) solo para admins globales / super admins
-    if (moduleName === 'GestionClientes') {
-      return isSuperAdminUser(currentUser);
-    }
-
-    // 'ConfiguracionBD' para admins de cliente (no usuarios normales, no globales)
-    if (moduleName === 'ConfiguracionBD') {
-      if (isSuperAdminUser(currentUser)) return false;
-      return isClientAdmin(currentUser);
-    }
-
-    // Si es super admin, tiene acceso a TODOS los demás módulos
-    if (isSuperAdminUser(currentUser)) return true;
-
-    if (moduleName === 'Usuarios') {
-      return Boolean(currentUser) && (hasActionPermission('ver_usuarios') || hasActionPermission('crear_usuario') || hasActionPermission('administrar_config'));
-    }
-
-    if (moduleName === 'Configuraciones') {
-      return Boolean(currentUser) && (hasActionPermission('administrar_config') || hasActionPermission('gestionar_categorias'));
-    }
-
-    if (!currentUser) {
-      if (currentClient.modules?.includes('ALL')) return true;
-      return currentClient.modules?.includes(moduleName);
-    }
-
-    const clientAllows = currentClient.modules?.includes('ALL') || currentClient.modules?.includes(moduleName);
-    const userModules = normalizeModuleList(currentUser.modulos);
-    const userAllows = userModules.includes('ALL') || userModules.includes(moduleName);
-
-    return clientAllows && userAllows;
-  };
+  
 
   React.useEffect(() => {
     const themeData = THEME_CONFIG[currentClient.theme || 'Tema Principal'] || THEME_CONFIG['Tema Principal'];
@@ -1241,102 +1196,7 @@ export function AgroProvider({ children }) {
     estado: categoria.estado || 'Activo'
   });
 
-  const loginUser = async ({ email, password }) => {
-    try {
-      const res = await fetch(`http://${window.location.hostname}:3000/api/login`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password })
-      }).catch(err => null);
-
-      let result;
-      if (res && res.ok) {
-        result = await res.json();
-      } else {
-        // Fallback al mock si el backend no responde
-        console.warn('Backend inalcanzable, usando autenticación mock.');
-        
-        if (email === 'admin@agro.com' && password === 'admin123') {
-          result = {
-            success: true,
-            isGlobalAdmin: true,
-            user: {
-              correo: email,
-              rol: 'Super Admin',
-              nombres: 'Super',
-              apellidos: 'Admin',
-              estado: 'Activo'
-            }
-          };
-        } else if (email === 'usuario@finca.com' && password === 'user123') {
-          result = {
-            success: true,
-            isGlobalAdmin: false,
-            user: {
-              correo: email,
-              rol: 'Administrador',
-              nombres: 'Admin',
-              apellidos: 'Finca',
-              estado: 'Activo'
-            },
-            client: {
-              id: 'std-01',
-              name: 'AgroIndustrias del Norte',
-              plan: 'Premium',
-              theme: 'Tema Principal',
-              status: 'Activo'
-            }
-          };
-        } else {
-          swalError('Credenciales incorrectas.');
-          return { success: false };
-        }
-      }
-
-      if (!result.success) {
-        swalError(result.message || 'Credenciales incorrectas.');
-        return { success: false };
-      }
-
-      // Construir usuario normalizado
-      const normalized = normalizeUsuario({
-        ...result.user,
-        correo: result.user.correo ?? email,
-        contrasena: password,
-        rol: result.user.rol ?? 'Usuario General',
-        modulos: result.isGlobalAdmin ? ['ALL'] : (result.user.modulos ?? ['Dashboard', 'Estructura', 'Maestros', 'Planificacion', 'Ejecucion', 'Reportes', 'Monitoreo', 'Mantenimiento', 'Sincronizacion', 'Mapas', 'Usuarios', 'Configuraciones']),
-        categoriaCodigo: result.isGlobalAdmin ? 'SUPER_ADMIN' : (result.user.categoriaCodigo ?? 'USUARIO_GENERAL'),
-        estado: 'Activo'
-      });
-      setCurrentUser(normalized);
-
-      if (!result.isGlobalAdmin && result.client) {
-        // Configurar el cliente del usuario automáticamente
-        const clientData = result.client;
-        const clientKey = clientData.id;
-        const connData = clientData.connectionData || {};
-        const builtClient = normalizeClient({
-          id: clientKey,
-          name: clientData.name,
-          plan: clientData.plan || 'Estándar',
-          modules: PLAN_CONFIG[clientData.plan] || PLAN_CONFIG['Estándar'],
-          theme: clientData.theme || 'Tema Principal',
-          databaseEngine: clientData.databaseEngine,
-          databaseName: clientData.databaseName,
-          connectionData: connData,
-          status: 'Activo'
-        });
-        setClients(prev => ({ ...prev, [clientKey]: builtClient }));
-        setCurrentClient(builtClient);
-      }
-
-      return { success: true, user: normalized, isGlobalAdmin: result.isGlobalAdmin };
-    } catch (e) {
-      console.error('Error en loginUser:', e);
-      swalError('No se pudo conectar con el servidor.');
-      return { success: false };
-    }
-  };
+  
 
   const registerUser = async (usuarioData) => {
     const correo = String(usuarioData.correo || usuarioData.email || '').trim().toLowerCase();
@@ -1376,42 +1236,9 @@ export function AgroProvider({ children }) {
     return { success: true, user: normalized };
   };
 
-  const logoutUser = () => {
-    setCurrentUser(null);
-  };
+  
 
-  const syncToDatabase = async (modelName, action, data, engineOverride = null, connectionDataOverride = null) => {
-    const engine = engineOverride || currentClient?.databaseEngine;
-    const conn = connectionDataOverride || currentClient?.connectionData;
-    const isGlobal = engine === 'Global';
-
-    if (!isGlobal && (!currentClient || !conn)) {
-      console.warn('[Sync] Abortado: No hay datos de conexión del cliente');
-      return;
-    }
-    
-    try {
-      const res = await fetch(`http://${window.location.hostname}:3000/api/sync-data`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          engine,
-          connectionData: isGlobal ? null : conn,
-          model: modelName,
-          action,
-          data
-        })
-      });
-      const result = await res.json();
-      if (!result.success) {
-        console.error(`[Sync] Error del servidor:`, result.message);
-      } else {
-        console.log(`[Sync] Éxito:`, result.message);
-      }
-    } catch (e) {
-      console.warn(`Excepción al sincronizar ${modelName}:`, e);
-    }
-  };
+  
 
   const [orderCounter, setOrderCounter] = useState(1);
 
