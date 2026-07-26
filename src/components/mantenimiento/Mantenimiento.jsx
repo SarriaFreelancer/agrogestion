@@ -43,21 +43,6 @@ export default function Mantenimiento() {
       maquinariaNombre: selectedMaq.name,
       maquinariaCodigo: selectedMaq.id
     });
-
-    setFormData({ tipo: 'Preventivo', horometer: '', descripcion: '', costo: 0, tecnico: '' });
-    setSelectedMaq(null);
-    alert("Mantenimiento registrado correctamente");
-  };
-
-  return (
-    <div className="fade-in">
-      <div className="header">
-        <h1>Gestión de Mantenimiento</h1>
-        <p>Control preventivo y correctivo de maquinaria basado en horómetro.</p>
-      </div>
-
-      {/* Panel de Alertas */}
-      <div className="grid-3" style={{ marginBottom: '2rem' }}>
         <div className="glass-card" style={{ borderLeft: '5px solid #ff5252' }}>
           <h3 style={{ color: '#ff5252' }}>Vencidos</h3>
           <div className="value" style={{ color: '#ff5252' }}>{alertas.filter(a => a.status === 'danger').length}</div>

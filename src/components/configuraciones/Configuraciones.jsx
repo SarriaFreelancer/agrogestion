@@ -3,7 +3,7 @@ import { useAgro } from '../../context/AgroContext';
 import { Switch } from '../ui/Switch';
 
 function Configuraciones() {
-  const { currentClient, configuraciones, updateConfiguracion, currentUser, changeTheme } = useAgro();
+  const { currentClient, configuraciones, updateConfiguracion, currentUser, updateClient, clients } = useAgro();
   const isAdminUser = currentUser?.rol === 'Super Admin' || currentUser?.rol === 'Administrador' || currentUser?.modulos?.includes('ALL');
 
   const [activeTab, setActiveTab] = useState('monitoreo');
@@ -29,8 +29,8 @@ function Configuraciones() {
 
   const handleThemeChange = (newTheme) => {
     const clientKey = Object.keys(clients || {}).find(k => (clients[k]?.id || k) === currentClient.id);
-    if (clientKey && typeof changeTheme === 'function') {
-      changeTheme(newTheme);
+    if (clientKey && typeof updateClient === 'function') {
+      updateClient(clientKey, currentClient.plan, currentClient.modules, newTheme);
     }
   };
 
@@ -429,7 +429,8 @@ function Configuraciones() {
         { id: 'Púrpura Real', label: 'Púrpura Real', desc: 'Elegancia, sofisticación y liderazgo.', img: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=800&auto=format&fit=crop' },
         { id: 'Naranja Atardecer', label: 'Naranja Atardecer', desc: 'Energía, creatividad y optimismo.', img: 'https://images.unsplash.com/photo-1472214103451-9374bd1c798e?q=80&w=800&auto=format&fit=crop' },
         { id: 'Gris Carbón', label: 'Gris Carbón', desc: 'Modernidad, equilibrio y profesionalismo.', img: 'https://images.unsplash.com/photo-1464802686167-b939a6910659?q=80&w=800&auto=format&fit=crop' },
-        { id: 'Modo Nocturno', label: 'Modo Nocturno', desc: 'Interfaz oscura para ambientes de baja luz.', img: 'https://images.unsplash.com/photo-1505322022379-7c3353ee6291?q=80&w=800&auto=format&fit=crop' }
+        { id: 'Modo Nocturno', label: 'Modo Nocturno', desc: 'Interfaz oscura para ambientes de baja luz.', img: 'https://images.unsplash.com/photo-1505322022379-7c3353ee6291?q=80&w=800&auto=format&fit=crop' },
+        { id: 'Blanco Completo', label: 'Blanco Completo', desc: 'Diseño limpio y minimalista de alto contraste.', img: 'https://images.unsplash.com/photo-1517487881594-2787fef5ebf7?q=80&w=800&auto=format&fit=crop' }
       ];
 
       return (

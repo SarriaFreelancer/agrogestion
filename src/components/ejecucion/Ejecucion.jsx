@@ -391,7 +391,7 @@ export default function Ejecucion() {
   const totalNominaDia = trabajadoresAgregados.reduce((acc, t) => acc + (t.total || 0), 0);
 
   return (
-    <div className="space-y-8 fade-in">
+    <div className="space-y-8 fade-in p-6 lg:p-10 h-full w-full overflow-y-auto custom-scrollbar bg-transparent">
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-white/10 pb-6">
         <div>
