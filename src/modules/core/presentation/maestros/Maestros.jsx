@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useAgro } from '@/providers/AgroContext';
+import { useAuth } from '@/providers/AuthProvider';
 import { Database, SlidersHorizontal, Layers, Tractor, Users, Package, Building2, Sprout, Microscope, ChevronDown, ChevronUp, Search } from 'lucide-react';
 
 // Import components from separate folders
@@ -30,9 +31,10 @@ export default function Maestros() {
     tiposProductos, addTipoProducto, editTipoProducto, deleteTipoProducto,
     controlesAgro, addControlAgro, editControlAgro, deleteControlAgro,
     proveedores, addProveedor, editProveedor, deleteProveedor,
-    configuraciones,
-    hasPermission
+    configuraciones
   } = useAgro();
+
+  const { hasPermission } = useAuth();
 
   const [activeTab, setActiveTab] = useState(null);
   const [showTipos, setShowTipos] = useState(false);

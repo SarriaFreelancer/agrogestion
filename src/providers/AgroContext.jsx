@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useRef, useState } from 'react';
 import { apiUrl } from '@/utils/api';
+import { apiService } from '@/shared/services';
 import { confirmDialog, swalError, swalSuccess } from '@/utils/swal';
 
 const AgroContext = createContext();
