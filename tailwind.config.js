@@ -10,9 +10,9 @@ export default {
         background: 'var(--color-background)',
         surface: 'var(--color-surface)',
         primary: {
-          DEFAULT: 'var(--color-primary)',
-          light: 'var(--color-primary-light)',
-          dark: 'var(--color-primary-dark)',
+          DEFAULT: 'rgb(var(--primary-rgb) / <alpha-value>)',
+          light: 'rgb(var(--primary-light-rgb) / <alpha-value>)',
+          dark: 'rgb(var(--primary-dark-rgb) / <alpha-value>)',
         },
         secondary: 'var(--color-secondary)',
         danger: 'var(--color-danger)',

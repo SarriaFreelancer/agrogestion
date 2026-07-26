@@ -388,11 +388,11 @@ export default function Usuarios() {
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-white/10 pb-6">
         <div>
           <div className="flex items-center gap-3 mb-1">
-            <h1 className="text-2xl md:text-3xl font-bold text-white tracking-tight">Usuarios & Permisos</h1>
+            <h1 className="text-2xl md:text-3xl font-bold text-[var(--text-contrast)] tracking-tight">Usuarios & Permisos</h1>
             <span className="badge badge-active text-[11px]">Control RBAC</span>
           </div>
           <p className="text-sm text-[#9CA3AF]">
-            Administración de cuentas, roles y categorías de acceso para la instancia <strong className="text-emerald-400 font-semibold">{currentClient.name}</strong>
+            Administración de cuentas, roles y categorías de acceso para la instancia <strong className="text-primary-light font-semibold">{currentClient.name}</strong>
           </p>
         </div>
       </div>

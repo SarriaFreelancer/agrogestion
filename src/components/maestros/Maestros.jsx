@@ -79,11 +79,11 @@ export default function Maestros() {
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-white/10 pb-6">
         <div>
           <div className="flex items-center gap-3 mb-1">
-            <h1 className="text-2xl md:text-3xl font-bold text-white tracking-tight">Centro de Maestros</h1>
+            <h1 className="text-2xl md:text-3xl font-bold text-[var(--text-contrast)] tracking-tight">Centro de Maestros</h1>
             <span className="badge badge-info text-[11px]">Catálogos Base</span>
           </div>
           <p className="text-sm text-[#9CA3AF]">
-            Gestión y mantenimiento de tablas maestros. Cultivo activo: <strong className="text-emerald-400 font-semibold">{globalCultivo}</strong>
+            Gestión y mantenimiento de tablas maestros. Cultivo activo: <strong className="text-primary-light font-semibold">{globalCultivo}</strong>
           </p>
         </div>
       </div>
@@ -131,10 +131,10 @@ export default function Maestros() {
       <div className={activeTab ? "glass-card !p-6" : "glass-card !p-12 text-center"}>
         {!activeTab && (
           <div className="flex flex-col items-center justify-center py-8 text-center">
-            <div className="w-16 h-16 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400 mb-4">
+            <div className="w-16 h-16 rounded-2xl bg-primary/10 border border-primary/20 flex items-center justify-center text-primary-light mb-4">
               <Database size={32} />
             </div>
-            <h3 className="text-lg font-bold text-white mb-2">Seleccione un maestro para comenzar</h3>
+            <h3 className="text-lg font-bold text-[var(--text-contrast)] mb-2">Seleccione un maestro para comenzar</h3>
             <p className="text-sm text-gray-400 max-w-md leading-relaxed">
               Explore y edite los catálogos de maquinaria, personal, productos, cultivos y configuraciones estructurales del sistema.
             </p>

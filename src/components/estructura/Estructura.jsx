@@ -90,9 +90,9 @@ export default function Estructura() {
     <button
       key={suerte.id}
       onClick={() => setSelectedNode(suerte)}
-      className={`w-full text-left p-2.5 rounded-lg border transition-all duration-200 flex items-center gap-2 text-xs font-semibold !m-0 ${activeNode?.id === suerte.id ? 'bg-emerald-500/20 border-emerald-500 text-emerald-300 shadow-[0_0_12px_rgba(16,185,129,0.2)]' : 'bg-white/[0.02] border-white/10 text-gray-300 hover:bg-white/[0.05]'}`}
+      className={`w-full text-left p-2.5 rounded-lg border transition-all duration-200 flex items-center gap-2 text-xs font-semibold !m-0 ${activeNode?.id === suerte.id ? 'bg-primary/20 border-primary text-primary-light shadow-[0_0_12px_rgba(16,185,129,0.2)]' : 'bg-white/[0.02] border-white/10 text-gray-300 hover:bg-white/[0.05]'}`}
     >
-      <Sprout size={14} className="text-emerald-400 flex-shrink-0" />
+      <Sprout size={14} className="text-primary-light flex-shrink-0" />
       <span className="truncate"><strong>{suerte.id}</strong> - {suerte.name}</span>
     </button>
   );
@@ -106,7 +106,7 @@ export default function Estructura() {
         <div className="flex items-center gap-2 justify-between">
           <button
             onClick={() => setSelectedNode(lote)}
-            className={`flex-1 text-left p-2.5 rounded-lg border transition-all duration-200 flex items-center gap-2 text-xs font-semibold !m-0 ${activeNode?.id === lote.id ? 'bg-emerald-500/20 border-emerald-500 text-emerald-300' : 'bg-white/[0.02] border-white/10 text-gray-300 hover:bg-white/[0.05]'}`}
+            className={`flex-1 text-left p-2.5 rounded-lg border transition-all duration-200 flex items-center gap-2 text-xs font-semibold !m-0 ${activeNode?.id === lote.id ? 'bg-primary/20 border-primary text-primary-light' : 'bg-white/[0.02] border-white/10 text-gray-300 hover:bg-white/[0.05]'}`}
           >
             <Package size={15} className="text-blue-400 flex-shrink-0" />
             <span className="truncate"><strong>{lote.id}</strong> - {lote.name}</span>
@@ -140,7 +140,7 @@ export default function Estructura() {
         <div className="flex items-center gap-2 justify-between">
           <button
             onClick={() => setSelectedNode(finca)}
-            className={`flex-1 text-left p-2.5 rounded-lg border transition-all duration-200 flex items-center gap-2 text-xs font-semibold !m-0 ${activeNode?.id === finca.id ? 'bg-emerald-500/20 border-emerald-500 text-emerald-300' : 'bg-white/[0.03] border-white/10 text-gray-200 hover:bg-white/[0.06]'}`}
+            className={`flex-1 text-left p-2.5 rounded-lg border transition-all duration-200 flex items-center gap-2 text-xs font-semibold !m-0 ${activeNode?.id === finca.id ? 'bg-primary/20 border-primary text-primary-light' : 'bg-white/[0.03] border-white/10 text-gray-200 hover:bg-white/[0.06]'}`}
           >
             <Home size={16} className="text-amber-400 flex-shrink-0" />
             <span className="truncate"><strong>{finca.id}</strong> - {finca.name}</span>
@@ -180,10 +180,10 @@ export default function Estructura() {
       <div key={sector.id} className="space-y-2 mb-4">
         <div className="flex items-center gap-2 justify-between">
           <button
-            className={`flex-1 text-left p-3 rounded-xl border transition-all duration-200 flex items-center gap-2.5 text-xs font-bold !m-0 ${activeNode?.id === sector.id ? 'bg-emerald-500/20 border-emerald-500 text-white shadow-[0_0_15px_rgba(16,185,129,0.25)]' : 'bg-white/[0.04] border-white/10 text-gray-100 hover:bg-white/[0.08]'}`}
+            className={`flex-1 text-left p-3 rounded-xl border transition-all duration-200 flex items-center gap-2.5 text-xs font-bold !m-0 ${activeNode?.id === sector.id ? 'bg-primary/20 border-primary text-[var(--text-contrast)] shadow-[0_0_15px_rgba(16,185,129,0.25)]' : 'bg-white/[0.04] border-white/10 text-gray-100 hover:bg-white/[0.08]'}`}
             onClick={() => setSelectedNode(sector)}
           >
-            <Folder size={17} className="text-emerald-400 flex-shrink-0" />
+            <Folder size={17} className="text-primary-light flex-shrink-0" />
             <span className="truncate"><strong>{sector.id}</strong> - {sector.name}</span>
           </button>
           {(sectorFincas.length > 0 || (structureLevelCount === 2 && sectorSuertes.length > 0)) && (
@@ -254,7 +254,7 @@ export default function Estructura() {
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-white/10 pb-6">
         <div>
           <div className="flex items-center gap-3 mb-1">
-            <h1 className="text-2xl md:text-3xl font-bold text-white tracking-tight">Estructura Agrícola</h1>
+            <h1 className="text-2xl md:text-3xl font-bold text-[var(--text-contrast)] tracking-tight">Estructura Agrícola</h1>
             <span className="badge badge-active text-[11px]">{structureLevelCount} Niveles</span>
           </div>
           <p className="text-sm text-[#9CA3AF]">
@@ -268,7 +268,7 @@ export default function Estructura() {
         <div className="glass-card !p-6 lg:col-span-5 space-y-4">
           <div className="flex items-center justify-between border-b border-white/10 pb-4">
             <div>
-              <h3 className="font-bold text-white text-base">Jerarquía Activa</h3>
+              <h3 className="font-bold text-[var(--text-contrast)] text-base">Jerarquía Activa</h3>
               <p className="text-xs text-gray-400 mt-0.5">
                 {levelLabels.slice(0, structureLevelCount).join(' › ')}
               </p>
@@ -287,9 +287,9 @@ export default function Estructura() {
         {/* Panel Derecho: Detalle o Creación */}
         <div className="lg:col-span-7 space-y-6">
           {creatingType && (
-            <div className="glass-card !p-6 border-2 border-emerald-500/50 space-y-4 fade-in">
-              <h3 className="text-base font-bold text-white flex items-center gap-2">
-                <Plus size={18} className="text-emerald-400" />
+            <div className="glass-card !p-6 border-2 border-primary/50 space-y-4 fade-in">
+              <h3 className="text-base font-bold text-[var(--text-contrast)] flex items-center gap-2">
+                <Plus size={18} className="text-primary-light" />
                 <span>Crear Nuevo {labelForType(creatingType)} {creatingType !== 'Sector' && `en ${activeNode?.name}`}</span>
               </h3>
               
@@ -332,10 +332,10 @@ export default function Estructura() {
             </div>
           ) : (
             <div className="glass-card !p-12 text-center flex flex-col items-center justify-center">
-              <div className="w-16 h-16 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400 mb-4">
+              <div className="w-16 h-16 rounded-2xl bg-primary/10 border border-primary/20 flex items-center justify-center text-primary-light mb-4">
                 <MousePointerClick size={32} />
               </div>
-              <h3 className="text-lg font-bold text-white mb-2">Seleccione un elemento de la jerarquía</h3>
+              <h3 className="text-lg font-bold text-[var(--text-contrast)] mb-2">Seleccione un elemento de la jerarquía</h3>
               <p className="text-sm text-gray-400 max-w-sm leading-relaxed">
                 Haga clic en cualquier Sector, Finca, Lote o Suerte del árbol para ver y editar su Hoja de Vida.
               </p>

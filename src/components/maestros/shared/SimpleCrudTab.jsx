@@ -59,9 +59,9 @@ export default function SimpleCrudTab({ title, data, onAdd, onEdit, onDelete, fi
 
       {/* Form Drawer / Panel */}
       {(isCreating || editingId) && (
-        <div className="p-6 rounded-2xl bg-white/[0.03] border border-emerald-500/30 backdrop-blur-md space-y-4 fade-in">
+        <div className="p-6 rounded-2xl bg-white/[0.03] border border-primary/30 backdrop-blur-md space-y-4 fade-in">
           <div className="flex items-center justify-between border-b border-white/10 pb-3">
-            <h4 className="font-bold text-white text-base">
+            <h4 className="font-bold text-[var(--text-contrast)] text-base">
               {editingId ? `Editar ${title}` : `Nuevo Registro de ${title}`}
             </h4>
             <span className="badge badge-active text-[10px]">Formulario</span>
@@ -121,11 +121,11 @@ export default function SimpleCrudTab({ title, data, onAdd, onEdit, onDelete, fi
             ) : (
               filteredData.map(item => (
                 <tr key={item.id}>
-                  {fields.map(f => <td key={f.key} className="text-white font-medium">{item[f.key]}</td>)}
+                  {fields.map(f => <td key={f.key} className="text-[var(--text-contrast)] font-medium">{item[f.key]}</td>)}
                   <td>
                     <div className="flex items-center justify-end gap-2">
                       <button 
-                        className="btn-secondary !p-2 !m-0 text-gray-300 hover:text-white" 
+                        className="btn-secondary !p-2 !m-0 text-gray-300 hover:text-[var(--text-contrast)]" 
                         title="Editar"
                         onClick={() => handleEdit(item)}
                       >

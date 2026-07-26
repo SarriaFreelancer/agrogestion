@@ -1,14 +1,14 @@
 import React from 'react';
 
 const Button = React.forwardRef(({ className, variant = 'primary', children, ...props }, ref) => {
-  const baseStyles = "inline-flex items-center justify-center rounded-xl text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 disabled:pointer-events-none disabled:opacity-50";
+  const baseStyles = "inline-flex items-center justify-center rounded-xl text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary disabled:pointer-events-none disabled:opacity-50";
   
   const variants = {
-    primary: "bg-emerald-500 text-white hover:bg-emerald-600 shadow-md",
-    secondary: "bg-surface text-white hover:bg-white/10 border border-white/10",
-    outline: "border border-emerald-500/50 text-emerald-500 hover:bg-emerald-500/10",
-    ghost: "hover:bg-white/10 hover:text-white text-gray-300",
-    danger: "bg-red-500 text-white hover:bg-red-600 shadow-md",
+    primary: "bg-primary text-[var(--text-contrast)] hover:bg-primary-dark shadow-md",
+    secondary: "bg-surface text-[var(--text-contrast)] hover:bg-white/10 border border-white/10",
+    outline: "border border-primary/50 text-primary hover:bg-primary/10",
+    ghost: "hover:bg-white/10 hover:text-[var(--text-contrast)] text-gray-300",
+    danger: "bg-red-500 text-[var(--text-contrast)] hover:bg-red-600 shadow-md",
   };
 
   const sizes = {

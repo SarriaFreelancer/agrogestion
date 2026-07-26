@@ -53,7 +53,7 @@ const Sidebar = ({ currentView, onNavClick, isMobileMenuOpen, setIsMobileMenuOpe
       
       <div className={`
         fixed lg:static inset-y-0 left-0 z-40
-        w-[260px] bg-surface text-white p-5 lg:p-6
+        w-[260px] bg-surface text-[var(--text-contrast)] p-5 lg:p-6
         flex flex-col shadow-2xl lg:shadow-[4px_0_20px_rgba(0,0,0,0.1)]
         transform transition-transform duration-300 ease-in-out
         border-r border-white/5
@@ -67,7 +67,7 @@ const Sidebar = ({ currentView, onNavClick, isMobileMenuOpen, setIsMobileMenuOpe
               🌱
             </div>
             <div>
-              <span className="font-extrabold text-white tracking-tight text-base block leading-tight">SarriaTech</span>
+              <span className="font-extrabold text-[var(--text-contrast)] tracking-tight text-base block leading-tight">SarriaTech</span>
               <span className="text-[10px] font-bold text-primary tracking-wider uppercase block mt-0.5">Solutions S.A.S.</span>
             </div>
           </div>
@@ -80,7 +80,7 @@ const Sidebar = ({ currentView, onNavClick, isMobileMenuOpen, setIsMobileMenuOpe
             <div className="w-2.5 h-2.5 rounded-full bg-primary shadow-[0_0_10px_#10B981]"></div>
           </div>
           <button 
-            className="lg:hidden text-gray-400 hover:text-white p-1"
+            className="lg:hidden text-gray-400 hover:text-[var(--text-contrast)] p-1"
             onClick={() => setIsMobileMenuOpen(false)}
           >
             ✕
@@ -91,12 +91,12 @@ const Sidebar = ({ currentView, onNavClick, isMobileMenuOpen, setIsMobileMenuOpe
         <div className="p-4 mb-6 bg-background/50 border border-white/10 rounded-xl shadow-inner">
           <label className="text-[10px] font-extrabold tracking-wider text-muted uppercase block mb-2">Instancia Activa</label>
           <select 
-            className="w-full p-2.5 rounded-lg border border-white/10 bg-surface text-white text-xs font-bold focus:outline-none focus:ring-2 focus:ring-primary transition-all cursor-pointer"
+            className="w-full p-2.5 rounded-lg border border-white/10 bg-surface text-[var(--text-contrast)] text-xs font-bold focus:outline-none focus:ring-2 focus:ring-primary transition-all cursor-pointer"
             value={Object.keys(clients).find(k => clients[k].id === currentClient.id) || ''}
             onChange={(e) => handleClientSwitch(e.target.value)}
           >
             {Object.entries(clients).map(([key, c]) => (
-              <option key={key} value={key} disabled={c.status === 'Suspendido'} className="bg-surface text-white font-medium">
+              <option key={key} value={key} disabled={c.status === 'Suspendido'} className="bg-surface text-[var(--text-contrast)] font-medium">
                 {c.name}{c.status === 'Suspendido' ? ' (Suspendido)' : ''}
               </option>
             ))}
@@ -138,7 +138,7 @@ const Sidebar = ({ currentView, onNavClick, isMobileMenuOpen, setIsMobileMenuOpe
               <div className="relative">
                 <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">🏢</span>
                 <select 
-                  className="w-full bg-background border border-white/10 rounded-xl px-9 py-2.5 text-xs text-white appearance-none focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all"
+                  className="w-full bg-background border border-white/10 rounded-xl px-9 py-2.5 text-xs text-[var(--text-contrast)] appearance-none focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all"
                   value={globalPlanta} 
                   onChange={e => setGlobalPlanta(e.target.value)}
                 >
@@ -154,7 +154,7 @@ const Sidebar = ({ currentView, onNavClick, isMobileMenuOpen, setIsMobileMenuOpe
               <div className="relative">
                 <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">🌱</span>
                 <select 
-                  className="w-full bg-background border border-white/10 rounded-xl px-9 py-2.5 text-xs text-white appearance-none focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all"
+                  className="w-full bg-background border border-white/10 rounded-xl px-9 py-2.5 text-xs text-[var(--text-contrast)] appearance-none focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all"
                   value={globalCultivo} 
                   onChange={e => setGlobalCultivo(e.target.value)}
                 >
@@ -174,7 +174,7 @@ const Sidebar = ({ currentView, onNavClick, isMobileMenuOpen, setIsMobileMenuOpe
                 {currentUser?.nombre?.[0] || 'U'}
               </div>
               <div className="overflow-hidden">
-                <p className="text-[13px] font-bold text-white truncate max-w-[130px]">{currentUser?.nombre}</p>
+                <p className="text-[13px] font-bold text-[var(--text-contrast)] truncate max-w-[130px]">{currentUser?.nombre}</p>
                 <p className="text-[10px] text-gray-400 truncate max-w-[130px] group-hover:text-gray-300 transition-colors">{currentUser?.email}</p>
               </div>
             </div>

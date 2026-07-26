@@ -22,7 +22,7 @@ const hexToRgb = (hex) => {
     : normalized;
 
   const parsed = Number.parseInt(value, 16);
-  return `${(parsed >> 16) & 255}, ${(parsed >> 8) & 255}, ${parsed & 255}`;
+  return `${(parsed >> 16) & 255} ${(parsed >> 8) & 255} ${parsed & 255}`;
 };
 
 const PLAN_CONFIG = {
@@ -1096,9 +1096,9 @@ export function AgroProvider({ children }) {
       if (themeData.border) document.documentElement.style.setProperty('--glass-border', themeData.border);
       if (themeData.input) document.documentElement.style.setProperty('--input-bg', themeData.input);
       
-      const isDark = (currentClient.theme === 'Modo Nocturno');
-      document.documentElement.style.setProperty('--text-contrast', isDark ? '#ffffff' : '#2c3e50');
-      document.documentElement.style.setProperty('--sidebar-bg', isDark ? '#000000' : '#1e1e2f');
+      const isLight = (currentClient.theme === 'Blanco Completo');
+      document.documentElement.style.setProperty('--text-contrast', isLight ? '#000000' : '#ffffff');
+      document.documentElement.style.setProperty('--sidebar-bg', isLight ? '#f3f4f6' : '#1e1e2f');
     }
   }, [currentClient.theme]);
 

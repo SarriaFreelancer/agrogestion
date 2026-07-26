@@ -275,7 +275,7 @@ export default function Reportes() {
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-white/10 pb-6">
         <div>
           <div className="flex items-center gap-3 mb-1">
-            <h1 className="text-2xl md:text-3xl font-bold text-white tracking-tight">Centro de Reportes & Analítica</h1>
+            <h1 className="text-2xl md:text-3xl font-bold text-[var(--text-contrast)] tracking-tight">Centro de Reportes & Analítica</h1>
             <span className="badge badge-info text-[11px]">Exportación Excel</span>
           </div>
           <p className="text-sm text-[#9CA3AF]">

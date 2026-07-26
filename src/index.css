@@ -28,9 +28,9 @@
   --primary-color: #2E7D32;
   --primary-light: #4CAF50;
   --primary-dark: #1B5E20;
-  --primary-rgb: 46, 125, 50;
-  --primary-light-rgb: 76, 175, 80;
-  --primary-dark-rgb: 27, 94, 32;
+  --primary-rgb: 46 125 50;
+  --primary-light-rgb: 76 175 80;
+  --primary-dark-rgb: 27 94 32;
 
   --secondary-color: #F9A825;
   --danger: #d32f2f;

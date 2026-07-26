@@ -3,7 +3,7 @@ import { useAgro } from '../../context/AgroContext';
 import { Switch } from '../ui/Switch';
 
 function Configuraciones() {
-  const { currentClient, configuraciones, updateConfiguracion, currentUser, updateClient, clients } = useAgro();
+  const { currentClient, configuraciones, updateConfiguracion, currentUser, updateClient, clients, setCurrentClient } = useAgro();
   const isAdminUser = currentUser?.rol === 'Super Admin' || currentUser?.rol === 'Administrador' || currentUser?.modulos?.includes('ALL');
 
   const [activeTab, setActiveTab] = useState('monitoreo');
@@ -31,6 +31,9 @@ function Configuraciones() {
     const clientKey = Object.keys(clients || {}).find(k => (clients[k]?.id || k) === currentClient.id);
     if (clientKey && typeof updateClient === 'function') {
       updateClient(clientKey, currentClient.plan, currentClient.modules, newTheme);
+    }
+    if (typeof setCurrentClient === 'function') {
+      setCurrentClient({ ...currentClient, theme: newTheme });
     }
   };
 
@@ -77,7 +80,7 @@ function Configuraciones() {
           {/* Header */}
           <div className="flex items-center justify-between mb-8">
             <div className="flex items-center gap-4">
-              <div className="w-12 h-12 rounded-xl bg-emerald-500/10 flex items-center justify-center text-emerald-500 text-2xl border border-emerald-500/20 shadow-[0_0_15px_rgba(16,185,129,0.15)]">
+              <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center text-primary text-2xl border border-primary/20 shadow-[0_0_15px_rgba(16,185,129,0.15)]">
                 🔬
               </div>
               <div>
@@ -85,12 +88,12 @@ function Configuraciones() {
                 <p className="text-sm text-gray-400 mt-1">Configure las opciones de monitoreo de su sistema</p>
               </div>
             </div>
-            <div className="bg-emerald-500/10 border border-emerald-500/20 px-4 py-3 rounded-xl flex items-center gap-3">
-              <div className="w-6 h-6 rounded-full bg-emerald-500/20 flex items-center justify-center text-emerald-500 text-xs">
+            <div className="bg-primary/10 border border-primary/20 px-4 py-3 rounded-xl flex items-center gap-3">
+              <div className="w-6 h-6 rounded-full bg-primary/20 flex items-center justify-center text-primary text-xs">
                 ✓
               </div>
               <div>
-                <h4 className="text-sm font-semibold text-emerald-500">Monitoreo Activo</h4>
+                <h4 className="text-sm font-semibold text-primary">Monitoreo Activo</h4>
                 <p className="text-[11px] text-gray-400">Todas las funciones están habilitadas</p>
               </div>
             </div>
@@ -105,12 +108,12 @@ function Configuraciones() {
               { id: 'monitoreo_obs', label: 'Permitir observaciones', desc: 'Agrega un campo de notas al formulario de monitoreo.', icon: '📝' },
               { id: 'monitoreo_req', label: 'Variables validar requeridas', desc: 'Impide guardar monitoreo si una variable marcada como requerida está vacía.', icon: '⚙️' }
             ].map(opt => (
-              <div key={opt.id} className="flex items-center justify-between p-4 rounded-xl bg-[#111827] border border-white/5 hover:border-emerald-500/30 transition-colors group relative overflow-hidden">
-                <div className="absolute left-0 top-0 bottom-0 w-1 bg-emerald-500 rounded-l-xl opacity-0 group-hover:opacity-100 transition-opacity"></div>
-                <div className="absolute inset-0 bg-gradient-to-r from-emerald-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none"></div>
+              <div key={opt.id} className="flex items-center justify-between p-4 rounded-xl bg-[#111827] border border-white/5 hover:border-primary/30 transition-colors group relative overflow-hidden">
+                <div className="absolute left-0 top-0 bottom-0 w-1 bg-primary rounded-l-xl opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                <div className="absolute inset-0 bg-gradient-to-r from-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none"></div>
                 
                 <div className="flex items-center gap-4 relative z-10">
-                  <div className="w-10 h-10 rounded-full bg-surface border border-white/10 flex items-center justify-center text-gray-400 group-hover:text-emerald-500 group-hover:border-emerald-500/30 transition-colors">
+                  <div className="w-10 h-10 rounded-full bg-surface border border-white/10 flex items-center justify-center text-gray-400 group-hover:text-primary group-hover:border-primary/30 transition-colors">
                     {opt.icon}
                   </div>
                   <div>
@@ -128,11 +131,11 @@ function Configuraciones() {
             ))}
           </div>
 
-          <div className="mt-8 p-4 rounded-xl border border-emerald-500/20 bg-emerald-500/5 flex gap-4 items-start relative overflow-hidden">
-            <div className="absolute right-0 bottom-0 w-32 h-32 bg-emerald-500/10 rounded-tl-full blur-2xl pointer-events-none"></div>
+          <div className="mt-8 p-4 rounded-xl border border-primary/20 bg-primary/5 flex gap-4 items-start relative overflow-hidden">
+            <div className="absolute right-0 bottom-0 w-32 h-32 bg-primary/10 rounded-tl-full blur-2xl pointer-events-none"></div>
             <span className="text-xl">💡</span>
             <div className="relative z-10">
-              <h4 className="text-sm font-bold text-emerald-500 mb-1">Consejo</h4>
+              <h4 className="text-sm font-bold text-primary mb-1">Consejo</h4>
               <p className="text-xs text-gray-400">Estas configuraciones se aplican a todos los formularios de monitoreo del sistema.</p>
             </div>
           </div>
@@ -146,7 +149,7 @@ function Configuraciones() {
           {/* Header */}
           <div className="flex items-center justify-between mb-8">
             <div className="flex items-center gap-4">
-              <div className="w-12 h-12 rounded-xl bg-emerald-500/10 flex items-center justify-center text-emerald-500 text-2xl border border-emerald-500/20 shadow-[0_0_15px_rgba(16,185,129,0.15)]">
+              <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center text-primary text-2xl border border-primary/20 shadow-[0_0_15px_rgba(16,185,129,0.15)]">
                 📦
               </div>
               <div>
@@ -163,11 +166,11 @@ function Configuraciones() {
               { id: 'bloquearStockNegativo', label: 'Bloquear Stock Negativo', desc: 'Impide salidas sin existencias.', icon: '🛑' },
               { id: 'registrarGpsInsumos', label: 'Registrar ubicación GPS', desc: 'Captura coordenadas para apuntes de insumos.', icon: '📍' }
             ].map(opt => (
-              <div key={opt.id} className="flex items-center justify-between p-4 rounded-xl bg-[#111827] border border-white/5 hover:border-emerald-500/30 transition-colors group relative overflow-hidden">
-                <div className="absolute left-0 top-0 bottom-0 w-1 bg-emerald-500 rounded-l-xl opacity-0 group-hover:opacity-100 transition-opacity"></div>
+              <div key={opt.id} className="flex items-center justify-between p-4 rounded-xl bg-[#111827] border border-white/5 hover:border-primary/30 transition-colors group relative overflow-hidden">
+                <div className="absolute left-0 top-0 bottom-0 w-1 bg-primary rounded-l-xl opacity-0 group-hover:opacity-100 transition-opacity"></div>
                 
                 <div className="flex items-center gap-4 relative z-10">
-                  <div className="w-10 h-10 rounded-full bg-surface border border-white/10 flex items-center justify-center text-gray-400 group-hover:text-emerald-500 transition-colors">
+                  <div className="w-10 h-10 rounded-full bg-surface border border-white/10 flex items-center justify-center text-gray-400 group-hover:text-primary transition-colors">
                     {opt.icon}
                   </div>
                   <div>
@@ -193,7 +196,7 @@ function Configuraciones() {
         <div className="space-y-6 w-full max-w-4xl fade-in">
           <div className="flex items-center justify-between mb-8">
             <div className="flex items-center gap-4">
-              <div className="w-12 h-12 rounded-xl bg-emerald-500/10 flex items-center justify-center text-emerald-500 text-2xl border border-emerald-500/20 shadow-[0_0_15px_rgba(16,185,129,0.15)]">
+              <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center text-primary text-2xl border border-primary/20 shadow-[0_0_15px_rgba(16,185,129,0.15)]">
                 🚜
               </div>
               <div>
@@ -209,11 +212,11 @@ function Configuraciones() {
               { id: 'validarMaquinaria', label: 'Obligar Maquinaria', desc: 'Requiere equipo en labores mecánicas.', icon: '⚠️' },
               { id: 'registrarGpsMaquinaria', label: 'Registrar ubicación GPS', desc: 'Captura coordenadas para apuntes de maquinaria.', icon: '📍' }
             ].map(opt => (
-              <div key={opt.id} className="flex items-center justify-between p-4 rounded-xl bg-[#111827] border border-white/5 hover:border-emerald-500/30 transition-colors group relative overflow-hidden">
-                <div className="absolute left-0 top-0 bottom-0 w-1 bg-emerald-500 rounded-l-xl opacity-0 group-hover:opacity-100 transition-opacity"></div>
+              <div key={opt.id} className="flex items-center justify-between p-4 rounded-xl bg-[#111827] border border-white/5 hover:border-primary/30 transition-colors group relative overflow-hidden">
+                <div className="absolute left-0 top-0 bottom-0 w-1 bg-primary rounded-l-xl opacity-0 group-hover:opacity-100 transition-opacity"></div>
                 
                 <div className="flex items-center gap-4 relative z-10">
-                  <div className="w-10 h-10 rounded-full bg-surface border border-white/10 flex items-center justify-center text-gray-400 group-hover:text-emerald-500 transition-colors">
+                  <div className="w-10 h-10 rounded-full bg-surface border border-white/10 flex items-center justify-center text-gray-400 group-hover:text-primary transition-colors">
                     {opt.icon}
                   </div>
                   <div>
@@ -239,7 +242,7 @@ function Configuraciones() {
         <div className="space-y-6 w-full max-w-4xl fade-in">
           <div className="flex items-center justify-between mb-8">
             <div className="flex items-center gap-4">
-              <div className="w-12 h-12 rounded-xl bg-emerald-500/10 flex items-center justify-center text-emerald-500 text-2xl border border-emerald-500/20 shadow-[0_0_15px_rgba(16,185,129,0.15)]">
+              <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center text-primary text-2xl border border-primary/20 shadow-[0_0_15px_rgba(16,185,129,0.15)]">
                 👥
               </div>
               <div>
@@ -255,11 +258,11 @@ function Configuraciones() {
               { id: 'validarNomina', label: 'Obligar Nómina', desc: 'Requiere registro de personal en las labores.', icon: '📋' },
               { id: 'registrarGpsManoObra', label: 'Registrar ubicación GPS', desc: 'Captura coordenadas para apuntes de mano de obra.', icon: '📍' }
             ].map(opt => (
-              <div key={opt.id} className="flex items-center justify-between p-4 rounded-xl bg-[#111827] border border-white/5 hover:border-emerald-500/30 transition-colors group relative overflow-hidden">
-                <div className="absolute left-0 top-0 bottom-0 w-1 bg-emerald-500 rounded-l-xl opacity-0 group-hover:opacity-100 transition-opacity"></div>
+              <div key={opt.id} className="flex items-center justify-between p-4 rounded-xl bg-[#111827] border border-white/5 hover:border-primary/30 transition-colors group relative overflow-hidden">
+                <div className="absolute left-0 top-0 bottom-0 w-1 bg-primary rounded-l-xl opacity-0 group-hover:opacity-100 transition-opacity"></div>
                 
                 <div className="flex items-center gap-4 relative z-10">
-                  <div className="w-10 h-10 rounded-full bg-surface border border-white/10 flex items-center justify-center text-gray-400 group-hover:text-emerald-500 transition-colors">
+                  <div className="w-10 h-10 rounded-full bg-surface border border-white/10 flex items-center justify-center text-gray-400 group-hover:text-primary transition-colors">
                     {opt.icon}
                   </div>
                   <div>
@@ -285,7 +288,7 @@ function Configuraciones() {
         <div className="space-y-6 w-full max-w-4xl fade-in">
           <div className="flex items-center justify-between mb-8">
             <div className="flex items-center gap-4">
-              <div className="w-12 h-12 rounded-xl bg-emerald-500/10 flex items-center justify-center text-emerald-500 text-2xl border border-emerald-500/20 shadow-[0_0_15px_rgba(16,185,129,0.15)]">
+              <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center text-primary text-2xl border border-primary/20 shadow-[0_0_15px_rgba(16,185,129,0.15)]">
                 🗺️
               </div>
               <div>
@@ -298,7 +301,7 @@ function Configuraciones() {
           <div className="bg-[#111827] border border-white/5 rounded-xl p-6 mb-6">
             <label className="block text-sm font-semibold text-gray-300 mb-2">Niveles de jerarquía</label>
             <select
-              className="w-full bg-[#0d131f] border border-white/10 rounded-lg px-4 py-2.5 text-white focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 transition-colors"
+              className="w-full bg-[#0d131f] border border-white/10 rounded-lg px-4 py-2.5 text-white focus:border-primary focus:ring-1 focus:ring-primary transition-colors"
               value={configuraciones.estructuraNiveles || 4}
               onChange={(e) => handleEstructuraNivelesChange(e.target.value)}
             >
@@ -319,7 +322,7 @@ function Configuraciones() {
                   <label className="block text-sm font-semibold text-gray-300 mb-2">Nombre global Nivel {levelNumber}</label>
                   <input
                     type="text"
-                    className="w-full bg-[#0d131f] border border-white/10 rounded-lg px-4 py-2 text-white focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="w-full bg-[#0d131f] border border-white/10 rounded-lg px-4 py-2 text-white focus:border-primary focus:ring-1 focus:ring-primary transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                     value={configuraciones.estructuraNivelNombres?.[key] || ''}
                     onChange={(e) => handleLevelNameChange(key, e.target.value)}
                     placeholder={`Ej: ${['Sector', 'Finca', 'Lote', 'Suerte', 'Subnivel', 'Subnivel'][index]}`}
@@ -339,7 +342,7 @@ function Configuraciones() {
         <div className="space-y-6 w-full max-w-4xl fade-in">
           <div className="flex items-center justify-between mb-8">
             <div className="flex items-center gap-4">
-              <div className="w-12 h-12 rounded-xl bg-emerald-500/10 flex items-center justify-center text-emerald-500 text-2xl border border-emerald-500/20 shadow-[0_0_15px_rgba(16,185,129,0.15)]">
+              <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center text-primary text-2xl border border-primary/20 shadow-[0_0_15px_rgba(16,185,129,0.15)]">
                 📚
               </div>
               <div>
@@ -364,7 +367,7 @@ function Configuraciones() {
               { id: 'maestro_unidades', label: 'Unidades de Medida', icon: '📏' },
               { id: 'maestro_tipos_productos', label: 'Tipos de Productos', icon: '🔖' }
             ].map(maestro => (
-              <div key={maestro.id} className="flex items-center justify-between p-4 rounded-xl bg-[#111827] border border-white/5 hover:border-emerald-500/30 transition-colors">
+              <div key={maestro.id} className="flex items-center justify-between p-4 rounded-xl bg-[#111827] border border-white/5 hover:border-primary/30 transition-colors">
                 <div className="flex items-center gap-3">
                   <span className="text-xl">{maestro.icon}</span>
                   <span className="text-sm font-semibold text-white">{maestro.label}</span>
@@ -385,7 +388,7 @@ function Configuraciones() {
         <div className="space-y-6 w-full max-w-4xl fade-in">
           <div className="flex items-center justify-between mb-8">
             <div className="flex items-center gap-4">
-              <div className="w-12 h-12 rounded-xl bg-emerald-500/10 flex items-center justify-center text-emerald-500 text-2xl border border-emerald-500/20 shadow-[0_0_15px_rgba(16,185,129,0.15)]">
+              <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center text-primary text-2xl border border-primary/20 shadow-[0_0_15px_rgba(16,185,129,0.15)]">
                 ⚙️
               </div>
               <div>
@@ -402,7 +405,7 @@ function Configuraciones() {
             </div>
             <div>
               <p className="text-xs text-gray-500 uppercase tracking-wider mb-1">Plan</p>
-              <p className="text-lg font-bold text-emerald-400">{currentClient?.plan || 'Standard'}</p>
+              <p className="text-lg font-bold text-primary-light">{currentClient?.plan || 'Standard'}</p>
             </div>
             {isAdminUser && (
               <>
@@ -451,7 +454,7 @@ function Configuraciones() {
                 ℹ️
               </div>
               <div>
-                <h4 className="text-[12px] font-semibold text-emerald-500 mb-0.5">Información</h4>
+                <h4 className="text-[12px] font-semibold text-primary mb-0.5">Información</h4>
                 <p className="text-[11px] text-gray-400 leading-tight">El cambio de apariencia se aplicará inmediatamente en toda la plataforma.</p>
               </div>
             </div>
@@ -466,7 +469,7 @@ function Configuraciones() {
                   onClick={() => handleThemeChange(theme.id)}
                   className={`relative text-left rounded-xl overflow-hidden border transition-all duration-300 group
                     ${isActive 
-                      ? 'border-emerald-500 shadow-[0_0_20px_rgba(16,185,129,0.15)] bg-[#111827]' 
+                      ? 'border-primary shadow-[0_0_20px_rgba(16,185,129,0.15)] bg-[#111827]' 
                       : 'border-white/5 bg-[#111827] hover:border-white/20'
                     }
                   `}
@@ -475,7 +478,7 @@ function Configuraciones() {
                     <div className="absolute inset-0 bg-gradient-to-t from-[#111827] via-transparent to-transparent z-10"></div>
                     <img src={theme.img} alt={theme.label} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
                     {isActive && (
-                      <div className="absolute top-3 right-3 z-20 w-6 h-6 rounded-full bg-emerald-500 text-white flex items-center justify-center text-xs font-bold shadow-lg">
+                      <div className="absolute top-3 right-3 z-20 w-6 h-6 rounded-full bg-primary text-white flex items-center justify-center text-xs font-bold shadow-lg">
                         ✓
                       </div>
                     )}
@@ -484,8 +487,8 @@ function Configuraciones() {
                     <h4 className={`text-base font-bold mb-1 ${isActive ? 'text-white' : 'text-gray-200'}`}>{theme.label}</h4>
                     <p className="text-xs text-gray-400 leading-relaxed mb-4 min-h-[36px]">{theme.desc}</p>
                     <div className="flex items-center gap-2">
-                      <div className={`w-3 h-3 rounded-full ${isActive ? 'bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.8)]' : 'border border-gray-600 bg-transparent'}`}></div>
-                      {isActive && <span className="text-[10px] font-bold text-emerald-500 uppercase tracking-wider bg-emerald-500/10 px-2 py-0.5 rounded">Activo</span>}
+                      <div className={`w-3 h-3 rounded-full ${isActive ? 'bg-primary shadow-[0_0_8px_rgba(16,185,129,0.8)]' : 'border border-gray-600 bg-transparent'}`}></div>
+                      {isActive && <span className="text-[10px] font-bold text-primary uppercase tracking-wider bg-primary/10 px-2 py-0.5 rounded">Activo</span>}
                     </div>
                   </div>
                 </button>
@@ -539,7 +542,7 @@ function Configuraciones() {
                       onClick={() => setActiveTab(item.id)}
                       className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-[13px] transition-all duration-200 group ${
                         isActive 
-                          ? 'bg-emerald-500 text-white font-semibold shadow-lg shadow-emerald-500/20' 
+                          ? 'bg-primary text-white font-semibold shadow-lg shadow-primary/20' 
                           : 'text-gray-400 hover:text-gray-200 hover:bg-white/5'
                       }`}
                     >

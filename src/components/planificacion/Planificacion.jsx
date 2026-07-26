@@ -275,11 +275,11 @@ export default function Planificacion() {
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-white/10 pb-6">
         <div>
           <div className="flex items-center gap-3 mb-1">
-            <h1 className="text-2xl md:text-3xl font-bold text-white tracking-tight">Módulo de Planificación</h1>
+            <h1 className="text-2xl md:text-3xl font-bold text-[var(--text-contrast)] tracking-tight">Módulo de Planificación</h1>
             <span className="badge badge-active text-[11px]">Programación & Órdenes</span>
           </div>
           <p className="text-sm text-[#9CA3AF]">
-            Genera, edita y consulta planificaciones agrícolas para el cultivo <strong className="text-emerald-400 font-semibold">{globalCultivo}</strong>
+            Genera, edita y consulta planificaciones agrícolas para el cultivo <strong className="text-primary-light font-semibold">{globalCultivo}</strong>
           </p>
         </div>
       </div>
@@ -297,7 +297,7 @@ export default function Planificacion() {
       {mainTab === 'planificar' && (
         <div className="space-y-6 fade-in">
           {mensajeExito && (
-            <div className="p-4 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-300 font-bold text-sm">
+            <div className="p-4 rounded-xl bg-primary/10 border border-primary/30 text-primary-light font-bold text-sm">
               {mensajeExito}
             </div>
           )}

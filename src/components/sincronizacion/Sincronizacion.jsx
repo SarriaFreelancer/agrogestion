@@ -6,12 +6,12 @@ export default function Sincronizacion() {
   const { isOnline, syncQueue, lastSync, processSync } = useAgro();
 
   return (
-    <div className="space-y-8 fade-in">
+    <div className="space-y-8 fade-in p-6 lg:p-10 h-full w-full overflow-y-auto custom-scrollbar bg-transparent">
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-white/10 pb-6">
         <div>
           <div className="flex items-center gap-3 mb-1">
-            <h1 className="text-2xl md:text-3xl font-bold text-white tracking-tight">Centro de Sincronización Móvil</h1>
+            <h1 className="text-2xl md:text-3xl font-bold text-[var(--text-contrast)] tracking-tight">Centro de Sincronización Móvil</h1>
             <span className="badge badge-active text-[11px]">Sync offline/online</span>
           </div>
           <p className="text-sm text-[#9CA3AF]">
@@ -22,18 +22,18 @@ export default function Sincronizacion() {
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* Lado Oficina -> Campo */}
-        <div className="glass-card !p-6 border-l-4 border-l-emerald-500 space-y-4">
+        <div className="glass-card !p-6 border-l-4 border-l-primary space-y-4">
           <div className="flex items-center gap-4">
-            <div className="w-12 h-12 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400">
+            <div className="w-12 h-12 rounded-xl bg-primary/10 border border-primary/20 flex items-center justify-center text-primary-light">
               <HardDriveDownload size={24} />
             </div>
             <div>
-              <h3 className="text-base font-bold text-white">Descarga de Formularios</h3>
+              <h3 className="text-base font-bold text-[var(--text-contrast)]">Descarga de Formularios</h3>
               <p className="text-xs text-gray-400">Maestros, Suertes y Órdenes Planificadas</p>
             </div>
           </div>
-          <div className="p-4 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-xs text-emerald-200 leading-relaxed">
-            <strong className="text-emerald-400 block mb-1">Estado de Caché Local:</strong>
+          <div className="p-4 rounded-xl bg-primary/10 border border-primary/20 text-xs text-primary-light leading-relaxed">
+            <strong className="text-primary-light block mb-1">Estado de Caché Local:</strong>
             Los formularios y maestros se descargan automáticamente al iniciar sesión. Toda la configuración está disponible en tu dispositivo para operar 100% offline en el campo.
           </div>
         </div>
@@ -45,13 +45,13 @@ export default function Sincronizacion() {
               <Send size={24} />
             </div>
             <div>
-              <h3 className="text-base font-bold text-white">Envío de Ejecuciones</h3>
+              <h3 className="text-base font-bold text-[var(--text-contrast)]">Envío de Ejecuciones</h3>
               <p className="text-xs text-gray-400">Labores realizadas y Monitoreos de campo</p>
             </div>
           </div>
           <div className="p-4 rounded-xl bg-amber-500/10 border border-amber-500/20 text-xs text-amber-200 leading-relaxed">
             <strong className="text-amber-400 block mb-1">Pendientes de Envío:</strong>
-            Tienes <strong className="text-white">{syncQueue.length}</strong> registros capturados en campo esperando a ser sincronizados con la oficina central.
+            Tienes <strong className="text-[var(--text-contrast)]">{syncQueue.length}</strong> registros capturados en campo esperando a ser sincronizados con la oficina central.
           </div>
         </div>
       </div>
@@ -60,11 +60,11 @@ export default function Sincronizacion() {
       <div className="glass-card !p-8 space-y-6">
         <div className="flex items-center justify-between border-b border-white/10 pb-4">
           <div>
-            <h3 className="text-lg font-bold text-white">Control de Sincronización Manual</h3>
+            <h3 className="text-lg font-bold text-[var(--text-contrast)]">Control de Sincronización Manual</h3>
             <p className="text-xs text-gray-400">Ejecute la sincronización cuando disponga de conexión estable a internet</p>
           </div>
           <div className="flex items-center gap-2 text-xs font-semibold px-3 py-1.5 rounded-lg bg-white/[0.04] border border-white/10 text-gray-300">
-            <Wifi size={14} className={isOnline ? "text-emerald-400" : "text-red-400"} />
+            <Wifi size={14} className={isOnline ? "text-primary-light" : "text-red-400"} />
             <span>{isOnline ? 'Internet Conectado' : 'Sin Conexión'}</span>
           </div>
         </div>
@@ -72,7 +72,7 @@ export default function Sincronizacion() {
         <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-2">
           <div className="text-xs text-gray-400 flex items-center gap-2">
             <Clock size={15} />
-            <span>Última sincronización exitosa: <strong className="text-white">{lastSync ? new Date(lastSync).toLocaleString() : 'Nunca'}</strong></span>
+            <span>Última sincronización exitosa: <strong className="text-[var(--text-contrast)]">{lastSync ? new Date(lastSync).toLocaleString() : 'Nunca'}</strong></span>
           </div>
 
           <button 
