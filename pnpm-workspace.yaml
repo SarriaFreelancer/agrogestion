@@ -3,6 +3,7 @@ packages:
 allowBuilds:
   '@prisma/client': false
   '@prisma/engines': true
+  bcrypt: set this to true or false
   oracledb: true
   prisma: true
   sqlite3: true
