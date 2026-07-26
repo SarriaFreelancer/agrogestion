@@ -111,8 +111,7 @@ export function ThemeProvider({ children }) {
       }
     }
 
-    // Contraste de texto según tema y modo
-    const isBlackBg = isNoche || (isBlanco && !isLightMode);
+    const isBlackBg = (isNoche && !isLightMode) || (isBlanco && !isLightMode);
     root.style.setProperty('--text-contrast', isBlackBg ? '#ffffff' : (isLightMode ? '#1f2937' : '#ffffff'));
 
     root.style.setProperty('--color-surface', isLightMode ? 'rgba(255, 255, 255, 0.7)' : themeData.glass);

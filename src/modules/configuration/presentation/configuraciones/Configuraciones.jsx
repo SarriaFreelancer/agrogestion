@@ -504,12 +504,12 @@ function Configuraciones() {
                     )}
                   </div>
                   <div className="p-4 relative z-20">
-                    <h4 className="text-base font-bold text-white mb-1">{theme.label}</h4>
-                    <p className="text-xs text-white leading-relaxed mb-4 min-h-[36px]">{theme.desc}</p>
+                    <h4 className="text-base font-bold text-[var(--text-contrast)] mb-1">{theme.label}</h4>
+                    <p className="text-xs text-[var(--text-muted)] leading-relaxed mb-4 min-h-[36px]">{theme.desc}</p>
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-2">
                         <div className={`w-3 h-3 rounded-full ${isActive ? 'bg-primary shadow-sm' : 'border border-gray-600 bg-transparent'}`}></div>
-                        <span className="text-xs font-semibold text-white">
+                        <span className="text-xs font-semibold text-[var(--text-contrast)]">
                           {isActive ? 'Tema Activo' : 'Seleccionar Tema'}
                         </span>
                       </div>
@@ -567,9 +567,10 @@ function Configuraciones() {
                       onClick={() => setActiveTab(item.id)}
                       className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-[13px] transition-all duration-200 group ${
                         isActive 
-                          ? 'bg-blue-900 text-white font-semibold shadow-lg shadow-blue-900/20' 
+                          ? 'text-white font-semibold shadow-lg' 
                           : 'text-[var(--sidebar-text-muted)] hover:text-[var(--sidebar-text)] hover:bg-[var(--input-bg)]'
                       }`}
+                      style={isActive ? { backgroundColor: 'var(--primary-color)', boxShadow: '0 10px 15px -3px rgba(var(--primary-rgb) / 0.2)' } : {}}
                     >
                       <span className={`w-5 h-5 flex items-center justify-center shrink-0 transition-colors ${
                         isActive ? 'text-white' : 'text-[var(--sidebar-text-muted)] group-hover:text-[var(--sidebar-text)]'
