@@ -16,6 +16,24 @@ function Configuraciones() {
     updateConfiguracion(key, nextValue);
   };
 
+  const handleLevelNameChange = (key, value) => {
+    updateConfiguracion('estructuraNivelNombres', {
+      ...configuraciones.estructuraNivelNombres,
+      [key]: value
+    });
+  };
+
+  const handleEstructuraNivelesChange = (value) => {
+    updateConfiguracion('estructuraNiveles', Number(value));
+  };
+
+  const handleThemeChange = (newTheme) => {
+    const clientKey = Object.keys(clients || {}).find(k => (clients[k]?.id || k) === currentClient.id);
+    if (clientKey && typeof changeTheme === 'function') {
+      changeTheme(newTheme);
+    }
+  };
+
   const menuSections = [
     {
       title: 'CONFIGURACIÓN GENERAL',
@@ -117,6 +135,287 @@ function Configuraciones() {
               <h4 className="text-sm font-bold text-emerald-500 mb-1">Consejo</h4>
               <p className="text-xs text-gray-400">Estas configuraciones se aplican a todos los formularios de monitoreo del sistema.</p>
             </div>
+          </div>
+        </div>
+      );
+    }
+
+    if (activeTab === 'insumos') {
+      return (
+        <div className="space-y-6 w-full max-w-4xl fade-in">
+          {/* Header */}
+          <div className="flex items-center justify-between mb-8">
+            <div className="flex items-center gap-4">
+              <div className="w-12 h-12 rounded-xl bg-emerald-500/10 flex items-center justify-center text-emerald-500 text-2xl border border-emerald-500/20 shadow-[0_0_15px_rgba(16,185,129,0.15)]">
+                📦
+              </div>
+              <div>
+                <h2 className="text-2xl font-bold text-white tracking-tight">Insumos</h2>
+                <p className="text-sm text-gray-400 mt-1">Validaciones de productos y control de stock.</p>
+              </div>
+            </div>
+          </div>
+
+          <div className="space-y-3">
+            {[
+              { id: 'config_insumos', label: 'Bloque de Insumos', desc: 'Activa o desactiva la sección operativa de insumos.', icon: '📦' },
+              { id: 'validarInsumos', label: 'Obligar Insumos', desc: 'Requiere productos en fertilizaciones.', icon: '⚠️' },
+              { id: 'bloquearStockNegativo', label: 'Bloquear Stock Negativo', desc: 'Impide salidas sin existencias.', icon: '🛑' },
+              { id: 'registrarGpsInsumos', label: 'Registrar ubicación GPS', desc: 'Captura coordenadas para apuntes de insumos.', icon: '📍' }
+            ].map(opt => (
+              <div key={opt.id} className="flex items-center justify-between p-4 rounded-xl bg-[#111827] border border-white/5 hover:border-emerald-500/30 transition-colors group relative overflow-hidden">
+                <div className="absolute left-0 top-0 bottom-0 w-1 bg-emerald-500 rounded-l-xl opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                
+                <div className="flex items-center gap-4 relative z-10">
+                  <div className="w-10 h-10 rounded-full bg-surface border border-white/10 flex items-center justify-center text-gray-400 group-hover:text-emerald-500 transition-colors">
+                    {opt.icon}
+                  </div>
+                  <div>
+                    <h4 className="text-[15px] font-semibold text-white">{opt.label}</h4>
+                    <p className="text-[13px] text-gray-400 mt-0.5">{opt.desc}</p>
+                  </div>
+                </div>
+                <div className="relative z-10 pr-2">
+                  <Switch 
+                    checked={isEnabled(configuraciones[opt.id] ?? (opt.id === 'config_insumos' ? 1 : 0))} 
+                    onCheckedChange={() => handleToggle(opt.id)} 
+                  />
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      );
+    }
+
+    if (activeTab === 'maquinaria') {
+      return (
+        <div className="space-y-6 w-full max-w-4xl fade-in">
+          <div className="flex items-center justify-between mb-8">
+            <div className="flex items-center gap-4">
+              <div className="w-12 h-12 rounded-xl bg-emerald-500/10 flex items-center justify-center text-emerald-500 text-2xl border border-emerald-500/20 shadow-[0_0_15px_rgba(16,185,129,0.15)]">
+                🚜
+              </div>
+              <div>
+                <h2 className="text-2xl font-bold text-white tracking-tight">Maquinaria</h2>
+                <p className="text-sm text-gray-400 mt-1">Reglas de equipos y validación operativa.</p>
+              </div>
+            </div>
+          </div>
+
+          <div className="space-y-3">
+            {[
+              { id: 'config_maq', label: 'Bloque de Maquinaria', desc: 'Activa o desactiva la sección operativa de maquinaria.', icon: '🚜' },
+              { id: 'validarMaquinaria', label: 'Obligar Maquinaria', desc: 'Requiere equipo en labores mecánicas.', icon: '⚠️' },
+              { id: 'registrarGpsMaquinaria', label: 'Registrar ubicación GPS', desc: 'Captura coordenadas para apuntes de maquinaria.', icon: '📍' }
+            ].map(opt => (
+              <div key={opt.id} className="flex items-center justify-between p-4 rounded-xl bg-[#111827] border border-white/5 hover:border-emerald-500/30 transition-colors group relative overflow-hidden">
+                <div className="absolute left-0 top-0 bottom-0 w-1 bg-emerald-500 rounded-l-xl opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                
+                <div className="flex items-center gap-4 relative z-10">
+                  <div className="w-10 h-10 rounded-full bg-surface border border-white/10 flex items-center justify-center text-gray-400 group-hover:text-emerald-500 transition-colors">
+                    {opt.icon}
+                  </div>
+                  <div>
+                    <h4 className="text-[15px] font-semibold text-white">{opt.label}</h4>
+                    <p className="text-[13px] text-gray-400 mt-0.5">{opt.desc}</p>
+                  </div>
+                </div>
+                <div className="relative z-10 pr-2">
+                  <Switch 
+                    checked={isEnabled(configuraciones[opt.id] ?? (opt.id === 'config_maq' ? 1 : 0))} 
+                    onCheckedChange={() => handleToggle(opt.id)} 
+                  />
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      );
+    }
+
+    if (activeTab === 'mano_obra') {
+      return (
+        <div className="space-y-6 w-full max-w-4xl fade-in">
+          <div className="flex items-center justify-between mb-8">
+            <div className="flex items-center gap-4">
+              <div className="w-12 h-12 rounded-xl bg-emerald-500/10 flex items-center justify-center text-emerald-500 text-2xl border border-emerald-500/20 shadow-[0_0_15px_rgba(16,185,129,0.15)]">
+                👥
+              </div>
+              <div>
+                <h2 className="text-2xl font-bold text-white tracking-tight">Mano de Obra</h2>
+                <p className="text-sm text-gray-400 mt-1">Control de nómina y personal requerido.</p>
+              </div>
+            </div>
+          </div>
+
+          <div className="space-y-3">
+            {[
+              { id: 'config_mao', label: 'Bloque de Mano de Obra', desc: 'Activa o desactiva la sección operativa de mano de obra.', icon: '👥' },
+              { id: 'validarNomina', label: 'Obligar Nómina', desc: 'Requiere registro de personal en las labores.', icon: '📋' },
+              { id: 'registrarGpsManoObra', label: 'Registrar ubicación GPS', desc: 'Captura coordenadas para apuntes de mano de obra.', icon: '📍' }
+            ].map(opt => (
+              <div key={opt.id} className="flex items-center justify-between p-4 rounded-xl bg-[#111827] border border-white/5 hover:border-emerald-500/30 transition-colors group relative overflow-hidden">
+                <div className="absolute left-0 top-0 bottom-0 w-1 bg-emerald-500 rounded-l-xl opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                
+                <div className="flex items-center gap-4 relative z-10">
+                  <div className="w-10 h-10 rounded-full bg-surface border border-white/10 flex items-center justify-center text-gray-400 group-hover:text-emerald-500 transition-colors">
+                    {opt.icon}
+                  </div>
+                  <div>
+                    <h4 className="text-[15px] font-semibold text-white">{opt.label}</h4>
+                    <p className="text-[13px] text-gray-400 mt-0.5">{opt.desc}</p>
+                  </div>
+                </div>
+                <div className="relative z-10 pr-2">
+                  <Switch 
+                    checked={isEnabled(configuraciones[opt.id] ?? (opt.id === 'config_mao' ? 1 : 0))} 
+                    onCheckedChange={() => handleToggle(opt.id)} 
+                  />
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      );
+    }
+
+    if (activeTab === 'estructura') {
+      return (
+        <div className="space-y-6 w-full max-w-4xl fade-in">
+          <div className="flex items-center justify-between mb-8">
+            <div className="flex items-center gap-4">
+              <div className="w-12 h-12 rounded-xl bg-emerald-500/10 flex items-center justify-center text-emerald-500 text-2xl border border-emerald-500/20 shadow-[0_0_15px_rgba(16,185,129,0.15)]">
+                🗺️
+              </div>
+              <div>
+                <h2 className="text-2xl font-bold text-white tracking-tight">Estructura</h2>
+                <p className="text-sm text-gray-400 mt-1">Defina los niveles de jerarquía y sus descripciones.</p>
+              </div>
+            </div>
+          </div>
+
+          <div className="bg-[#111827] border border-white/5 rounded-xl p-6 mb-6">
+            <label className="block text-sm font-semibold text-gray-300 mb-2">Niveles de jerarquía</label>
+            <select
+              className="w-full bg-[#0d131f] border border-white/10 rounded-lg px-4 py-2.5 text-white focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 transition-colors"
+              value={configuraciones.estructuraNiveles || 4}
+              onChange={(e) => handleEstructuraNivelesChange(e.target.value)}
+            >
+              {[2, 3, 4].map(level => (
+                <option key={level} value={level}>{level} niveles</option>
+              ))}
+            </select>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+            {Array.from({ length: configuraciones.estructuraNiveles || 4 }, (_, index) => {
+              const nivelCount = configuraciones.estructuraNiveles || 4;
+              const isLastLevel = index === nivelCount - 1;
+              const key = isLastLevel ? 'nivel4' : `nivel${index + 1}`;
+              const levelNumber = isLastLevel ? 4 : index + 1;
+              return (
+                <div key={key} className="bg-[#111827] border border-white/5 rounded-xl p-5">
+                  <label className="block text-sm font-semibold text-gray-300 mb-2">Nombre global Nivel {levelNumber}</label>
+                  <input
+                    type="text"
+                    className="w-full bg-[#0d131f] border border-white/10 rounded-lg px-4 py-2 text-white focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                    value={configuraciones.estructuraNivelNombres?.[key] || ''}
+                    onChange={(e) => handleLevelNameChange(key, e.target.value)}
+                    placeholder={`Ej: ${['Sector', 'Finca', 'Lote', 'Suerte', 'Subnivel', 'Subnivel'][index]}`}
+                    disabled={isLastLevel}
+                  />
+                  {isLastLevel && <p className="text-xs text-gray-500 mt-2">El último nivel siempre representa la unidad mínima productiva.</p>}
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      );
+    }
+
+    if (activeTab === 'maestros') {
+      return (
+        <div className="space-y-6 w-full max-w-4xl fade-in">
+          <div className="flex items-center justify-between mb-8">
+            <div className="flex items-center gap-4">
+              <div className="w-12 h-12 rounded-xl bg-emerald-500/10 flex items-center justify-center text-emerald-500 text-2xl border border-emerald-500/20 shadow-[0_0_15px_rgba(16,185,129,0.15)]">
+                📚
+              </div>
+              <div>
+                <h2 className="text-2xl font-bold text-white tracking-tight">Maestros</h2>
+                <p className="text-sm text-gray-400 mt-1">Habilite o desactive los catálogos en el sistema.</p>
+              </div>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {[
+              { id: 'maestro_actividad', label: 'Actividades', icon: '📝' },
+              { id: 'maestro_maq', label: 'Maquinaria', icon: '🚜' },
+              { id: 'maestro_mao', label: 'Trabajadores', icon: '👥' },
+              { id: 'maestro_ins', label: 'Productos', icon: '📦' },
+              { id: 'maestro_proveedores', label: 'Proveedores', icon: '🏢' },
+              { id: 'maestro_cultivos', label: 'Cultivos', icon: '🌱' },
+              { id: 'maestro_controles', label: 'Controles Agro', icon: '🔬' },
+              { id: 'maestro_tp_act', label: 'Grupos de Actividad', icon: '🗂️' },
+              { id: 'maestro_tipos_maquinaria', label: 'Tipos de Maquinaria', icon: '⚙️' },
+              { id: 'maestro_cuadrillas', label: 'Cuadrillas', icon: '🧑‍🤝‍🧑' },
+              { id: 'maestro_unidades', label: 'Unidades de Medida', icon: '📏' },
+              { id: 'maestro_tipos_productos', label: 'Tipos de Productos', icon: '🔖' }
+            ].map(maestro => (
+              <div key={maestro.id} className="flex items-center justify-between p-4 rounded-xl bg-[#111827] border border-white/5 hover:border-emerald-500/30 transition-colors">
+                <div className="flex items-center gap-3">
+                  <span className="text-xl">{maestro.icon}</span>
+                  <span className="text-sm font-semibold text-white">{maestro.label}</span>
+                </div>
+                <Switch 
+                  checked={isEnabled(configuraciones[maestro.id] ?? 1)} 
+                  onCheckedChange={() => handleToggle(maestro.id)} 
+                />
+              </div>
+            ))}
+          </div>
+        </div>
+      );
+    }
+
+    if (activeTab === 'instancia') {
+      return (
+        <div className="space-y-6 w-full max-w-4xl fade-in">
+          <div className="flex items-center justify-between mb-8">
+            <div className="flex items-center gap-4">
+              <div className="w-12 h-12 rounded-xl bg-emerald-500/10 flex items-center justify-center text-emerald-500 text-2xl border border-emerald-500/20 shadow-[0_0_15px_rgba(16,185,129,0.15)]">
+                ⚙️
+              </div>
+              <div>
+                <h2 className="text-2xl font-bold text-white tracking-tight">Instancia</h2>
+                <p className="text-sm text-gray-400 mt-1">Datos y estado de la cuenta activa.</p>
+              </div>
+            </div>
+          </div>
+
+          <div className="bg-[#111827] border border-white/5 rounded-xl p-6 grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+              <p className="text-xs text-gray-500 uppercase tracking-wider mb-1">Empresa</p>
+              <p className="text-lg font-bold text-white">{currentClient?.name || 'Agro Empresa'}</p>
+            </div>
+            <div>
+              <p className="text-xs text-gray-500 uppercase tracking-wider mb-1">Plan</p>
+              <p className="text-lg font-bold text-emerald-400">{currentClient?.plan || 'Standard'}</p>
+            </div>
+            {isAdminUser && (
+              <>
+                <div className="pt-4 border-t border-white/10">
+                  <p className="text-xs text-gray-500 uppercase tracking-wider mb-1">Base de Datos</p>
+                  <p className="text-base text-gray-300 font-mono">{currentClient?.databaseName || `agroData_${currentClient?.id}`}</p>
+                </div>
+                <div className="pt-4 border-t border-white/10">
+                  <p className="text-xs text-gray-500 uppercase tracking-wider mb-1">Usuario BD</p>
+                  <p className="text-base text-gray-300 font-mono">{currentClient?.databaseUser || `${currentClient?.id}_user`}</p>
+                </div>
+              </>
+            )}
           </div>
         </div>
       );
