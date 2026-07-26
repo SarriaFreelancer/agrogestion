@@ -18,23 +18,29 @@ export default function Estructura() {
     return suertes.filter(s => s.cultivo === globalCultivo);
   };
 
-  const findNodeById = (nodes, id) => {
-    if (!id) return null;
+  const findNodeByIdAndType = (nodes, id, searchType, currentLevel = 'Sector') => {
+    if (!id || !nodes) return null;
 
     for (const node of nodes) {
-      if (node.id === id) return node;
-
-      const childCollections = [node.fincas, node.lotes, node.suertes].filter(Boolean);
-      for (const children of childCollections) {
-        const found = findNodeById(children, id);
-        if (found) return found;
+      const nodeType = node.type || currentLevel;
+      if (node.id === id && (!searchType || nodeType === searchType)) {
+        return { ...node, type: nodeType };
       }
+
+      const foundInFincas = findNodeByIdAndType(node.fincas, id, searchType, 'Finca');
+      if (foundInFincas) return foundInFincas;
+
+      const foundInLotes = findNodeByIdAndType(node.lotes, id, searchType, 'Lote');
+      if (foundInLotes) return foundInLotes;
+
+      const foundInSuertes = findNodeByIdAndType(node.suertes, id, searchType, 'Suerte');
+      if (foundInSuertes) return foundInSuertes;
     }
 
     return null;
   };
 
-  const activeNode = findNodeById(sectores, selectedNode?.id) || selectedNode;
+  const activeNode = findNodeByIdAndType(sectores, selectedNode?.id, selectedNode?.type) || selectedNode;
   const structureLevelCount = Math.min(4, Math.max(2, configuraciones?.estructuraNiveles || 4));
   const levelLabels = [
     configuraciones?.estructuraNivelNombres?.nivel1 || 'Sector',
@@ -89,8 +95,8 @@ export default function Estructura() {
   const renderSuerteItem = (suerte) => (
     <button
       key={suerte.id}
-      onClick={() => setSelectedNode(suerte)}
-      className={`w-full text-left p-2.5 rounded-lg border transition-all duration-200 flex items-center gap-2 text-xs font-semibold !m-0 ${activeNode?.id === suerte.id ? 'bg-primary/20 border-primary text-primary-light shadow-[0_0_12px_rgba(16,185,129,0.2)]' : 'bg-white/[0.02] border-white/10 text-[var(--text-muted)] hover:bg-white/[0.05]'}`}
+      onClick={() => setSelectedNode({ ...suerte, type: 'Suerte' })}
+      className={`w-full text-left p-2.5 rounded-lg border transition-all duration-200 flex items-center gap-2 text-xs font-semibold !m-0 ${(activeNode?.id === suerte.id && activeNode?.type === 'Suerte') ? 'bg-primary/20 border-primary text-primary-light shadow-[0_0_12px_rgba(16,185,129,0.2)]' : 'bg-[var(--glass-bg)] border-[var(--glass-border)] text-[var(--text-muted)] hover:border-primary/30'}`}
     >
       <Sprout size={14} className="text-primary-light flex-shrink-0" />
       <span className="truncate"><strong>{suerte.id}</strong> - {suerte.name}</span>
@@ -105,8 +111,8 @@ export default function Estructura() {
       <div key={lote.id} className="space-y-1.5 mb-2">
         <div className="flex items-center gap-2 justify-between">
           <button
-            onClick={() => setSelectedNode(lote)}
-            className={`flex-1 text-left p-2.5 rounded-lg border transition-all duration-200 flex items-center gap-2 text-xs font-semibold !m-0 ${activeNode?.id === lote.id ? 'bg-primary/20 border-primary text-primary-light' : 'bg-white/[0.02] border-white/10 text-[var(--text-muted)] hover:bg-white/[0.05]'}`}
+            onClick={() => setSelectedNode({ ...lote, type: 'Lote' })}
+            className={`flex-1 text-left p-2.5 rounded-lg border transition-all duration-200 flex items-center gap-2 text-xs font-semibold !m-0 ${(activeNode?.id === lote.id && activeNode?.type === 'Lote') ? 'bg-primary/20 border-primary text-primary-light' : 'bg-[var(--glass-bg)] border-[var(--glass-border)] text-[var(--text-muted)] hover:border-primary/30'}`}
           >
             <Package size={15} className="text-blue-400 flex-shrink-0" />
             <span className="truncate"><strong>{lote.id}</strong> - {lote.name}</span>
@@ -139,8 +145,8 @@ export default function Estructura() {
       <div key={finca.id} className="space-y-2 mb-3">
         <div className="flex items-center gap-2 justify-between">
           <button
-            onClick={() => setSelectedNode(finca)}
-            className={`flex-1 text-left p-2.5 rounded-lg border transition-all duration-200 flex items-center gap-2 text-xs font-semibold !m-0 ${activeNode?.id === finca.id ? 'bg-primary/20 border-primary text-primary-light' : 'bg-white/[0.03] border-white/10 text-gray-200 hover:bg-white/[0.06]'}`}
+            onClick={() => setSelectedNode({ ...finca, type: 'Finca' })}
+            className={`flex-1 text-left p-2.5 rounded-lg border transition-all duration-200 flex items-center gap-2 text-xs font-semibold !m-0 ${(activeNode?.id === finca.id && activeNode?.type === 'Finca') ? 'bg-primary/20 border-primary text-primary-light' : 'bg-[var(--glass-bg)] border-[var(--glass-border)] text-[var(--text-contrast)] hover:border-primary/30'}`}
           >
             <Home size={16} className="text-amber-400 flex-shrink-0" />
             <span className="truncate"><strong>{finca.id}</strong> - {finca.name}</span>
@@ -180,8 +186,8 @@ export default function Estructura() {
       <div key={sector.id} className="space-y-2 mb-4">
         <div className="flex items-center gap-2 justify-between">
           <button
-            className={`flex-1 text-left p-3 rounded-xl border transition-all duration-200 flex items-center gap-2.5 text-xs font-bold !m-0 ${activeNode?.id === sector.id ? 'bg-primary/20 border-primary text-[var(--text-contrast)] shadow-[0_0_15px_rgba(16,185,129,0.25)]' : 'bg-white/[0.04] border-white/10 text-gray-100 hover:bg-white/[0.08]'}`}
-            onClick={() => setSelectedNode(sector)}
+            className={`flex-1 text-left p-3 rounded-xl border transition-all duration-200 flex items-center gap-2.5 text-xs font-bold !m-0 ${(activeNode?.id === sector.id && activeNode?.type === 'Sector') ? 'bg-primary/20 border-primary text-[var(--text-contrast)] shadow-[0_0_15px_rgba(16,185,129,0.25)]' : 'bg-[var(--glass-bg)] border-[var(--glass-border)] text-[var(--text-contrast)] hover:border-primary/30'}`}
+            onClick={() => setSelectedNode({ ...sector, type: 'Sector' })}
           >
             <Folder size={17} className="text-primary-light flex-shrink-0" />
             <span className="truncate"><strong>{sector.id}</strong> - {sector.name}</span>

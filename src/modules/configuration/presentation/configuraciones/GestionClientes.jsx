@@ -4,8 +4,8 @@ import { useAgro } from '@/providers/AgroContext';
 import DatabaseConnectionConfig from '@/modules/configuration/presentation/configuraciones/DatabaseConnectionConfig';
 
 export default function GestionClientes() {
-  const { clients, updateClient, editClient, deleteClient, suspendClient, reactivateClient, resetClientData, addClient, switchClient, currentClient, PLAN_CONFIG, THEME_CONFIG } = useAgro();
-  const isAdminUser = currentClient.modules?.includes('ALL');
+  const { clients, updateClient, editClient, deleteClient, suspendClient, reactivateClient, resetClientData, addClient, switchClient, currentClient, currentUser, PLAN_CONFIG, THEME_CONFIG } = useAgro();
+  const isAdminUser = currentUser?.rol === 'Super Admin' || currentUser?.rol === 'Administrador' || currentUser?.modulos?.includes('ALL');
   const firstClientKey = Object.keys(clients)[0] || '';
   const activeClientKey = Object.keys(clients).find(key => clients[key].id === currentClient.id) || firstClientKey;
   const [selectedClientKey, setSelectedClientKey] = useState(activeClientKey);
