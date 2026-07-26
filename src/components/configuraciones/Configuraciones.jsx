@@ -80,7 +80,7 @@ function Configuraciones() {
           {/* Header */}
           <div className="flex items-center justify-between mb-8">
             <div className="flex items-center gap-4">
-              <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center text-primary text-2xl border border-primary/20 shadow-[0_0_15px_rgba(16,185,129,0.15)]">
+              <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center text-primary text-2xl border border-primary/20 shadow-md">
                 🔬
               </div>
               <div>
@@ -149,7 +149,7 @@ function Configuraciones() {
           {/* Header */}
           <div className="flex items-center justify-between mb-8">
             <div className="flex items-center gap-4">
-              <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center text-primary text-2xl border border-primary/20 shadow-[0_0_15px_rgba(16,185,129,0.15)]">
+              <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center text-primary text-2xl border border-primary/20 shadow-md">
                 📦
               </div>
               <div>
@@ -196,7 +196,7 @@ function Configuraciones() {
         <div className="space-y-6 w-full max-w-4xl fade-in">
           <div className="flex items-center justify-between mb-8">
             <div className="flex items-center gap-4">
-              <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center text-primary text-2xl border border-primary/20 shadow-[0_0_15px_rgba(16,185,129,0.15)]">
+              <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center text-primary text-2xl border border-primary/20 shadow-md">
                 🚜
               </div>
               <div>
@@ -242,7 +242,7 @@ function Configuraciones() {
         <div className="space-y-6 w-full max-w-4xl fade-in">
           <div className="flex items-center justify-between mb-8">
             <div className="flex items-center gap-4">
-              <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center text-primary text-2xl border border-primary/20 shadow-[0_0_15px_rgba(16,185,129,0.15)]">
+              <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center text-primary text-2xl border border-primary/20 shadow-md">
                 👥
               </div>
               <div>
@@ -288,7 +288,7 @@ function Configuraciones() {
         <div className="space-y-6 w-full max-w-4xl fade-in">
           <div className="flex items-center justify-between mb-8">
             <div className="flex items-center gap-4">
-              <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center text-primary text-2xl border border-primary/20 shadow-[0_0_15px_rgba(16,185,129,0.15)]">
+              <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center text-primary text-2xl border border-primary/20 shadow-md">
                 🗺️
               </div>
               <div>
@@ -342,7 +342,7 @@ function Configuraciones() {
         <div className="space-y-6 w-full max-w-4xl fade-in">
           <div className="flex items-center justify-between mb-8">
             <div className="flex items-center gap-4">
-              <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center text-primary text-2xl border border-primary/20 shadow-[0_0_15px_rgba(16,185,129,0.15)]">
+              <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center text-primary text-2xl border border-primary/20 shadow-md">
                 📚
               </div>
               <div>
@@ -388,7 +388,7 @@ function Configuraciones() {
         <div className="space-y-6 w-full max-w-4xl fade-in">
           <div className="flex items-center justify-between mb-8">
             <div className="flex items-center gap-4">
-              <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center text-primary text-2xl border border-primary/20 shadow-[0_0_15px_rgba(16,185,129,0.15)]">
+              <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center text-primary text-2xl border border-primary/20 shadow-md">
                 ⚙️
               </div>
               <div>
@@ -486,7 +486,7 @@ function Configuraciones() {
                   onClick={() => handleThemeChange(theme.id)}
                   className={`relative text-left rounded-xl overflow-hidden border transition-all duration-300 group
                     ${isActive 
-                      ? 'border-primary shadow-[0_0_20px_rgba(16,185,129,0.15)] bg-[#111827]' 
+                      ? 'border-primary shadow-lg bg-[#111827]' 
                       : 'border-[var(--glass-border)] bg-[#111827] hover:border-white/20'
                     }
                   `}
@@ -504,7 +504,7 @@ function Configuraciones() {
                     <h4 className={`text-base font-bold mb-1 ${isActive ? 'text-[var(--text-contrast)]' : 'text-[var(--text-muted)]'}`}>{theme.label}</h4>
                     <p className="text-xs text-[var(--text-muted)] leading-relaxed mb-4 min-h-[36px]">{theme.desc}</p>
                     <div className="flex items-center gap-2">
-                      <div className={`w-3 h-3 rounded-full ${isActive ? 'bg-primary shadow-[0_0_8px_rgba(16,185,129,0.8)]' : 'border border-gray-600 bg-transparent'}`}></div>
+                      <div className={`w-3 h-3 rounded-full ${isActive ? 'bg-primary shadow-sm' : 'border border-gray-600 bg-transparent'}`}></div>
                       {isActive && <span className="text-[10px] font-bold text-primary uppercase tracking-wider bg-primary/10 px-2 py-0.5 rounded">Activo</span>}
                     </div>
                   </div>

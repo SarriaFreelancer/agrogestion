@@ -181,7 +181,7 @@ button {
 .sidebar-menu li.active {
   background: var(--primary-color);
   font-weight: 600;
-  box-shadow: 0 4px 15px rgba(46, 125, 50, 0.4);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
 }
 
 .global-filter {
@@ -215,7 +215,7 @@ button {
 }
 
 .global-filter select:focus {
-  box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.5);
+  box-shadow: 0 0 0 3px rgba(var(--primary-rgb), 0.2);
 }
 
 /* Main Content Styles */
@@ -303,12 +303,12 @@ button {
 .btn-primary {
   background: var(--primary-color);
   color: white;
-  box-shadow: 0 4px 10px rgba(46, 125, 50, 0.3);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
 }
 
 .btn-primary:hover:not(:disabled) {
   background: var(--primary-light);
-  box-shadow: 0 6px 15px rgba(76, 175, 80, 0.4);
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2);
   transform: translateY(-2px);
 }
 
@@ -357,7 +357,7 @@ button:disabled {
 .input-field:focus {
   outline: none;
   border-color: var(--primary-color);
-  box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.2);
+  box-shadow: 0 0 0 3px rgba(var(--primary-rgb), 0.1);
 }
 
 /* Auth */

@@ -30,7 +30,7 @@ const Sidebar = ({ currentView, onNavClick, isMobileMenuOpen, setIsMobileMenuOpe
         onClick={() => onNavClick(view)}
         className={`px-4 py-2.5 rounded-xl cursor-pointer transition-all duration-200 flex items-center gap-3 text-[0.98rem]
           ${isActive 
-            ? 'bg-primary text-black font-semibold shadow-[0_4px_15px_rgba(16,185,129,0.4)]' 
+            ? 'bg-primary text-black font-semibold shadow-md' 
             : 'text-[var(--sidebar-text-muted)] hover:bg-white/10 hover:translate-x-1'
           }
         `}
@@ -63,7 +63,7 @@ const Sidebar = ({ currentView, onNavClick, isMobileMenuOpen, setIsMobileMenuOpe
         {/* Logo Area */}
         <div className="flex items-center justify-between w-full mb-8">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-primary/20 border border-primary/40 flex items-center justify-center text-primary font-bold text-xl shadow-[0_0_15px_rgba(16,185,129,0.3)]">
+            <div className="w-10 h-10 rounded-xl bg-primary/20 border border-primary/40 flex items-center justify-center text-primary font-bold text-xl shadow-md">
               🌱
             </div>
             <div>
@@ -77,7 +77,7 @@ const Sidebar = ({ currentView, onNavClick, isMobileMenuOpen, setIsMobileMenuOpe
                 {syncQueue.length} ⏳
               </span>
             )}
-            <div className="w-2.5 h-2.5 rounded-full bg-primary shadow-[0_0_10px_#10B981]"></div>
+            <div className="w-2.5 h-2.5 rounded-full bg-primary shadow-sm"></div>
           </div>
           <button 
             className="lg:hidden text-[var(--sidebar-text-muted)] hover:text-[var(--sidebar-text)] p-1"

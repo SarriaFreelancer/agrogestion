@@ -14,7 +14,7 @@ const THEME_CONFIG = {
   'Modo Nocturno': { primary: '#10B981', light: '#34D399', dark: '#059669', bg: '#000000', text: '#ffffff', muted: '#aaaaaa', glass: 'rgba(25, 25, 25, 0.95)', border: 'rgba(255,255,255,0.15)', input: '#1a1a1a' },
   'Noche Clásica': { primary: '#000000', light: '#1a1a1a', dark: '#000000', bg: '#000000', text: '#F9FAFB', muted: '#9CA3AF', glass: '#050505', border: 'rgba(255, 255, 255, 0.1)', input: 'rgba(255, 255, 255, 0.05)' },
   'Blanco Completo': { primary: '#000000', light: '#333333', dark: '#000000', bg: '#ffffff', text: '#000000', muted: '#6B7280', glass: 'rgba(255, 255, 255, 0.95)', border: 'rgba(0, 0, 0, 0.1)', input: 'rgba(0, 0, 0, 0.05)' },
-  'Azul Pizarra': { primary: '#111827', light: '#1F2937', dark: '#030712', bg: 'linear-gradient(135deg, #090d16 0%, #111827 100%)', text: '#F9FAFB', muted: '#9CA3AF', glass: 'rgba(17, 24, 39, 0.75)', border: 'rgba(255, 255, 255, 0.08)', input: 'rgba(255, 255, 255, 0.04)' }
+  'Azul Pizarra': { primary: '#1565C0', light: '#42A5F5', dark: '#0D47A1', bg: 'linear-gradient(135deg, #090d16 0%, #111827 100%)', text: '#F9FAFB', muted: '#9CA3AF', glass: 'rgba(17, 24, 39, 0.75)', border: 'rgba(255, 255, 255, 0.08)', input: 'rgba(255, 255, 255, 0.04)' }
 };
 
 const hexToRgb = (hex) => {
@@ -1119,7 +1119,7 @@ export function AgroProvider({ children }) {
         if (isLightMode) {
           // Soft primary background, strong primary sidebar
           document.documentElement.style.setProperty('--bg-gradient', 'linear-gradient(135deg, rgb(var(--primary-rgb) / 0.05) 0%, rgb(var(--primary-rgb) / 0.15) 100%)');
-          document.documentElement.style.setProperty('--sidebar-bg', 'color-mix(in srgb, var(--primary-dark) 50%, #000000)');
+          document.documentElement.style.setProperty('--sidebar-bg', isPizarra ? '#111827' : 'color-mix(in srgb, var(--primary-dark) 50%, #000000)');
           document.documentElement.style.setProperty('--glass-bg', 'rgba(255, 255, 255, 0.7)');
           document.documentElement.style.setProperty('--glass-border', 'rgb(var(--primary-rgb) / 0.2)');
           document.documentElement.style.setProperty('--input-bg', 'rgba(255, 255, 255, 0.9)');
