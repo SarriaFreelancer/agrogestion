@@ -672,16 +672,7 @@ export function AgroProvider({ children }) {
     if (!client.databaseEngine) return [];
     const results = await Promise.all(models.map(async (model) => {
       try {
-        const response = await fetch(apiUrl('/api/load-data'), {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            engine: client.databaseEngine,
-            connectionData,
-            model
-          })
-        });
-        const result = await response.json();
+        const result = await apiService.loadData(client.databaseEngine, connectionData, model);
         return [model, result.success ? result.data : []];
       } catch (error) {
         console.error(`Error cargando ${model} desde BD:`, error);
@@ -788,16 +779,7 @@ export function AgroProvider({ children }) {
       const connectionData = currentClient.connectionData || {};
       if (!currentClient.databaseEngine || !Object.keys(connectionData).length) return;
       try {
-        const res = await fetch(apiUrl('/api/load-data'), {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            engine: currentClient.databaseEngine,
-            connectionData,
-            model: 'ConfiguracionGlobal'
-          })
-        });
-        const result = await res.json();
+        const result = await apiService.loadData(currentClient.databaseEngine, connectionData, 'ConfiguracionGlobal');
         if (result.success && Array.isArray(result.data)) {
           const row = result.data.find(item => String(item.codigo || item.id || '').toUpperCase() === 'GLOBAL') || result.data[0];
           if (row) {
