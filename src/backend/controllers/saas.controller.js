@@ -1,5 +1,5 @@
-import { prisma } from '../../lib/prisma.js';
-import { logActivity } from '../../lib/audit.js';
+import { prisma } from '../../utils/prisma.js';
+import { logActivity } from '../../utils/audit.js';
 
 // Simularemos la importación de la conexión a la base de datos antigua
 // En tu servidor actual, usarías getMySqlConnection o similar para consultar los clientes

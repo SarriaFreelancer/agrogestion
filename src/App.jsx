@@ -1,25 +1,25 @@
 import { useState } from 'react';
 import './index.css';
-import { AgroProvider, useAgro } from './context/AgroContext';
+import { AgroProvider, useAgro } from '@/providers/AgroContext';
 
 // Import components
-import Dashboard from './components/dashboard/Dashboard';
-import Estructura from './components/estructura/Estructura';
-import Maestros from './components/maestros/Maestros';
-import Usuarios from './components/usuarios/Usuarios';
-import Planificacion from './components/planificacion/Planificacion';
-import Ejecucion from './components/ejecucion/Ejecucion';
-import Reportes from './components/reportes/Reportes';
-import Configuraciones from './components/configuraciones/Configuraciones';
-import Auth from './components/auth/Auth';
-import Monitoreo from './components/monitoreo/Monitoreo';
-import Mantenimiento from './components/mantenimiento/Mantenimiento';
-import Sincronizacion from './components/sincronizacion/Sincronizacion';
-import MapaCalor from './components/mapas/MapaCalor';
-import GestionClientes from './components/configuraciones/GestionClientes';
-import InstallPWA from './components/InstallPWA';
-import MainLayout from './components/layout/MainLayout';
-import Sidebar from './components/layout/Sidebar';
+import Dashboard from '@/modules/core/presentation/dashboard/Dashboard';
+import Estructura from '@/modules/farms/presentation/estructura/Estructura';
+import Maestros from '@/modules/core/presentation/maestros/Maestros';
+import Usuarios from '@/modules/users/presentation/usuarios/Usuarios';
+import Planificacion from '@/modules/production/presentation/planificacion/Planificacion';
+import Ejecucion from '@/modules/production/presentation/ejecucion/Ejecucion';
+import Reportes from '@/modules/reports/presentation/reportes/Reportes';
+import Configuraciones from '@/modules/configuration/presentation/configuraciones/Configuraciones';
+import Auth from '@/modules/auth/presentation/auth/Auth';
+import Monitoreo from '@/modules/production/presentation/monitoreo/Monitoreo';
+import Mantenimiento from '@/modules/production/presentation/mantenimiento/Mantenimiento';
+import Sincronizacion from '@/modules/core/presentation/sincronizacion/Sincronizacion';
+import MapaCalor from '@/modules/farms/presentation/mapas/MapaCalor';
+import GestionClientes from '@/modules/configuration/presentation/configuraciones/GestionClientes';
+import InstallPWA from '@/components/InstallPWA';
+import MainLayout from './shared/components/layout/MainLayout';
+import Sidebar from './shared/components/layout/Sidebar';
 
 function AppContent() {
   const [currentView, setCurrentView] = useState('dashboard');
