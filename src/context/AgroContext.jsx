@@ -13,7 +13,7 @@ const THEME_CONFIG = {
   'Gris Carbón': { primary: '#263238', light: '#455A64', dark: '#102027', bg: 'linear-gradient(135deg, #090d16 0%, #111619 100%)', text: '#F9FAFB', muted: '#9CA3AF', glass: 'rgba(18, 25, 38, 0.75)', border: 'rgba(255, 255, 255, 0.08)', input: 'rgba(255, 255, 255, 0.04)' },
   'Modo Nocturno': { primary: '#4F46E5', light: '#818CF8', dark: '#3730A3', bg: '#000000', text: '#ffffff', muted: '#aaaaaa', glass: 'rgba(25, 25, 25, 0.95)', border: 'rgba(255,255,255,0.15)', input: '#1a1a1a' },
   'Noche Clásica': { primary: '#000000', light: '#1a1a1a', dark: '#000000', bg: '#000000', text: '#F9FAFB', muted: '#9CA3AF', glass: '#050505', border: 'rgba(255, 255, 255, 0.1)', input: 'rgba(255, 255, 255, 0.05)' },
-  'Blanco Completo': { primary: '#000000', light: '#333333', dark: '#000000', bg: '#ffffff', text: '#000000', muted: '#6B7280', glass: 'rgba(255, 255, 255, 0.95)', border: 'rgba(0, 0, 0, 0.1)', input: 'rgba(0, 0, 0, 0.05)' },
+  'Blanco Completo': { primary: '#0f172a', light: '#333333', dark: '#000000', bg: '#ffffff', text: '#000000', muted: '#6B7280', glass: 'rgba(255, 255, 255, 0.95)', border: 'rgba(0, 0, 0, 0.1)', input: 'rgba(0, 0, 0, 0.05)' },
   'Tema Principal': { primary: '#1565C0', light: '#42A5F5', dark: '#0D47A1', bg: 'linear-gradient(135deg, #090d16 0%, #111827 100%)', text: '#F9FAFB', muted: '#9CA3AF', glass: 'rgba(17, 24, 39, 0.75)', border: 'rgba(255, 255, 255, 0.08)', input: 'rgba(255, 255, 255, 0.04)' }
 };
 
@@ -1096,8 +1096,8 @@ export function AgroProvider({ children }) {
       const isPizarra = currentClient.theme === 'Tema Principal';
 
       if (isBlanco) {
-        document.documentElement.style.setProperty('--primary-rgb', isLightMode ? '15, 23, 42' : '255, 255, 255');
-        document.documentElement.style.setProperty('--primary-light-rgb', isLightMode ? '30, 41, 59' : '200, 200, 200');
+        document.documentElement.style.setProperty('--primary-rgb', isLightMode ? '15 23 42' : '255 255 255');
+        document.documentElement.style.setProperty('--primary-light-rgb', isLightMode ? '30 41 59' : '200 200 200');
         document.documentElement.style.setProperty('--bg-gradient', isLightMode ? '#ffffff' : '#000000');
         document.documentElement.style.setProperty('--sidebar-bg', isLightMode ? '#f9fafb' : '#050505');
         document.documentElement.style.setProperty('--glass-bg', isLightMode ? 'rgba(255, 255, 255, 0.9)' : 'rgba(10, 10, 10, 0.8)');
@@ -1108,8 +1108,8 @@ export function AgroProvider({ children }) {
         document.documentElement.style.setProperty('--sidebar-text', isLightMode ? '#000000' : '#ffffff');
         document.documentElement.style.setProperty('--sidebar-text-muted', isLightMode ? '#4b5563' : '#9ca3af');
       } else if (isNoche) {
-        document.documentElement.style.setProperty('--primary-rgb', isLightMode ? '15, 23, 42' : '0, 0, 0');
-        document.documentElement.style.setProperty('--primary-light-rgb', isLightMode ? '30, 41, 59' : '26, 26, 26');
+        document.documentElement.style.setProperty('--primary-rgb', isLightMode ? '15 23 42' : '0 0 0');
+        document.documentElement.style.setProperty('--primary-light-rgb', isLightMode ? '30 41 59' : '26 26 26');
         document.documentElement.style.setProperty('--bg-gradient', isLightMode ? '#e5e7eb' : '#000000');
         document.documentElement.style.setProperty('--sidebar-bg', isLightMode ? '#ffffff' : '#000000');
         document.documentElement.style.setProperty('--glass-bg', isLightMode ? 'rgba(255, 255, 255, 0.7)' : '#050505');
