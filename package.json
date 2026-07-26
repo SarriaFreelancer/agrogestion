@@ -9,7 +9,7 @@
     "lint": "eslint .",
     "preview": "vite preview",
     "start:server": "node server.js",
-    "start": "concurrently \"pnpm run start:server\" \"pnpm run dev\""
+    "start": "pnpm run build && concurrently \"pnpm run start:server\" \"pnpm run dev\""
   },
   "dependencies": {
     "cors": "^2.8.6",

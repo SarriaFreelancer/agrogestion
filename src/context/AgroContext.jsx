@@ -14,7 +14,7 @@ const THEME_CONFIG = {
   'Modo Nocturno': { primary: '#10B981', light: '#34D399', dark: '#059669', bg: '#000000', text: '#ffffff', muted: '#aaaaaa', glass: 'rgba(25, 25, 25, 0.95)', border: 'rgba(255,255,255,0.15)', input: '#1a1a1a' },
   'Noche Clásica': { primary: '#000000', light: '#1a1a1a', dark: '#000000', bg: '#000000', text: '#F9FAFB', muted: '#9CA3AF', glass: '#050505', border: 'rgba(255, 255, 255, 0.1)', input: 'rgba(255, 255, 255, 0.05)' },
   'Blanco Completo': { primary: '#000000', light: '#333333', dark: '#000000', bg: '#ffffff', text: '#000000', muted: '#6B7280', glass: 'rgba(255, 255, 255, 0.95)', border: 'rgba(0, 0, 0, 0.1)', input: 'rgba(0, 0, 0, 0.05)' },
-  'Azul Pizarra': { primary: '#1565C0', light: '#42A5F5', dark: '#0D47A1', bg: 'linear-gradient(135deg, #090d16 0%, #111827 100%)', text: '#F9FAFB', muted: '#9CA3AF', glass: 'rgba(17, 24, 39, 0.75)', border: 'rgba(255, 255, 255, 0.08)', input: 'rgba(255, 255, 255, 0.04)' }
+  'Tema Principal': { primary: '#1565C0', light: '#42A5F5', dark: '#0D47A1', bg: 'linear-gradient(135deg, #090d16 0%, #111827 100%)', text: '#F9FAFB', muted: '#9CA3AF', glass: 'rgba(17, 24, 39, 0.75)', border: 'rgba(255, 255, 255, 0.08)', input: 'rgba(255, 255, 255, 0.04)' }
 };
 
 const hexToRgb = (hex) => {
@@ -60,7 +60,7 @@ const GLOBAL_CONFIG_DEFAULTS = {
   maestro_mao: 1,
   maestro_maq: 1,
   maestro_ins: 1,
-  modoOscuro: 1,
+  modoOscuro: 0,
   maestro_actividad: 1,
   maestro_tp_act: 1,
   maestro_proveedores: 1,
@@ -214,7 +214,7 @@ const normalizeClient = (client) => ({
 });
 
 const DEFAULT_CLIENTS = {
-  'std-01': normalizeClient({ id: 'std-01', name: 'Cliente Estándar Demo', plan: 'Estándar', modules: PLAN_CONFIG['Estándar'], theme: 'Verde Agro' }),
+  'std-01': normalizeClient({ id: 'std-01', name: 'Cliente Estándar Demo', plan: 'Estándar', modules: PLAN_CONFIG['Estándar'], theme: 'Tema Principal' }),
   'prm-01': normalizeClient({ id: 'prm-01', name: 'Cliente Premium Demo', plan: 'Premium', modules: PLAN_CONFIG['Premium'], theme: 'Azul Océano' }),
   'adm': normalizeClient({ id: 'adm', name: 'Administrador Global', plan: 'Admin', modules: PLAN_CONFIG['Admin'], theme: 'Modo Nocturno', databaseName: 'agroData_admin_global', databaseUser: 'admin_global' })
 };
@@ -669,6 +669,7 @@ export function AgroProvider({ children }) {
       'CategoriaAcceso'
     ];
 
+    if (!client.databaseEngine) return [];
     const results = await Promise.all(models.map(async (model) => {
       try {
         const response = await fetch(apiUrl('/api/load-data'), {
@@ -955,7 +956,7 @@ export function AgroProvider({ children }) {
 
   const addClient = (key, clientData) => {
     const modules = PLAN_CONFIG[clientData.plan] || PLAN_CONFIG['Estándar'];
-    const newClient = normalizeClient({ ...clientData, modules, theme: clientData.theme || 'Verde Agro' });
+    const newClient = normalizeClient({ ...clientData, modules, theme: clientData.theme || 'Tema Principal' });
     setClients(prev => ({
       ...prev,
       [key]: newClient
@@ -966,7 +967,7 @@ export function AgroProvider({ children }) {
   const updateClient = (key, plan, customModules = null, theme = null, databaseConfig = {}) => {
     const client = normalizeClient(clients[key]);
     const modules = customModules || PLAN_CONFIG[plan] || PLAN_CONFIG['Estándar'];
-    const finalTheme = theme || client.theme || 'Verde Agro';
+    const finalTheme = theme || client.theme || 'Tema Principal';
     const updatedClient = normalizeClient({
       ...client,
       ...databaseConfig,
@@ -1082,7 +1083,7 @@ export function AgroProvider({ children }) {
   };
 
   React.useEffect(() => {
-    const themeData = THEME_CONFIG[currentClient.theme || 'Verde Agro'] || THEME_CONFIG['Verde Agro'];
+    const themeData = THEME_CONFIG[currentClient.theme || 'Tema Principal'] || THEME_CONFIG['Tema Principal'];
     if (themeData) {
       document.documentElement.style.setProperty('--primary-color', themeData.primary);
       document.documentElement.style.setProperty('--primary-light', themeData.light);
@@ -1092,7 +1093,7 @@ export function AgroProvider({ children }) {
       const isLightMode = configuraciones?.modoOscuro === 0 || currentClient.theme === 'Blanco Completo';
       const isBlanco = currentClient.theme === 'Blanco Completo';
       const isNoche = currentClient.theme === 'Noche Clásica';
-      const isPizarra = currentClient.theme === 'Azul Pizarra';
+      const isPizarra = currentClient.theme === 'Tema Principal';
 
       if (isBlanco) {
         document.documentElement.style.setProperty('--bg-gradient', isLightMode ? '#f3f4f6' : '#09090b');
@@ -1239,7 +1240,7 @@ export function AgroProvider({ children }) {
 
   const loginUser = async ({ email, password }) => {
     try {
-      const res = await fetch(`http://${window.location.hostname}:3001/api/login`, {
+      const res = await fetch(`http://${window.location.hostname}:3000/api/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password })
@@ -1279,7 +1280,7 @@ export function AgroProvider({ children }) {
               id: 'std-01',
               name: 'AgroIndustrias del Norte',
               plan: 'Premium',
-              theme: 'Verde Agro',
+              theme: 'Tema Principal',
               status: 'Activo'
             }
           };
@@ -1316,7 +1317,7 @@ export function AgroProvider({ children }) {
           name: clientData.name,
           plan: clientData.plan || 'Estándar',
           modules: PLAN_CONFIG[clientData.plan] || PLAN_CONFIG['Estándar'],
-          theme: clientData.theme || 'Verde Agro',
+          theme: clientData.theme || 'Tema Principal',
           databaseEngine: clientData.databaseEngine,
           databaseName: clientData.databaseName,
           connectionData: connData,
@@ -1387,7 +1388,7 @@ export function AgroProvider({ children }) {
     }
     
     try {
-      const res = await fetch(`http://${window.location.hostname}:3001/api/sync-data`, {
+      const res = await fetch(`http://${window.location.hostname}:3000/api/sync-data`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

@@ -170,7 +170,7 @@ export default function DatabaseConnectionConfig({
       }
     } catch (error) {
       setTestResult('error');
-      setTestMessage(`No se pudo conectar al servidor de validación local (asegúrate de que el backend esté ejecutándose en el puerto 3001). Error: ${error.message}`);
+      setTestMessage(`No se pudo conectar al servidor de validación local (asegúrate de que el backend esté ejecutándose en el puerto 3000). Error: ${error.message}`);
     } finally {
       setIsTesting(false);
     }

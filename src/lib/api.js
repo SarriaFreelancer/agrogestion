@@ -1,5 +1,5 @@
 const hostname = typeof window !== 'undefined' ? window.location.hostname : 'localhost';
-const rawApiBaseUrl = import.meta.env.VITE_API_URL || `http://${hostname}:3001`;
+const rawApiBaseUrl = import.meta.env.VITE_API_URL || `http://${hostname}:3000`;
 
 export const API_BASE_URL = rawApiBaseUrl.replace(/\/$/, '');
 

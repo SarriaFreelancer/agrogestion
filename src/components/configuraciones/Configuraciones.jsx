@@ -3,7 +3,7 @@ import { useAgro } from '../../context/AgroContext';
 import { Switch } from '../ui/Switch';
 
 function Configuraciones() {
-  const { currentClient, configuraciones, updateConfiguracion, currentUser, updateClient, clients, setCurrentClient } = useAgro();
+  const { currentClient, configuraciones, updateConfiguracion, currentUser, updateClient, clients, setCurrentClient, THEME_CONFIG } = useAgro();
   const isAdminUser = currentUser?.rol === 'Super Admin' || currentUser?.rol === 'Administrador' || currentUser?.modulos?.includes('ALL');
 
   const [activeTab, setActiveTab] = useState('monitoreo');
@@ -34,6 +34,9 @@ function Configuraciones() {
     }
     if (typeof setCurrentClient === 'function') {
       setCurrentClient({ ...currentClient, theme: newTheme });
+    }
+    if (typeof updateConfiguracion === 'function') {
+      updateConfiguracion('tema', newTheme);
     }
   };
 
@@ -432,7 +435,7 @@ function Configuraciones() {
         { id: 'Púrpura Real', label: 'Púrpura Real', desc: 'Elegancia, sofisticación y liderazgo.', img: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=800&auto=format&fit=crop' },
         { id: 'Naranja Atardecer', label: 'Naranja Atardecer', desc: 'Energía, creatividad y optimismo.', img: 'https://images.unsplash.com/photo-1472214103451-9374bd1c798e?q=80&w=800&auto=format&fit=crop' },
         { id: 'Gris Carbón', label: 'Gris Carbón', desc: 'Modernidad, equilibrio y profesionalismo.', img: 'https://images.unsplash.com/photo-1464802686167-b939a6910659?q=80&w=800&auto=format&fit=crop' },
-        { id: 'Azul Pizarra', label: 'Azul Pizarra', desc: 'El tono pizarra profundo de las tarjetas originales.', img: 'https://images.unsplash.com/photo-1550684848-fac1c5b4e853?q=80&w=800&auto=format&fit=crop' },
+        { id: 'Tema Principal', label: 'Tema Principal', desc: 'El tono pizarra profundo de las tarjetas originales.', img: 'https://images.unsplash.com/photo-1550684848-fac1c5b4e853?q=80&w=800&auto=format&fit=crop' },
         { id: 'Noche Clásica', label: 'Noche Clásica', desc: 'Un modo negro absoluto de alto contraste.', img: 'https://images.unsplash.com/photo-1519681393784-d120267933ba?q=80&w=800&auto=format&fit=crop' },
         { id: 'Modo Nocturno', label: 'Modo Nocturno', desc: 'Interfaz oscura para ambientes de baja luz.', img: 'https://images.unsplash.com/photo-1505322022379-7c3353ee6291?q=80&w=800&auto=format&fit=crop' },
         { id: 'Blanco Completo', label: 'Blanco Completo', desc: 'Diseño limpio y minimalista de alto contraste.', img: 'https://images.unsplash.com/photo-1517487881594-2787fef5ebf7?q=80&w=800&auto=format&fit=crop' }
@@ -503,9 +506,14 @@ function Configuraciones() {
                   <div className="p-4 relative z-20">
                     <h4 className={`text-base font-bold mb-1 ${isActive ? 'text-[var(--text-contrast)]' : 'text-[var(--text-muted)]'}`}>{theme.label}</h4>
                     <p className="text-xs text-[var(--text-muted)] leading-relaxed mb-4 min-h-[36px]">{theme.desc}</p>
-                    <div className="flex items-center gap-2">
-                      <div className={`w-3 h-3 rounded-full ${isActive ? 'bg-primary shadow-sm' : 'border border-gray-600 bg-transparent'}`}></div>
-                      {isActive && <span className="text-[10px] font-bold text-primary uppercase tracking-wider bg-primary/10 px-2 py-0.5 rounded">Activo</span>}
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <div className={`w-3 h-3 rounded-full ${isActive ? 'bg-primary shadow-sm' : 'border border-gray-600 bg-transparent'}`}></div>
+                        <span className={`text-xs font-semibold ${isActive ? 'text-[var(--text-contrast)]' : 'text-[var(--text-muted)]'}`}>
+                          {isActive ? 'Tema Activo' : 'Seleccionar Tema'}
+                        </span>
+                      </div>
+                      <div className="w-12 h-4 rounded shadow-sm border border-black/20" style={{ backgroundColor: THEME_CONFIG?.[theme.id]?.primary || 'gray' }}></div>
                     </div>
                   </div>
                 </button>
