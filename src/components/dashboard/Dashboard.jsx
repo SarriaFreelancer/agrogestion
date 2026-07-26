@@ -19,7 +19,7 @@ export default function Dashboard() {
           </p>
         </div>
         <div className="flex items-center gap-3">
-          <div className="px-3.5 py-1.5 rounded-xl bg-white/[0.04] border border-white/10 text-xs text-gray-300 flex items-center gap-2">
+          <div className="px-3.5 py-1.5 rounded-xl bg-white/[0.04] border border-white/10 text-xs text-[var(--text-muted)] flex items-center gap-2">
             <span className={`w-2 h-2 rounded-full ${isOnline ? 'bg-primary-light shadow-[0_0_8px_#10B981]' : 'bg-red-400'}`}></span>
             {isOnline ? 'Conectado en Tiempo Real' : 'Modo Offline (En Cola)'}
           </div>
@@ -30,7 +30,7 @@ export default function Dashboard() {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <div className="glass-card !p-6 relative overflow-hidden group hover:border-primary/40 transition-all duration-300">
           <div className="flex items-center justify-between mb-4">
-            <span className="text-xs font-bold text-gray-400 uppercase tracking-wider">Hectáreas Totales</span>
+            <span className="text-xs font-bold text-[var(--text-muted)] uppercase tracking-wider">Hectáreas Totales</span>
             <div className="w-10 h-10 rounded-xl bg-primary/10 border border-primary/20 flex items-center justify-center text-primary-light">
               <Layers size={20} />
             </div>
@@ -46,7 +46,7 @@ export default function Dashboard() {
 
         <div className="glass-card !p-6 relative overflow-hidden group hover:border-blue-500/40 transition-all duration-300">
           <div className="flex items-center justify-between mb-4">
-            <span className="text-xs font-bold text-gray-400 uppercase tracking-wider">Lotes Activos</span>
+            <span className="text-xs font-bold text-[var(--text-muted)] uppercase tracking-wider">Lotes Activos</span>
             <div className="w-10 h-10 rounded-xl bg-blue-500/10 border border-blue-500/20 flex items-center justify-center text-blue-400">
               <MapPin size={20} />
             </div>
@@ -62,7 +62,7 @@ export default function Dashboard() {
 
         <div className="glass-card !p-6 relative overflow-hidden group hover:border-amber-500/40 transition-all duration-300">
           <div className="flex items-center justify-between mb-4">
-            <span className="text-xs font-bold text-gray-400 uppercase tracking-wider">Actividades Programadas</span>
+            <span className="text-xs font-bold text-[var(--text-muted)] uppercase tracking-wider">Actividades Programadas</span>
             <div className="w-10 h-10 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-400">
               <Calendar size={20} />
             </div>
@@ -85,7 +85,7 @@ export default function Dashboard() {
           </div>
           <div>
             <h3 className="text-lg font-bold text-[var(--text-contrast)]">Estado del Sistema Agrícola</h3>
-            <p className="text-xs text-gray-400">Monitoreo de sincronización y parámetros de producción</p>
+            <p className="text-xs text-[var(--text-muted)]">Monitoreo de sincronización y parámetros de producción</p>
           </div>
         </div>
 
@@ -96,7 +96,7 @@ export default function Dashboard() {
             </div>
             <div>
               <div className="text-xs font-bold text-[var(--text-contrast)] uppercase tracking-wider">Disponibilidad de Instancia</div>
-              <div className="text-xs text-gray-400">Respaldo automático y alta tolerancia a fallos</div>
+              <div className="text-xs text-[var(--text-muted)]">Respaldo automático y alta tolerancia a fallos</div>
             </div>
           </div>
 
@@ -106,7 +106,7 @@ export default function Dashboard() {
             </div>
             <div>
               <div className="text-xs font-bold text-[var(--text-contrast)] uppercase tracking-wider">Cola de Sincronización</div>
-              <div className="text-xs text-gray-400">{syncQueue.length} registros pendientes en cola local</div>
+              <div className="text-xs text-[var(--text-muted)]">{syncQueue.length} registros pendientes en cola local</div>
             </div>
           </div>
         </div>

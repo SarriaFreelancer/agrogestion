@@ -84,8 +84,8 @@ function Configuraciones() {
                 🔬
               </div>
               <div>
-                <h2 className="text-2xl font-bold text-white tracking-tight">Monitoreo</h2>
-                <p className="text-sm text-gray-400 mt-1">Configure las opciones de monitoreo de su sistema</p>
+                <h2 className="text-2xl font-bold text-[var(--text-contrast)] tracking-tight">Monitoreo</h2>
+                <p className="text-sm text-[var(--text-muted)] mt-1">Configure las opciones de monitoreo de su sistema</p>
               </div>
             </div>
             <div className="bg-primary/10 border border-primary/20 px-4 py-3 rounded-xl flex items-center gap-3">
@@ -94,7 +94,7 @@ function Configuraciones() {
               </div>
               <div>
                 <h4 className="text-sm font-semibold text-primary">Monitoreo Activo</h4>
-                <p className="text-[11px] text-gray-400">Todas las funciones están habilitadas</p>
+                <p className="text-[11px] text-[var(--text-muted)]">Todas las funciones están habilitadas</p>
               </div>
             </div>
           </div>
@@ -108,17 +108,17 @@ function Configuraciones() {
               { id: 'monitoreo_obs', label: 'Permitir observaciones', desc: 'Agrega un campo de notas al formulario de monitoreo.', icon: '📝' },
               { id: 'monitoreo_req', label: 'Variables validar requeridas', desc: 'Impide guardar monitoreo si una variable marcada como requerida está vacía.', icon: '⚙️' }
             ].map(opt => (
-              <div key={opt.id} className="flex items-center justify-between p-4 rounded-xl bg-[#111827] border border-white/5 hover:border-primary/30 transition-colors group relative overflow-hidden">
+              <div key={opt.id} className="flex items-center justify-between p-4 rounded-xl bg-[#111827] border border-[var(--glass-border)] hover:border-primary/30 transition-colors group relative overflow-hidden">
                 <div className="absolute left-0 top-0 bottom-0 w-1 bg-primary rounded-l-xl opacity-0 group-hover:opacity-100 transition-opacity"></div>
                 <div className="absolute inset-0 bg-gradient-to-r from-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none"></div>
                 
                 <div className="flex items-center gap-4 relative z-10">
-                  <div className="w-10 h-10 rounded-full bg-surface border border-white/10 flex items-center justify-center text-gray-400 group-hover:text-primary group-hover:border-primary/30 transition-colors">
+                  <div className="w-10 h-10 rounded-full bg-[var(--glass-bg)] border border-[var(--glass-border)] flex items-center justify-center text-[var(--text-muted)] group-hover:text-primary group-hover:border-primary/30 transition-colors">
                     {opt.icon}
                   </div>
                   <div>
-                    <h4 className="text-[15px] font-semibold text-white">{opt.label}</h4>
-                    <p className="text-[13px] text-gray-400 mt-0.5">{opt.desc}</p>
+                    <h4 className="text-[15px] font-semibold text-[var(--text-contrast)]">{opt.label}</h4>
+                    <p className="text-[13px] text-[var(--text-muted)] mt-0.5">{opt.desc}</p>
                   </div>
                 </div>
                 <div className="relative z-10 pr-2">
@@ -136,7 +136,7 @@ function Configuraciones() {
             <span className="text-xl">💡</span>
             <div className="relative z-10">
               <h4 className="text-sm font-bold text-primary mb-1">Consejo</h4>
-              <p className="text-xs text-gray-400">Estas configuraciones se aplican a todos los formularios de monitoreo del sistema.</p>
+              <p className="text-xs text-[var(--text-muted)]">Estas configuraciones se aplican a todos los formularios de monitoreo del sistema.</p>
             </div>
           </div>
         </div>
@@ -153,8 +153,8 @@ function Configuraciones() {
                 📦
               </div>
               <div>
-                <h2 className="text-2xl font-bold text-white tracking-tight">Insumos</h2>
-                <p className="text-sm text-gray-400 mt-1">Validaciones de productos y control de stock.</p>
+                <h2 className="text-2xl font-bold text-[var(--text-contrast)] tracking-tight">Insumos</h2>
+                <p className="text-sm text-[var(--text-muted)] mt-1">Validaciones de productos y control de stock.</p>
               </div>
             </div>
           </div>
@@ -166,16 +166,16 @@ function Configuraciones() {
               { id: 'bloquearStockNegativo', label: 'Bloquear Stock Negativo', desc: 'Impide salidas sin existencias.', icon: '🛑' },
               { id: 'registrarGpsInsumos', label: 'Registrar ubicación GPS', desc: 'Captura coordenadas para apuntes de insumos.', icon: '📍' }
             ].map(opt => (
-              <div key={opt.id} className="flex items-center justify-between p-4 rounded-xl bg-[#111827] border border-white/5 hover:border-primary/30 transition-colors group relative overflow-hidden">
+              <div key={opt.id} className="flex items-center justify-between p-4 rounded-xl bg-[#111827] border border-[var(--glass-border)] hover:border-primary/30 transition-colors group relative overflow-hidden">
                 <div className="absolute left-0 top-0 bottom-0 w-1 bg-primary rounded-l-xl opacity-0 group-hover:opacity-100 transition-opacity"></div>
                 
                 <div className="flex items-center gap-4 relative z-10">
-                  <div className="w-10 h-10 rounded-full bg-surface border border-white/10 flex items-center justify-center text-gray-400 group-hover:text-primary transition-colors">
+                  <div className="w-10 h-10 rounded-full bg-[var(--glass-bg)] border border-[var(--glass-border)] flex items-center justify-center text-[var(--text-muted)] group-hover:text-primary transition-colors">
                     {opt.icon}
                   </div>
                   <div>
-                    <h4 className="text-[15px] font-semibold text-white">{opt.label}</h4>
-                    <p className="text-[13px] text-gray-400 mt-0.5">{opt.desc}</p>
+                    <h4 className="text-[15px] font-semibold text-[var(--text-contrast)]">{opt.label}</h4>
+                    <p className="text-[13px] text-[var(--text-muted)] mt-0.5">{opt.desc}</p>
                   </div>
                 </div>
                 <div className="relative z-10 pr-2">
@@ -200,8 +200,8 @@ function Configuraciones() {
                 🚜
               </div>
               <div>
-                <h2 className="text-2xl font-bold text-white tracking-tight">Maquinaria</h2>
-                <p className="text-sm text-gray-400 mt-1">Reglas de equipos y validación operativa.</p>
+                <h2 className="text-2xl font-bold text-[var(--text-contrast)] tracking-tight">Maquinaria</h2>
+                <p className="text-sm text-[var(--text-muted)] mt-1">Reglas de equipos y validación operativa.</p>
               </div>
             </div>
           </div>
@@ -212,16 +212,16 @@ function Configuraciones() {
               { id: 'validarMaquinaria', label: 'Obligar Maquinaria', desc: 'Requiere equipo en labores mecánicas.', icon: '⚠️' },
               { id: 'registrarGpsMaquinaria', label: 'Registrar ubicación GPS', desc: 'Captura coordenadas para apuntes de maquinaria.', icon: '📍' }
             ].map(opt => (
-              <div key={opt.id} className="flex items-center justify-between p-4 rounded-xl bg-[#111827] border border-white/5 hover:border-primary/30 transition-colors group relative overflow-hidden">
+              <div key={opt.id} className="flex items-center justify-between p-4 rounded-xl bg-[#111827] border border-[var(--glass-border)] hover:border-primary/30 transition-colors group relative overflow-hidden">
                 <div className="absolute left-0 top-0 bottom-0 w-1 bg-primary rounded-l-xl opacity-0 group-hover:opacity-100 transition-opacity"></div>
                 
                 <div className="flex items-center gap-4 relative z-10">
-                  <div className="w-10 h-10 rounded-full bg-surface border border-white/10 flex items-center justify-center text-gray-400 group-hover:text-primary transition-colors">
+                  <div className="w-10 h-10 rounded-full bg-[var(--glass-bg)] border border-[var(--glass-border)] flex items-center justify-center text-[var(--text-muted)] group-hover:text-primary transition-colors">
                     {opt.icon}
                   </div>
                   <div>
-                    <h4 className="text-[15px] font-semibold text-white">{opt.label}</h4>
-                    <p className="text-[13px] text-gray-400 mt-0.5">{opt.desc}</p>
+                    <h4 className="text-[15px] font-semibold text-[var(--text-contrast)]">{opt.label}</h4>
+                    <p className="text-[13px] text-[var(--text-muted)] mt-0.5">{opt.desc}</p>
                   </div>
                 </div>
                 <div className="relative z-10 pr-2">
@@ -246,8 +246,8 @@ function Configuraciones() {
                 👥
               </div>
               <div>
-                <h2 className="text-2xl font-bold text-white tracking-tight">Mano de Obra</h2>
-                <p className="text-sm text-gray-400 mt-1">Control de nómina y personal requerido.</p>
+                <h2 className="text-2xl font-bold text-[var(--text-contrast)] tracking-tight">Mano de Obra</h2>
+                <p className="text-sm text-[var(--text-muted)] mt-1">Control de nómina y personal requerido.</p>
               </div>
             </div>
           </div>
@@ -258,16 +258,16 @@ function Configuraciones() {
               { id: 'validarNomina', label: 'Obligar Nómina', desc: 'Requiere registro de personal en las labores.', icon: '📋' },
               { id: 'registrarGpsManoObra', label: 'Registrar ubicación GPS', desc: 'Captura coordenadas para apuntes de mano de obra.', icon: '📍' }
             ].map(opt => (
-              <div key={opt.id} className="flex items-center justify-between p-4 rounded-xl bg-[#111827] border border-white/5 hover:border-primary/30 transition-colors group relative overflow-hidden">
+              <div key={opt.id} className="flex items-center justify-between p-4 rounded-xl bg-[#111827] border border-[var(--glass-border)] hover:border-primary/30 transition-colors group relative overflow-hidden">
                 <div className="absolute left-0 top-0 bottom-0 w-1 bg-primary rounded-l-xl opacity-0 group-hover:opacity-100 transition-opacity"></div>
                 
                 <div className="flex items-center gap-4 relative z-10">
-                  <div className="w-10 h-10 rounded-full bg-surface border border-white/10 flex items-center justify-center text-gray-400 group-hover:text-primary transition-colors">
+                  <div className="w-10 h-10 rounded-full bg-[var(--glass-bg)] border border-[var(--glass-border)] flex items-center justify-center text-[var(--text-muted)] group-hover:text-primary transition-colors">
                     {opt.icon}
                   </div>
                   <div>
-                    <h4 className="text-[15px] font-semibold text-white">{opt.label}</h4>
-                    <p className="text-[13px] text-gray-400 mt-0.5">{opt.desc}</p>
+                    <h4 className="text-[15px] font-semibold text-[var(--text-contrast)]">{opt.label}</h4>
+                    <p className="text-[13px] text-[var(--text-muted)] mt-0.5">{opt.desc}</p>
                   </div>
                 </div>
                 <div className="relative z-10 pr-2">
@@ -292,16 +292,16 @@ function Configuraciones() {
                 🗺️
               </div>
               <div>
-                <h2 className="text-2xl font-bold text-white tracking-tight">Estructura</h2>
-                <p className="text-sm text-gray-400 mt-1">Defina los niveles de jerarquía y sus descripciones.</p>
+                <h2 className="text-2xl font-bold text-[var(--text-contrast)] tracking-tight">Estructura</h2>
+                <p className="text-sm text-[var(--text-muted)] mt-1">Defina los niveles de jerarquía y sus descripciones.</p>
               </div>
             </div>
           </div>
 
-          <div className="bg-[#111827] border border-white/5 rounded-xl p-6 mb-6">
-            <label className="block text-sm font-semibold text-gray-300 mb-2">Niveles de jerarquía</label>
+          <div className="bg-[#111827] border border-[var(--glass-border)] rounded-xl p-6 mb-6">
+            <label className="block text-sm font-semibold text-[var(--text-muted)] mb-2">Niveles de jerarquía</label>
             <select
-              className="w-full bg-[#0d131f] border border-white/10 rounded-lg px-4 py-2.5 text-white focus:border-primary focus:ring-1 focus:ring-primary transition-colors"
+              className="w-full bg-[#0d131f] border border-[var(--glass-border)] rounded-lg px-4 py-2.5 text-[var(--text-contrast)] focus:border-primary focus:ring-1 focus:ring-primary transition-colors"
               value={configuraciones.estructuraNiveles || 4}
               onChange={(e) => handleEstructuraNivelesChange(e.target.value)}
             >
@@ -318,11 +318,11 @@ function Configuraciones() {
               const key = isLastLevel ? 'nivel4' : `nivel${index + 1}`;
               const levelNumber = isLastLevel ? 4 : index + 1;
               return (
-                <div key={key} className="bg-[#111827] border border-white/5 rounded-xl p-5">
-                  <label className="block text-sm font-semibold text-gray-300 mb-2">Nombre global Nivel {levelNumber}</label>
+                <div key={key} className="bg-[#111827] border border-[var(--glass-border)] rounded-xl p-5">
+                  <label className="block text-sm font-semibold text-[var(--text-muted)] mb-2">Nombre global Nivel {levelNumber}</label>
                   <input
                     type="text"
-                    className="w-full bg-[#0d131f] border border-white/10 rounded-lg px-4 py-2 text-white focus:border-primary focus:ring-1 focus:ring-primary transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="w-full bg-[#0d131f] border border-[var(--glass-border)] rounded-lg px-4 py-2 text-[var(--text-contrast)] focus:border-primary focus:ring-1 focus:ring-primary transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                     value={configuraciones.estructuraNivelNombres?.[key] || ''}
                     onChange={(e) => handleLevelNameChange(key, e.target.value)}
                     placeholder={`Ej: ${['Sector', 'Finca', 'Lote', 'Suerte', 'Subnivel', 'Subnivel'][index]}`}
@@ -346,8 +346,8 @@ function Configuraciones() {
                 📚
               </div>
               <div>
-                <h2 className="text-2xl font-bold text-white tracking-tight">Maestros</h2>
-                <p className="text-sm text-gray-400 mt-1">Habilite o desactive los catálogos en el sistema.</p>
+                <h2 className="text-2xl font-bold text-[var(--text-contrast)] tracking-tight">Maestros</h2>
+                <p className="text-sm text-[var(--text-muted)] mt-1">Habilite o desactive los catálogos en el sistema.</p>
               </div>
             </div>
           </div>
@@ -367,10 +367,10 @@ function Configuraciones() {
               { id: 'maestro_unidades', label: 'Unidades de Medida', icon: '📏' },
               { id: 'maestro_tipos_productos', label: 'Tipos de Productos', icon: '🔖' }
             ].map(maestro => (
-              <div key={maestro.id} className="flex items-center justify-between p-4 rounded-xl bg-[#111827] border border-white/5 hover:border-primary/30 transition-colors">
+              <div key={maestro.id} className="flex items-center justify-between p-4 rounded-xl bg-[#111827] border border-[var(--glass-border)] hover:border-primary/30 transition-colors">
                 <div className="flex items-center gap-3">
                   <span className="text-xl">{maestro.icon}</span>
-                  <span className="text-sm font-semibold text-white">{maestro.label}</span>
+                  <span className="text-sm font-semibold text-[var(--text-contrast)]">{maestro.label}</span>
                 </div>
                 <Switch 
                   checked={isEnabled(configuraciones[maestro.id] ?? 1)} 
@@ -392,16 +392,16 @@ function Configuraciones() {
                 ⚙️
               </div>
               <div>
-                <h2 className="text-2xl font-bold text-white tracking-tight">Instancia</h2>
-                <p className="text-sm text-gray-400 mt-1">Datos y estado de la cuenta activa.</p>
+                <h2 className="text-2xl font-bold text-[var(--text-contrast)] tracking-tight">Instancia</h2>
+                <p className="text-sm text-[var(--text-muted)] mt-1">Datos y estado de la cuenta activa.</p>
               </div>
             </div>
           </div>
 
-          <div className="bg-[#111827] border border-white/5 rounded-xl p-6 grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="bg-[#111827] border border-[var(--glass-border)] rounded-xl p-6 grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
               <p className="text-xs text-gray-500 uppercase tracking-wider mb-1">Empresa</p>
-              <p className="text-lg font-bold text-white">{currentClient?.name || 'Agro Empresa'}</p>
+              <p className="text-lg font-bold text-[var(--text-contrast)]">{currentClient?.name || 'Agro Empresa'}</p>
             </div>
             <div>
               <p className="text-xs text-gray-500 uppercase tracking-wider mb-1">Plan</p>
@@ -409,13 +409,13 @@ function Configuraciones() {
             </div>
             {isAdminUser && (
               <>
-                <div className="pt-4 border-t border-white/10">
+                <div className="pt-4 border-t border-[var(--glass-border)]">
                   <p className="text-xs text-gray-500 uppercase tracking-wider mb-1">Base de Datos</p>
-                  <p className="text-base text-gray-300 font-mono">{currentClient?.databaseName || `agroData_${currentClient?.id}`}</p>
+                  <p className="text-base text-[var(--text-muted)] font-mono">{currentClient?.databaseName || `agroData_${currentClient?.id}`}</p>
                 </div>
-                <div className="pt-4 border-t border-white/10">
+                <div className="pt-4 border-t border-[var(--glass-border)]">
                   <p className="text-xs text-gray-500 uppercase tracking-wider mb-1">Usuario BD</p>
-                  <p className="text-base text-gray-300 font-mono">{currentClient?.databaseUser || `${currentClient?.id}_user`}</p>
+                  <p className="text-base text-[var(--text-muted)] font-mono">{currentClient?.databaseUser || `${currentClient?.id}_user`}</p>
                 </div>
               </>
             )}
@@ -432,6 +432,7 @@ function Configuraciones() {
         { id: 'Púrpura Real', label: 'Púrpura Real', desc: 'Elegancia, sofisticación y liderazgo.', img: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=800&auto=format&fit=crop' },
         { id: 'Naranja Atardecer', label: 'Naranja Atardecer', desc: 'Energía, creatividad y optimismo.', img: 'https://images.unsplash.com/photo-1472214103451-9374bd1c798e?q=80&w=800&auto=format&fit=crop' },
         { id: 'Gris Carbón', label: 'Gris Carbón', desc: 'Modernidad, equilibrio y profesionalismo.', img: 'https://images.unsplash.com/photo-1464802686167-b939a6910659?q=80&w=800&auto=format&fit=crop' },
+        { id: 'Noche Clásica', label: 'Noche Clásica', desc: 'El tono oscuro profundo clásico del sistema original.', img: 'https://images.unsplash.com/photo-1519681393784-d120267933ba?q=80&w=800&auto=format&fit=crop' },
         { id: 'Modo Nocturno', label: 'Modo Nocturno', desc: 'Interfaz oscura para ambientes de baja luz.', img: 'https://images.unsplash.com/photo-1505322022379-7c3353ee6291?q=80&w=800&auto=format&fit=crop' },
         { id: 'Blanco Completo', label: 'Blanco Completo', desc: 'Diseño limpio y minimalista de alto contraste.', img: 'https://images.unsplash.com/photo-1517487881594-2787fef5ebf7?q=80&w=800&auto=format&fit=crop' }
       ];
@@ -441,22 +442,37 @@ function Configuraciones() {
           {/* Header */}
           <div className="flex items-center justify-between mb-8">
             <div className="flex items-center gap-4">
-              <div className="w-12 h-12 rounded-xl bg-white/5 flex items-center justify-center text-gray-300 text-2xl border border-white/10">
+              <div className="w-12 h-12 rounded-xl bg-white/5 flex items-center justify-center text-[var(--text-muted)] text-2xl border border-[var(--glass-border)]">
                 🎨
               </div>
               <div>
-                <h2 className="text-2xl font-bold text-white tracking-tight">Apariencia</h2>
-                <p className="text-sm text-gray-400 mt-1">Seleccione el esquema de colores para su instancia</p>
+                <h2 className="text-2xl font-bold text-[var(--text-contrast)] tracking-tight">Apariencia</h2>
+                <p className="text-sm text-[var(--text-muted)] mt-1">Seleccione el esquema de colores para su instancia</p>
               </div>
             </div>
-            <div className="bg-surface border border-white/5 px-4 py-3 rounded-xl flex items-center gap-3 max-w-sm">
-              <div className="w-6 h-6 shrink-0 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-gray-400 text-xs">
+            <div className="bg-[var(--glass-bg)] border border-[var(--glass-border)] px-4 py-3 rounded-xl flex items-center gap-3 max-w-sm">
+              <div className="w-6 h-6 shrink-0 rounded-full bg-white/5 border border-[var(--glass-border)] flex items-center justify-center text-[var(--text-muted)] text-xs">
                 ℹ️
               </div>
               <div>
                 <h4 className="text-[12px] font-semibold text-primary mb-0.5">Información</h4>
-                <p className="text-[11px] text-gray-400 leading-tight">El cambio de apariencia se aplicará inmediatamente en toda la plataforma.</p>
+                <p className="text-[11px] text-[var(--text-muted)] leading-tight">El cambio de apariencia se aplicará inmediatamente en toda la plataforma.</p>
               </div>
+            </div>
+          </div>
+          
+          <div className="bg-[#111827] border border-[var(--glass-border)] rounded-xl p-4 mb-6 flex items-center justify-between">
+            <div>
+              <h4 className="text-[15px] font-semibold text-[var(--text-contrast)]">Modo Claro / Oscuro</h4>
+              <p className="text-[13px] text-[var(--text-muted)] mt-0.5">Alterna la base de la interfaz (los colores primarios del tema se mantendrán).</p>
+            </div>
+            <div className="flex items-center gap-3">
+              <span className={`text-xs font-semibold ${configuraciones.modoOscuro === 0 ? 'text-primary' : 'text-gray-500'}`}>Claro</span>
+              <Switch 
+                checked={configuraciones.modoOscuro !== 0} 
+                onCheckedChange={() => handleToggle('modoOscuro')} 
+              />
+              <span className={`text-xs font-semibold ${configuraciones.modoOscuro !== 0 ? 'text-primary' : 'text-gray-500'}`}>Oscuro</span>
             </div>
           </div>
 
@@ -470,7 +486,7 @@ function Configuraciones() {
                   className={`relative text-left rounded-xl overflow-hidden border transition-all duration-300 group
                     ${isActive 
                       ? 'border-primary shadow-[0_0_20px_rgba(16,185,129,0.15)] bg-[#111827]' 
-                      : 'border-white/5 bg-[#111827] hover:border-white/20'
+                      : 'border-[var(--glass-border)] bg-[#111827] hover:border-white/20'
                     }
                   `}
                 >
@@ -484,8 +500,8 @@ function Configuraciones() {
                     )}
                   </div>
                   <div className="p-4 relative z-20">
-                    <h4 className={`text-base font-bold mb-1 ${isActive ? 'text-white' : 'text-gray-200'}`}>{theme.label}</h4>
-                    <p className="text-xs text-gray-400 leading-relaxed mb-4 min-h-[36px]">{theme.desc}</p>
+                    <h4 className={`text-base font-bold mb-1 ${isActive ? 'text-[var(--text-contrast)]' : 'text-[var(--text-muted)]'}`}>{theme.label}</h4>
+                    <p className="text-xs text-[var(--text-muted)] leading-relaxed mb-4 min-h-[36px]">{theme.desc}</p>
                     <div className="flex items-center gap-2">
                       <div className={`w-3 h-3 rounded-full ${isActive ? 'bg-primary shadow-[0_0_8px_rgba(16,185,129,0.8)]' : 'border border-gray-600 bg-transparent'}`}></div>
                       {isActive && <span className="text-[10px] font-bold text-primary uppercase tracking-wider bg-primary/10 px-2 py-0.5 rounded">Activo</span>}
@@ -511,13 +527,13 @@ function Configuraciones() {
   };
 
   return (
-    <div className="flex h-full w-full fade-in gap-5 p-0 bg-[#070b12]">
+    <div className="flex h-full w-full fade-in gap-5 p-0 bg-transparent">
       {/* Sidebar de Configuración */}
-      <div className="w-[280px] border-r border-white/5 flex-shrink-0 z-10 bg-[#0d131f] flex flex-col h-full overflow-hidden shadow-2xl">
+      <div className="w-[280px] border-r border-[var(--glass-border)] flex-shrink-0 z-10 bg-[var(--sidebar-bg)] flex flex-col h-full overflow-hidden shadow-2xl">
         {/* Header */}
         <div className="px-6 py-8 shrink-0 bg-transparent flex flex-col justify-center">
-          <h1 className="text-2xl font-bold tracking-tight text-white leading-tight mb-1">Configuración</h1>
-          <p className="text-[13px] text-gray-400 leading-normal">Administre sus preferencias</p>
+          <h1 className="text-2xl font-bold tracking-tight text-[var(--sidebar-text)] leading-tight mb-1">Configuración</h1>
+          <p className="text-[13px] text-[var(--sidebar-text-muted)] leading-normal">Administre sus preferencias</p>
         </div>
 
         {/* Lista de Navegación Ordenada */}
@@ -526,7 +542,7 @@ function Configuraciones() {
             <div key={idx} className="space-y-3">
               {/* Título de Categoría */}
               <div className="flex items-center gap-2 px-2 mb-2">
-                <h3 className="text-[10px] font-bold tracking-widest uppercase text-gray-500 leading-none">
+                <h3 className="text-[10px] font-bold tracking-widest uppercase text-[var(--sidebar-text-muted)] leading-none">
                   {section.title}
                 </h3>
               </div>
@@ -543,11 +559,11 @@ function Configuraciones() {
                       className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-[13px] transition-all duration-200 group ${
                         isActive 
                           ? 'bg-primary text-white font-semibold shadow-lg shadow-primary/20' 
-                          : 'text-gray-400 hover:text-gray-200 hover:bg-white/5'
+                          : 'text-[var(--sidebar-text-muted)] hover:text-gray-200 hover:bg-white/5'
                       }`}
                     >
                       <span className={`w-5 h-5 flex items-center justify-center shrink-0 transition-colors ${
-                        isActive ? 'text-white' : 'text-gray-500 group-hover:text-gray-300'
+                        isActive ? 'text-[var(--sidebar-text)]' : 'text-[var(--sidebar-text-muted)] group-hover:text-gray-300'
                       }`}>
                         {item.icon}
                       </span>

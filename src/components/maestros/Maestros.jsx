@@ -135,7 +135,7 @@ export default function Maestros() {
               <Database size={32} />
             </div>
             <h3 className="text-lg font-bold text-[var(--text-contrast)] mb-2">Seleccione un maestro para comenzar</h3>
-            <p className="text-sm text-gray-400 max-w-md leading-relaxed">
+            <p className="text-sm text-[var(--text-muted)] max-w-md leading-relaxed">
               Explore y edite los catálogos de maquinaria, personal, productos, cultivos y configuraciones estructurales del sistema.
             </p>
           </div>

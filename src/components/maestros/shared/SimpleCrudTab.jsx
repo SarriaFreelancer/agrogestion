@@ -39,7 +39,7 @@ export default function SimpleCrudTab({ title, data, onAdd, onEdit, onDelete, fi
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div className="flex items-center gap-3 flex-1 max-w-md">
           <div className="relative w-full">
-            <Search size={17} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+            <Search size={17} className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--text-muted)]" />
             <input
               className="input-field !pl-9"
               placeholder={`Buscar en ${title.toLowerCase()}...`}
@@ -125,7 +125,7 @@ export default function SimpleCrudTab({ title, data, onAdd, onEdit, onDelete, fi
                   <td>
                     <div className="flex items-center justify-end gap-2">
                       <button 
-                        className="btn-secondary !p-2 !m-0 text-gray-300 hover:text-[var(--text-contrast)]" 
+                        className="btn-secondary !p-2 !m-0 text-[var(--text-muted)] hover:text-[var(--text-contrast)]" 
                         title="Editar"
                         onClick={() => handleEdit(item)}
                       >

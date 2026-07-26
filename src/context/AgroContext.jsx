@@ -12,6 +12,7 @@ const THEME_CONFIG = {
   'Naranja Atardecer': { primary: '#E65100', light: '#FF9800', dark: '#BF360C', bg: 'linear-gradient(135deg, #090d16 0%, #1c0e06 100%)', text: '#F9FAFB', muted: '#9CA3AF', glass: 'rgba(18, 25, 38, 0.75)', border: 'rgba(255, 255, 255, 0.08)', input: 'rgba(255, 255, 255, 0.04)' },
   'Gris Carbón': { primary: '#263238', light: '#455A64', dark: '#102027', bg: 'linear-gradient(135deg, #090d16 0%, #111619 100%)', text: '#F9FAFB', muted: '#9CA3AF', glass: 'rgba(18, 25, 38, 0.75)', border: 'rgba(255, 255, 255, 0.08)', input: 'rgba(255, 255, 255, 0.04)' },
   'Modo Nocturno': { primary: '#10B981', light: '#34D399', dark: '#059669', bg: '#000000', text: '#ffffff', muted: '#aaaaaa', glass: 'rgba(25, 25, 25, 0.95)', border: 'rgba(255,255,255,0.15)', input: '#1a1a1a' },
+  'Noche Clásica': { primary: '#0d131f', light: '#1a263e', dark: '#070b12', bg: 'linear-gradient(135deg, #090d16 0%, #0d131f 100%)', text: '#F9FAFB', muted: '#9CA3AF', glass: 'rgba(18, 25, 38, 0.75)', border: 'rgba(255, 255, 255, 0.08)', input: 'rgba(255, 255, 255, 0.04)' },
   'Blanco Completo': { primary: '#000000', light: '#333333', dark: '#000000', bg: '#ffffff', text: '#000000', muted: '#6B7280', glass: 'rgba(255, 255, 255, 0.95)', border: 'rgba(0, 0, 0, 0.1)', input: 'rgba(0, 0, 0, 0.05)' }
 };
 
@@ -58,6 +59,7 @@ const GLOBAL_CONFIG_DEFAULTS = {
   maestro_mao: 1,
   maestro_maq: 1,
   maestro_ins: 1,
+  modoOscuro: 1,
   maestro_actividad: 1,
   maestro_tp_act: 1,
   maestro_proveedores: 1,
@@ -1086,21 +1088,48 @@ export function AgroProvider({ children }) {
       document.documentElement.style.setProperty('--primary-dark', themeData.dark);
       document.documentElement.style.setProperty('--primary-rgb', hexToRgb(themeData.primary));
       document.documentElement.style.setProperty('--primary-light-rgb', hexToRgb(themeData.light));
-      document.documentElement.style.setProperty('--primary-dark-rgb', hexToRgb(themeData.dark));
+      const isLightMode = configuraciones?.modoOscuro === 0 || currentClient.theme === 'Blanco Completo';
+      const isBlanco = currentClient.theme === 'Blanco Completo';
+
+      if (isBlanco) {
+        document.documentElement.style.setProperty('--bg-gradient', isLightMode ? '#f3f4f6' : '#09090b');
+        document.documentElement.style.setProperty('--sidebar-bg', isLightMode ? '#ffffff' : '#0d131f');
+        document.documentElement.style.setProperty('--glass-bg', isLightMode ? 'rgba(255, 255, 255, 0.8)' : 'rgba(18, 25, 38, 0.75)');
+        document.documentElement.style.setProperty('--glass-border', isLightMode ? 'rgba(0, 0, 0, 0.1)' : 'rgba(255, 255, 255, 0.08)');
+        document.documentElement.style.setProperty('--input-bg', isLightMode ? 'rgba(255, 255, 255, 1)' : 'rgba(255, 255, 255, 0.04)');
+        document.documentElement.style.setProperty('--text-main', isLightMode ? '#374151' : '#F9FAFB');
+        document.documentElement.style.setProperty('--text-muted', isLightMode ? '#6b7280' : '#9ca3af');
+        document.documentElement.style.setProperty('--sidebar-text', isLightMode ? '#111827' : '#ffffff');
+        document.documentElement.style.setProperty('--sidebar-text-muted', isLightMode ? '#6b7280' : '#9ca3af');
+      } else {
+        if (isLightMode) {
+          // Soft primary background, strong primary sidebar
+          document.documentElement.style.setProperty('--bg-gradient', 'linear-gradient(135deg, rgb(var(--primary-rgb) / 0.05) 0%, rgb(var(--primary-rgb) / 0.15) 100%)');
+          document.documentElement.style.setProperty('--sidebar-bg', 'color-mix(in srgb, var(--primary-dark) 50%, #000000)');
+          document.documentElement.style.setProperty('--glass-bg', 'rgba(255, 255, 255, 0.7)');
+          document.documentElement.style.setProperty('--glass-border', 'rgb(var(--primary-rgb) / 0.2)');
+          document.documentElement.style.setProperty('--input-bg', 'rgba(255, 255, 255, 0.9)');
+          document.documentElement.style.setProperty('--text-main', '#374151');
+          document.documentElement.style.setProperty('--text-muted', '#6b7280');
+          document.documentElement.style.setProperty('--sidebar-text', '#ffffff');
+          document.documentElement.style.setProperty('--sidebar-text-muted', 'rgba(255, 255, 255, 0.7)');
+        } else {
+          // Dark background restores original beautiful theme values, with original menu color
+          document.documentElement.style.setProperty('--bg-gradient', themeData.bg);
+          document.documentElement.style.setProperty('--sidebar-bg', '#0d131f'); // original elegant dark color
+          document.documentElement.style.setProperty('--glass-bg', themeData.glass);
+          document.documentElement.style.setProperty('--glass-border', themeData.border);
+          document.documentElement.style.setProperty('--input-bg', themeData.input);
+          document.documentElement.style.setProperty('--text-main', themeData.text);
+          document.documentElement.style.setProperty('--text-muted', themeData.muted);
+          document.documentElement.style.setProperty('--sidebar-text', '#ffffff');
+          document.documentElement.style.setProperty('--sidebar-text-muted', 'rgba(255, 255, 255, 0.7)');
+        }
+      }
       
-      // Nuevas variables para modo oscuro completo
-      if (themeData.bg) document.documentElement.style.setProperty('--bg-gradient', themeData.bg);
-      if (themeData.text) document.documentElement.style.setProperty('--text-main', themeData.text);
-      if (themeData.muted) document.documentElement.style.setProperty('--text-muted', themeData.muted);
-      if (themeData.glass) document.documentElement.style.setProperty('--glass-bg', themeData.glass);
-      if (themeData.border) document.documentElement.style.setProperty('--glass-border', themeData.border);
-      if (themeData.input) document.documentElement.style.setProperty('--input-bg', themeData.input);
-      
-      const isLight = (currentClient.theme === 'Blanco Completo');
-      document.documentElement.style.setProperty('--text-contrast', isLight ? '#000000' : '#ffffff');
-      document.documentElement.style.setProperty('--sidebar-bg', isLight ? '#f3f4f6' : '#1e1e2f');
+      document.documentElement.style.setProperty('--text-contrast', isLightMode ? '#1f2937' : '#ffffff');
     }
-  }, [currentClient.theme]);
+  }, [currentClient.theme, configuraciones?.modoOscuro]);
 
   const processSync = async () => {
     if (!isOnline || syncQueue.length === 0) return;

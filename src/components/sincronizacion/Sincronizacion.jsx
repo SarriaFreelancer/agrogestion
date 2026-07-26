@@ -29,7 +29,7 @@ export default function Sincronizacion() {
             </div>
             <div>
               <h3 className="text-base font-bold text-[var(--text-contrast)]">Descarga de Formularios</h3>
-              <p className="text-xs text-gray-400">Maestros, Suertes y Órdenes Planificadas</p>
+              <p className="text-xs text-[var(--text-muted)]">Maestros, Suertes y Órdenes Planificadas</p>
             </div>
           </div>
           <div className="p-4 rounded-xl bg-primary/10 border border-primary/20 text-xs text-primary-light leading-relaxed">
@@ -46,7 +46,7 @@ export default function Sincronizacion() {
             </div>
             <div>
               <h3 className="text-base font-bold text-[var(--text-contrast)]">Envío de Ejecuciones</h3>
-              <p className="text-xs text-gray-400">Labores realizadas y Monitoreos de campo</p>
+              <p className="text-xs text-[var(--text-muted)]">Labores realizadas y Monitoreos de campo</p>
             </div>
           </div>
           <div className="p-4 rounded-xl bg-amber-500/10 border border-amber-500/20 text-xs text-amber-200 leading-relaxed">
@@ -61,16 +61,16 @@ export default function Sincronizacion() {
         <div className="flex items-center justify-between border-b border-white/10 pb-4">
           <div>
             <h3 className="text-lg font-bold text-[var(--text-contrast)]">Control de Sincronización Manual</h3>
-            <p className="text-xs text-gray-400">Ejecute la sincronización cuando disponga de conexión estable a internet</p>
+            <p className="text-xs text-[var(--text-muted)]">Ejecute la sincronización cuando disponga de conexión estable a internet</p>
           </div>
-          <div className="flex items-center gap-2 text-xs font-semibold px-3 py-1.5 rounded-lg bg-white/[0.04] border border-white/10 text-gray-300">
+          <div className="flex items-center gap-2 text-xs font-semibold px-3 py-1.5 rounded-lg bg-white/[0.04] border border-white/10 text-[var(--text-muted)]">
             <Wifi size={14} className={isOnline ? "text-primary-light" : "text-red-400"} />
             <span>{isOnline ? 'Internet Conectado' : 'Sin Conexión'}</span>
           </div>
         </div>
 
         <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-2">
-          <div className="text-xs text-gray-400 flex items-center gap-2">
+          <div className="text-xs text-[var(--text-muted)] flex items-center gap-2">
             <Clock size={15} />
             <span>Última sincronización exitosa: <strong className="text-[var(--text-contrast)]">{lastSync ? new Date(lastSync).toLocaleString() : 'Nunca'}</strong></span>
           </div>

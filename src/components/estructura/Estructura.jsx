@@ -90,7 +90,7 @@ export default function Estructura() {
     <button
       key={suerte.id}
       onClick={() => setSelectedNode(suerte)}
-      className={`w-full text-left p-2.5 rounded-lg border transition-all duration-200 flex items-center gap-2 text-xs font-semibold !m-0 ${activeNode?.id === suerte.id ? 'bg-primary/20 border-primary text-primary-light shadow-[0_0_12px_rgba(16,185,129,0.2)]' : 'bg-white/[0.02] border-white/10 text-gray-300 hover:bg-white/[0.05]'}`}
+      className={`w-full text-left p-2.5 rounded-lg border transition-all duration-200 flex items-center gap-2 text-xs font-semibold !m-0 ${activeNode?.id === suerte.id ? 'bg-primary/20 border-primary text-primary-light shadow-[0_0_12px_rgba(16,185,129,0.2)]' : 'bg-white/[0.02] border-white/10 text-[var(--text-muted)] hover:bg-white/[0.05]'}`}
     >
       <Sprout size={14} className="text-primary-light flex-shrink-0" />
       <span className="truncate"><strong>{suerte.id}</strong> - {suerte.name}</span>
@@ -106,7 +106,7 @@ export default function Estructura() {
         <div className="flex items-center gap-2 justify-between">
           <button
             onClick={() => setSelectedNode(lote)}
-            className={`flex-1 text-left p-2.5 rounded-lg border transition-all duration-200 flex items-center gap-2 text-xs font-semibold !m-0 ${activeNode?.id === lote.id ? 'bg-primary/20 border-primary text-primary-light' : 'bg-white/[0.02] border-white/10 text-gray-300 hover:bg-white/[0.05]'}`}
+            className={`flex-1 text-left p-2.5 rounded-lg border transition-all duration-200 flex items-center gap-2 text-xs font-semibold !m-0 ${activeNode?.id === lote.id ? 'bg-primary/20 border-primary text-primary-light' : 'bg-white/[0.02] border-white/10 text-[var(--text-muted)] hover:bg-white/[0.05]'}`}
           >
             <Package size={15} className="text-blue-400 flex-shrink-0" />
             <span className="truncate"><strong>{lote.id}</strong> - {lote.name}</span>
@@ -269,7 +269,7 @@ export default function Estructura() {
           <div className="flex items-center justify-between border-b border-white/10 pb-4">
             <div>
               <h3 className="font-bold text-[var(--text-contrast)] text-base">Jerarquía Activa</h3>
-              <p className="text-xs text-gray-400 mt-0.5">
+              <p className="text-xs text-[var(--text-muted)] mt-0.5">
                 {levelLabels.slice(0, structureLevelCount).join(' › ')}
               </p>
             </div>
@@ -336,7 +336,7 @@ export default function Estructura() {
                 <MousePointerClick size={32} />
               </div>
               <h3 className="text-lg font-bold text-[var(--text-contrast)] mb-2">Seleccione un elemento de la jerarquía</h3>
-              <p className="text-sm text-gray-400 max-w-sm leading-relaxed">
+              <p className="text-sm text-[var(--text-muted)] max-w-sm leading-relaxed">
                 Haga clic en cualquier Sector, Finca, Lote o Suerte del árbol para ver y editar su Hoja de Vida.
               </p>
             </div>

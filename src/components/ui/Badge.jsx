@@ -7,7 +7,7 @@ const Badge = React.forwardRef(({ className, variant = 'default', children, ...p
     default: "bg-primary text-[var(--text-contrast)] hover:bg-primary-dark",
     secondary: "bg-surface text-[var(--text-contrast)] border border-white/10 hover:bg-surface-hover",
     destructive: "bg-red-500 text-[var(--text-contrast)] hover:bg-red-600",
-    outline: "text-gray-300 border border-white/10",
+    outline: "text-[var(--text-muted)] border border-white/10",
     success: "bg-primary/20 text-primary-light border border-primary/30",
     warning: "bg-yellow-500/20 text-yellow-500 border border-yellow-500/30",
   };
