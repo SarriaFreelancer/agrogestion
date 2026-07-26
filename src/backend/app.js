@@ -6,6 +6,7 @@ import tenantRoutes from './modules/tenant/tenant.routes.js';
 import adminRoutes from './modules/admin/admin.routes.js';
 import clientsRoutes from './modules/clients/clients.routes.js';
 import syncRoutes from './modules/sync/sync.routes.js';
+import billingRoutes from './modules/billing/billing.routes.js';
 
 const app = express();
 app.use(cors());
@@ -20,5 +21,6 @@ app.use('/api', tenantRoutes); // test-connection, init-db
 app.use('/api/global-admins', adminRoutes);
 app.use('/api/clientes', clientsRoutes);
 app.use('/api', syncRoutes); // sync-data, load-data
+app.use('/api/billing', billingRoutes); // suscripciones y facturacion
 
 export default app;
