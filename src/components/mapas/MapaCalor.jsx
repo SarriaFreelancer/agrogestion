@@ -139,7 +139,7 @@ export default function MapaCalor() {
   }, [registrosControles, selectedControl, selectedVar]);
 
   return (
-    <div className="fade-in">
+    <div className="space-y-8 fade-in p-6 lg:p-10 h-full w-full overflow-y-auto custom-scrollbar bg-transparent">
       <div className="header">
         <h1>Mapas de Calor y Monitoreo Geográfico</h1>
         <p>Visualización espacial de plagas, enfermedades y variables agronómicas.</p>

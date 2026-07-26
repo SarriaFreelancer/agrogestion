@@ -162,7 +162,7 @@ export default function GestionClientes() {
   }
 
   return (
-    <div className="fade-in">
+    <div className="space-y-8 fade-in p-6 lg:p-10 h-full w-full overflow-y-auto custom-scrollbar bg-transparent">
       <div className="header clients-header">
         <div>
           <h1>Gestión de Empresas</h1>
