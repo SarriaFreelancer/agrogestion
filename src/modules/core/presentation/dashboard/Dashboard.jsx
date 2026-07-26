@@ -1,9 +1,13 @@
 import React from 'react';
 import { useAgro } from '@/providers/AgroContext';
+import { useTenant } from '@/providers/TenantProvider';
+import { useSync } from '@/providers/SyncProvider';
 import { Layers, MapPin, Calendar, Activity, TrendingUp, CheckCircle, ShieldCheck, Zap } from 'lucide-react';
 
 export default function Dashboard() {
-  const { calcTotalHa, calcLotesActivos, currentClient, isOnline, syncQueue } = useAgro();
+  const { calcTotalHa, calcLotesActivos } = useAgro();
+  const { currentClient } = useTenant();
+  const { isOnline, syncQueue } = useSync();
 
   return (
     <div className="space-y-8 fade-in p-6 lg:p-10 h-full w-full overflow-y-auto custom-scrollbar bg-transparent">
@@ -15,7 +19,7 @@ export default function Dashboard() {
             <span className="badge badge-active text-[11px]">En Vivo</span>
           </div>
           <p className="text-sm text-[#9CA3AF]">
-            Resumen operativo y métricas clave de la instancia <strong className="text-primary-light font-semibold">{currentClient.name}</strong>
+            Resumen operativo y métricas clave de la instancia <strong className="text-primary-light font-semibold">{currentClient?.name || 'Cargando...'}</strong>
           </p>
         </div>
         <div className="flex items-center gap-3">

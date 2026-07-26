@@ -128,8 +128,9 @@ export const login = async (req, res) => {
           client: {
             id: company.id,
             name: company.name,
-            databaseEngine: company.server?.engine,
-            databaseName: company.databaseName
+            databaseEngine: company.server?.engine === 'SQLSERVER' ? 'SQL Server' : (company.server?.engine === 'POSTGRESQL' ? 'PostgreSQL' : 'MySQL'),
+            databaseName: company.databaseName,
+            connectionData
           },
           isGlobalAdmin: false
         });

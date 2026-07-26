@@ -2,6 +2,8 @@ import { useState } from 'react';
 import './index.css';
 import { GlobalProvider } from '@/providers';
 import { useAgro } from '@/providers/AgroContext';
+import { useAuth } from '@/providers/AuthProvider';
+import { useTenant } from '@/providers/TenantProvider';
 
 // Import components
 import Dashboard from '@/modules/core/presentation/dashboard/Dashboard';
@@ -26,9 +28,11 @@ function AppContent() {
   const [currentView, setCurrentView] = useState('dashboard');
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   
-  const { 
-    currentClient, currentUser, loginUser, logoutUser, hasPermission
-  } = useAgro();
+  const { currentUser, loginUser, logoutUser, hasPermission } = useAuth();
+  const { currentClient } = useTenant();
+  // We keep useAgro for other things if needed, but not for auth.
+  const {} = useAgro(); 
+
   const isAdminUser = currentUser?.rol === 'Super Admin' || currentUser?.rol === 'Administrador' || currentUser?.modulos?.includes('ALL');
 
   if (!currentUser) {

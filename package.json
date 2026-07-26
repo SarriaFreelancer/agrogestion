@@ -8,7 +8,7 @@
     "build": "vite build",
     "lint": "eslint .",
     "preview": "vite preview",
-    "start:server": "node server.js",
+    "start:server": "npx prisma db push && node src/backend/seed.js && node server.js",
     "start": "pnpm run build && concurrently \"pnpm run start:server\" \"pnpm run dev\""
   },
   "dependencies": {

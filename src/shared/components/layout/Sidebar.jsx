@@ -1,12 +1,17 @@
 import React from 'react';
 import { useAgro } from '@/providers/AgroContext';
+import { useAuth } from '@/providers/AuthProvider';
+import { useTenant } from '@/providers/TenantProvider';
 
 const Sidebar = ({ currentView, onNavClick, isMobileMenuOpen, setIsMobileMenuOpen }) => {
   const { 
     globalPlanta, setGlobalPlanta, plantas,
     globalCultivo, setGlobalCultivo, cultivos, syncQueue, 
-    currentClient, currentUser, switchClient, hasPermission, clients
+    switchClient, clients
   } = useAgro();
+  
+  const { currentUser, hasPermission } = useAuth();
+  const { currentClient } = useTenant();
   
   const isAdminUser = currentUser?.rol === 'Super Admin' || currentUser?.rol === 'Administrador' || currentUser?.modulos?.includes('ALL');
 
@@ -87,25 +92,7 @@ const Sidebar = ({ currentView, onNavClick, isMobileMenuOpen, setIsMobileMenuOpe
           </button>
         </div>
 
-        {/* Instancia Activa */}
-        <div className="p-4 mb-6 bg-[var(--input-bg)] border border-white/10 rounded-xl shadow-inner">
-          <label className="text-[10px] font-extrabold tracking-wider text-[var(--sidebar-text-muted)] uppercase block mb-2">Instancia Activa</label>
-          <select 
-            className="w-full p-2.5 rounded-lg border border-white/10 bg-[var(--input-bg)] text-[var(--sidebar-text)] text-xs font-bold focus:outline-none focus:ring-2 focus:ring-primary transition-all cursor-pointer"
-            value={Object.keys(clients).find(k => clients[k].id === currentClient.id) || ''}
-            onChange={(e) => handleClientSwitch(e.target.value)}
-          >
-            {Object.entries(clients).map(([key, c]) => (
-              <option key={key} value={key} disabled={c.status === 'Suspendido'} className="bg-[var(--input-bg)] text-[var(--sidebar-text)] font-medium">
-                {c.name}{c.status === 'Suspendido' ? ' (Suspendido)' : ''}
-              </option>
-            ))}
-          </select>
-          <div className="mt-3 pt-2 border-t border-white/10 flex justify-between items-center">
-            <span className="text-[10px] text-muted">ID: {currentClient.id}</span>
-            <span className="text-[10px] text-muted truncate max-w-[100px]" title={currentClient.databaseName}>BD: {currentClient.databaseName}</span>
-          </div>
-        </div>
+        {/* Instancia Activa eliminada por petición del usuario */}
 
         <ul className="flex-1 space-y-1.5 overflow-y-auto custom-scrollbar pr-2 -mr-2">
           <NavItem view="dashboard" icon="📊" label="Dashboard" />
