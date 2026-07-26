@@ -1,5 +1,5 @@
 import jwt from 'jsonwebtoken';
-import prisma from '../database/prisma.js';
+import prisma from '../../database/prisma.js';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'super-secret-key-development-only';
 
