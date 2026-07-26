@@ -18,14 +18,15 @@ import Sincronizacion from './components/sincronizacion/Sincronizacion';
 import MapaCalor from './components/mapas/MapaCalor';
 import GestionClientes from './components/configuraciones/GestionClientes';
 import InstallPWA from './components/InstallPWA';
+import MainLayout from './components/layout/MainLayout';
+import Sidebar from './components/layout/Sidebar';
 
 function AppContent() {
   const [currentView, setCurrentView] = useState('dashboard');
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   
   const { 
-    globalCultivo, setGlobalCultivo, cultivos, isOnline, syncQueue, 
-    currentClient, currentUser, loginUser, logoutUser, switchClient, hasPermission, clients, hasActionPermission
+    currentClient, currentUser, loginUser, logoutUser, hasPermission
   } = useAgro();
   const isAdminUser = currentUser?.rol === 'Super Admin' || currentUser?.rol === 'Administrador' || currentUser?.modulos?.includes('ALL');
 
@@ -35,10 +36,10 @@ function AppContent() {
 
   if (currentClient.status === 'Suspendido' && !isAdminUser) {
     return (
-      <div className="auth-page">
-        <div className="glass-card" style={{ maxWidth: '520px', textAlign: 'center' }}>
-          <h1 style={{ color: 'var(--primary-dark)', marginBottom: '1rem' }}>Servicio suspendido</h1>
-          <p style={{ color: 'var(--text-muted)', marginBottom: '1.5rem' }}>
+      <div className="flex items-center justify-center h-screen bg-background p-4">
+        <div className="glass-card max-w-lg text-center p-8">
+          <h1 className="text-red-500 font-bold text-2xl mb-4">Servicio suspendido</h1>
+          <p className="text-muted mb-6">
             Esta instancia está suspendida por falta de pago. Comuníquese con el administrador para reactivar el servicio.
           </p>
           <button className="btn-primary" onClick={() => logoutUser()}>Volver al login</button>
@@ -47,9 +48,28 @@ function AppContent() {
     );
   }
 
+  function getViewPermission(view) {
+    const map = {
+      'dashboard': 'Dashboard',
+      'estructura': 'Estructura',
+      'maestros': 'Maestros',
+      'usuarios': 'Usuarios',
+      'planificacion': 'Planificacion',
+      'ejecucion': 'Ejecucion',
+      'reportes': 'Reportes',
+      'monitoreo': 'Monitoreo',
+      'mantenimiento': 'Mantenimiento',
+      'sincronizacion': 'Sincronizacion',
+      'mapas': 'Mapas',
+      'gestionClientes': 'Dashboard',
+      'configuraciones': 'Configuraciones' 
+    };
+    return map[view] || view;
+  }
+
   const renderView = () => {
-    // Si la vista actual no tiene permiso, volver al dashboard
-    if (currentView !== 'dashboard' && !hasPermission(getViewPermission(currentView))) {
+    // Si la vista actual no tiene permiso, volver al dashboard (excepto superadmin)
+    if (!isAdminUser && currentView !== 'dashboard' && !hasPermission(getViewPermission(currentView))) {
        return <Dashboard />;
     }
 
@@ -71,123 +91,43 @@ function AppContent() {
     }
   };
 
-  function getViewPermission(view) {
-    const map = {
-      'dashboard': 'Dashboard',
-      'estructura': 'Estructura',
-      'maestros': 'Maestros',
-      'usuarios': 'Usuarios',
-      'planificacion': 'Planificacion',
-      'ejecucion': 'Ejecucion',
-      'reportes': 'Reportes',
-      'monitoreo': 'Monitoreo',
-      'mantenimiento': 'Mantenimiento',
-      'sincronizacion': 'Sincronizacion',
-      'mapas': 'Mapas',
-      'gestionClientes': 'GestionClientes',
-      'configuraciones': 'Configuraciones' 
-    };
-    return map[view] || view;
-  }
-
   const handleNavClick = (view) => {
+    if (view === 'logout') {
+      logoutUser();
+      return;
+    }
     setCurrentView(view);
     setIsMobileMenuOpen(false);
   };
 
-  const handleClientSwitch = (clientKey) => {
-    if (clients[clientKey]?.status === 'Suspendido') {
-      alert('Esta instancia está suspendida por falta de pago.');
-      return;
-    }
-
-    switchClient(clientKey);
-    setCurrentView('dashboard');
-  };
-
   return (
-    <div className="app-container">
+    <>
       <InstallPWA />
-      {isMobileMenuOpen && <div className="sidebar-overlay" onClick={() => setIsMobileMenuOpen(false)}></div>}
-      <div className={`sidebar ${isMobileMenuOpen ? 'open' : ''}`}>
-        <div className="sidebar-logo" style={{ display: 'flex', justifyContent: 'space-between', width: '100%' }}>
-          <span>🌱 AgroGestión</span>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-            {syncQueue.length > 0 && <span className="badge badge-inactive" style={{fontSize: '0.7rem', padding: '0.2rem 0.5rem'}}>{syncQueue.length} ⏳</span>}
-            <div style={{ width: '10px', height: '10px', borderRadius: '50%', backgroundColor: isOnline ? '#4caf50' : '#f44336' }}></div>
-          </div>
-          <button className="mobile-close-btn" onClick={() => setIsMobileMenuOpen(false)}>✕</button>
-        </div>
-
-        {/* SELECTOR DE CLIENTE (Multi-tenant Demo) */}
-        <div style={{ padding: '0.5rem 1rem', marginBottom: '1rem', background: 'rgba(255,255,255,0.1)', borderRadius: '8px', margin: '1rem' }}>
-          <label style={{ fontSize: '0.7rem', opacity: 0.7, color: 'white', display: 'block', marginBottom: '0.3rem' }}>CLIENTE / INSTANCIA:</label>
-          <select 
-            style={{ width: '100%', padding: '0.4rem', borderRadius: '4px', border: 'none', background: '#333', color: 'white', fontSize: '0.8rem' }}
-            value={Object.keys(clients).find(k => clients[k].id === currentClient.id)}
-            onChange={(e) => handleClientSwitch(e.target.value)}
-          >
-            {Object.entries(clients).map(([key, c]) => (
-              <option key={key} value={key} disabled={c.status === 'Suspendido'}>{c.name}{c.status === 'Suspendido' ? ' (Suspendido)' : ''}</option>
-            ))}
-          </select>
-          <div style={{ fontSize: '0.6rem', marginTop: '0.4rem', color: '#ffcc00' }}>
-            ID Instancia: {currentClient.id}
-          </div>
-          {isAdminUser && (
-            <div style={{ fontSize: '0.6rem', marginTop: '0.25rem', color: '#c8e6c9' }}>
-              Base: {currentClient.databaseName || `agroData_${currentClient.id}`}
-            </div>
-          )}
-        </div>
+      <MainLayout>
+        <Sidebar 
+          currentView={currentView}
+          onNavClick={handleNavClick}
+          isMobileMenuOpen={isMobileMenuOpen}
+          setIsMobileMenuOpen={setIsMobileMenuOpen}
+        />
         
-        <ul className="sidebar-menu">
-          {hasPermission('Dashboard') && <li className={currentView === 'dashboard' ? 'active' : ''} onClick={() => handleNavClick('dashboard')}>📊 Dashboard</li>}
-          {hasPermission('Estructura') && <li className={currentView === 'estructura' ? 'active' : ''} onClick={() => handleNavClick('estructura')}>🗺️ Estructura Agrícola</li>}
-          {hasPermission('Maestros') && <li className={currentView === 'maestros' ? 'active' : ''} onClick={() => handleNavClick('maestros')}>📚 Maestros</li>}
-          {hasPermission('Usuarios') && <li className={currentView === 'usuarios' ? 'active' : ''} onClick={() => handleNavClick('usuarios')}>👥 Usuarios</li>}
-          {hasPermission('Planificacion') && <li className={currentView === 'planificacion' ? 'active' : ''} onClick={() => handleNavClick('planificacion')}>📅 Planificación</li>}
-          {hasPermission('Ejecucion') && <li className={currentView === 'ejecucion' ? 'active' : ''} onClick={() => handleNavClick('ejecucion')}>🚜 Ejecución (Campo)</li>}
-          {hasPermission('Reportes') && <li className={currentView === 'reportes' ? 'active' : ''} onClick={() => handleNavClick('reportes')}>📊 Reportes</li>}
-          {hasPermission('Monitoreo') && <li className={currentView === 'monitoreo' ? 'active' : ''} onClick={() => handleNavClick('monitoreo')}>🔬 Monitoreo</li>}
-          {hasPermission('Mantenimiento') && <li className={currentView === 'mantenimiento' ? 'active' : ''} onClick={() => handleNavClick('mantenimiento')}>🛠 Mantenimiento</li>}
-          {hasPermission('Sincronizacion') && <li className={currentView === 'sincronizacion' ? 'active' : ''} onClick={() => handleNavClick('sincronizacion')}>🔄 Sincronización</li>}
-          {hasPermission('Mapas') && <li className={currentView === 'mapas' ? 'active' : ''} onClick={() => handleNavClick('mapas')}>🗺️ Mapas</li>}
+        <div className="flex-1 overflow-hidden relative flex flex-col">
+          <div className="lg:hidden m-4 mb-2 flex items-center justify-between bg-surface p-4 rounded-xl border border-white/5">
+            <span className="font-semibold text-white">Menú Principal</span>
+            <button 
+              className="p-2 rounded-lg bg-white/5 hover:bg-white/10 transition-colors"
+              onClick={() => setIsMobileMenuOpen(true)}
+            >
+              ☰
+            </button>
+          </div>
           
-          {/* MÓDULO SUPER ADMIN */}
-          {isAdminUser && (
-            <li className={currentView === 'gestionClientes' ? 'active' : ''} onClick={() => handleNavClick('gestionClientes')} style={{ color: '#ffcc00', borderTop: '1px solid rgba(255,255,255,0.1)', marginTop: '0.5rem' }}>
-              🏢 Gestión Clientes
-            </li>
-          )}
-
-          {hasPermission('Configuraciones') && <li className={currentView === 'configuraciones' ? 'active' : ''} onClick={() => handleNavClick('configuraciones')}>⚙️ Configuraciones</li>}
-          
-          <li onClick={() => logoutUser()} style={{ marginTop: '2rem', color: '#ff5252' }}>🚪 Cerrar Sesión</li>
-        </ul>
-
-        <div className="global-filter">
-          <h3>Cultivo Activo</h3>
-          <select value={globalCultivo} onChange={e => setGlobalCultivo(e.target.value)}>
-            <option value="Todos">Todos</option>
-            {cultivos.filter(c => c.estado !== 'Inactivo').map(cultivo => (
-              <option key={cultivo.id} value={cultivo.name}>{cultivo.name}</option>
-            ))}
-          </select>
+          <div className="w-full h-full animate-in fade-in zoom-in-95 duration-200">
+            {renderView()}
+          </div>
         </div>
-      </div>
-      <div className="main-content">
-        <div className="mobile-header">
-          <button className="mobile-menu-btn" onClick={() => setIsMobileMenuOpen(true)}>☰ Menú</button>
-        </div>
-        <div className="view-container">
-          {renderView()}
-        </div>
-        <footer className="system-footer">
-          © {new Date().getFullYear()} SarriaTech Solutions S.A.S.
-        </footer>
-      </div>
-    </div>
+      </MainLayout>
+    </>
   );
 }
 

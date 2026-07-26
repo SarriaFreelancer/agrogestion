@@ -1,8 +1,11 @@
 packages:
   - '.'
 allowBuilds:
-  oracledb: set this to true or false
-  sqlite3: set this to true or false
+  '@prisma/client': false
+  '@prisma/engines': true
+  oracledb: true
+  prisma: true
+  sqlite3: true
 onlyBuiltDependencies:
   - oracledb
   - sqlite3

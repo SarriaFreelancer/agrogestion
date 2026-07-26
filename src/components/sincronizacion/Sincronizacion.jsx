@@ -1,68 +1,87 @@
 import React from 'react';
 import { useAgro } from '../../context/AgroContext';
+import { RefreshCw, Smartphone, Building2, CheckCircle2, Clock, Wifi, HardDriveDownload, Send } from 'lucide-react';
 
 export default function Sincronizacion() {
   const { isOnline, syncQueue, lastSync, processSync } = useAgro();
 
   return (
-    <div className="fade-in">
-      <div className="header">
-        <h1>Centro de Sincronización Móvil</h1>
-        <p>Gestiona la transferencia de datos entre la oficina (Desktop) y el campo (Móvil).</p>
+    <div className="space-y-8 fade-in">
+      {/* Header */}
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-white/10 pb-6">
+        <div>
+          <div className="flex items-center gap-3 mb-1">
+            <h1 className="text-2xl md:text-3xl font-bold text-white tracking-tight">Centro de Sincronización Móvil</h1>
+            <span className="badge badge-active text-[11px]">Sync offline/online</span>
+          </div>
+          <p className="text-sm text-[#9CA3AF]">
+            Gestiona la transferencia bidireccional de datos entre la oficina central y los dispositivos de campo
+          </p>
+        </div>
       </div>
 
-      <div className="grid-2">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* Lado Oficina -> Campo */}
-        <div className="glass-card" style={{ borderLeft: '5px solid var(--primary-color)' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-            <div style={{ fontSize: '2rem' }}>🏢 ➔ 📱</div>
+        <div className="glass-card !p-6 border-l-4 border-l-emerald-500 space-y-4">
+          <div className="flex items-center gap-4">
+            <div className="w-12 h-12 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400">
+              <HardDriveDownload size={24} />
+            </div>
             <div>
-              <h3 style={{ margin: 0 }}>Descarga de Formularios</h3>
-              <p style={{ margin: 0, fontSize: '0.85rem', color: '#666' }}>Maestros, Suertes y Órdenes Planificadas</p>
+              <h3 className="text-base font-bold text-white">Descarga de Formularios</h3>
+              <p className="text-xs text-gray-400">Maestros, Suertes y Órdenes Planificadas</p>
             </div>
           </div>
-          <div style={{ marginTop: '1rem', padding: '1rem', background: '#e8f5e9', borderRadius: '8px', fontSize: '0.9rem' }}>
-            <strong>Estado:</strong> Los formularios se descargan automáticamente al iniciar sesión con internet. Toda la configuración de actividades y controles ya está disponible en tu dispositivo para uso offline.
+          <div className="p-4 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-xs text-emerald-200 leading-relaxed">
+            <strong className="text-emerald-400 block mb-1">Estado de Caché Local:</strong>
+            Los formularios y maestros se descargan automáticamente al iniciar sesión. Toda la configuración está disponible en tu dispositivo para operar 100% offline en el campo.
           </div>
         </div>
 
         {/* Lado Campo -> Oficina */}
-        <div className="glass-card" style={{ borderLeft: '5px solid #ffa000' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-            <div style={{ fontSize: '2rem' }}>🚜 ➔ 💻</div>
+        <div className="glass-card !p-6 border-l-4 border-l-amber-500 space-y-4">
+          <div className="flex items-center gap-4">
+            <div className="w-12 h-12 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-400">
+              <Send size={24} />
+            </div>
             <div>
-              <h3 style={{ margin: 0 }}>Envío de Ejecuciones</h3>
-              <p style={{ margin: 0, fontSize: '0.85rem', color: '#666' }}>Labores realizadas y Monitoreos de campo</p>
+              <h3 className="text-base font-bold text-white">Envío de Ejecuciones</h3>
+              <p className="text-xs text-gray-400">Labores realizadas y Monitoreos de campo</p>
             </div>
           </div>
-          <div style={{ marginTop: '1rem', padding: '1rem', background: '#fff3e0', borderRadius: '8px', fontSize: '0.9rem' }}>
-            <strong>Pendientes:</strong> Tienes <strong>{syncQueue.length}</strong> registros capturados en campo esperando a ser enviados a la oficina central.
+          <div className="p-4 rounded-xl bg-amber-500/10 border border-amber-500/20 text-xs text-amber-200 leading-relaxed">
+            <strong className="text-amber-400 block mb-1">Pendientes de Envío:</strong>
+            Tienes <strong className="text-white">{syncQueue.length}</strong> registros capturados en campo esperando a ser sincronizados con la oficina central.
           </div>
         </div>
       </div>
 
-      <div className="grid-2" style={{ marginTop: '2rem' }}>
-        <div className="glass-card" style={{ borderTop: `5px solid ${isOnline ? '#4caf50' : '#f44336'}` }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-            <div style={{ 
-              width: '15px', height: '15px', borderRadius: '50%', 
-              backgroundColor: isOnline ? '#4caf50' : '#f44336',
-              boxShadow: `0 0 10px ${isOnline ? '#4caf50' : '#f44336'}`
-            }}></div>
-            <h2 style={{ margin: 0 }}>{isOnline ? 'Conexión Activa' : 'Sin Conexión'}</h2>
+      {/* Control Manual de Sync */}
+      <div className="glass-card !p-8 space-y-6">
+        <div className="flex items-center justify-between border-b border-white/10 pb-4">
+          <div>
+            <h3 className="text-lg font-bold text-white">Control de Sincronización Manual</h3>
+            <p className="text-xs text-gray-400">Ejecute la sincronización cuando disponga de conexión estable a internet</p>
           </div>
-          <p style={{ marginTop: '1rem', color: '#666' }}>
-            {isOnline 
-              ? 'Puedes sincronizar tus datos ahora mismo con el servidor central.' 
-              : 'Estás trabajando en modo local. Los datos se guardan de forma segura en tu móvil hasta que recuperes la conexión.'}
-          </p>
+          <div className="flex items-center gap-2 text-xs font-semibold px-3 py-1.5 rounded-lg bg-white/[0.04] border border-white/10 text-gray-300">
+            <Wifi size={14} className={isOnline ? "text-emerald-400" : "text-red-400"} />
+            <span>{isOnline ? 'Internet Conectado' : 'Sin Conexión'}</span>
+          </div>
+        </div>
+
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-2">
+          <div className="text-xs text-gray-400 flex items-center gap-2">
+            <Clock size={15} />
+            <span>Última sincronización exitosa: <strong className="text-white">{lastSync ? new Date(lastSync).toLocaleString() : 'Nunca'}</strong></span>
+          </div>
+
           <button 
-            className="btn-primary" 
-            style={{ width: '100%', marginTop: '1rem', height: '50px', fontSize: '1.1rem', opacity: (!isOnline || syncQueue.length === 0) ? 0.5 : 1 }}
+            className="btn-primary !m-0 !w-full sm:!w-auto" 
+            onClick={processSync} 
             disabled={!isOnline || syncQueue.length === 0}
-            onClick={processSync}
           >
-            {isOnline ? '🚀 ENVIAR DATOS A OFICINA' : '🚫 ESPERANDO INTERNET...'}
+            <RefreshCw size={17} />
+            <span>{isOnline ? 'Sincronizar Datos Ahora' : 'Esperando Conexión...'}</span>
           </button>
         </div>
 

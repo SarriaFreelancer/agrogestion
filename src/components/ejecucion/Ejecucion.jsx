@@ -391,15 +391,28 @@ export default function Ejecucion() {
   const totalNominaDia = trabajadoresAgregados.reduce((acc, t) => acc + (t.total || 0), 0);
 
   return (
-    <div className="fade-in">
-      <div className="header">
-        <h1>Ejecución y Control de Labores</h1>
-        <p>Registra el avance de la orden y asocia los trabajadores para el pago (destajo).</p>
+    <div className="space-y-8 fade-in">
+      {/* Header */}
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-white/10 pb-6">
+        <div>
+          <div className="flex items-center gap-3 mb-1">
+            <h1 className="text-2xl md:text-3xl font-bold text-white tracking-tight">Ejecución & Control de Labores</h1>
+            <span className="badge badge-active text-[11px]">Operación en Campo</span>
+          </div>
+          <p className="text-sm text-[#9CA3AF]">
+            Registro de avance por orden de trabajo, liquidación de destajo y seguimiento de insumos
+          </p>
+        </div>
       </div>
 
-      <div className="tabs-container">
-        <button className={mainTab === 'control' ? 'btn-primary' : 'btn-secondary'} onClick={() => setMainTab('control')}>Control de Órdenes</button>
-        <button className={mainTab === 'reporte' ? 'btn-primary' : 'btn-secondary'} onClick={() => setMainTab('reporte')}>Reporte de Nómina Global</button>
+      {/* Tabs */}
+      <div className="flex items-center gap-3 border-b border-white/10 pb-4">
+        <button className={`!m-0 ${mainTab === 'control' ? 'btn-primary' : 'btn-secondary'}`} onClick={() => setMainTab('control')}>
+          <span>Control de Órdenes</span>
+        </button>
+        <button className={`!m-0 ${mainTab === 'reporte' ? 'btn-primary' : 'btn-secondary'}`} onClick={() => setMainTab('reporte')}>
+          <span>Reporte de Nómina Global</span>
+        </button>
       </div>
 
       {mainTab === 'control' ? (

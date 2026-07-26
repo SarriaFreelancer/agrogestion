@@ -383,22 +383,29 @@ export default function Usuarios() {
   };
 
   return (
-    <div className="fade-in">
-      <div className="header">
-        <h1>Usuarios y accesos</h1>
-        <p>
-          Administra los usuarios del cliente <strong>{currentClient.name}</strong>, asigna módulos y define categorías de acceso.
-        </p>
+    <div className="space-y-8 fade-in">
+      {/* Header */}
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-white/10 pb-6">
+        <div>
+          <div className="flex items-center gap-3 mb-1">
+            <h1 className="text-2xl md:text-3xl font-bold text-white tracking-tight">Usuarios & Permisos</h1>
+            <span className="badge badge-active text-[11px]">Control RBAC</span>
+          </div>
+          <p className="text-sm text-[#9CA3AF]">
+            Administración de cuentas, roles y categorías de acceso para la instancia <strong className="text-emerald-400 font-semibold">{currentClient.name}</strong>
+          </p>
+        </div>
       </div>
 
-      <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap', marginBottom: '1rem' }}>
-        <button type="button" className={activeTab === 'usuarios' ? 'btn-primary' : 'btn-secondary'} onClick={() => setActiveTab('usuarios')}>
-          <UserCog size={16} style={{ marginRight: '0.4rem' }} />
-          Usuarios
+      {/* Selector de Pestañas */}
+      <div className="flex items-center gap-3 border-b border-white/10 pb-4">
+        <button type="button" className={`!m-0 ${activeTab === 'usuarios' ? 'btn-primary' : 'btn-secondary'}`} onClick={() => setActiveTab('usuarios')}>
+          <UserCog size={16} />
+          <span>Usuarios ({normalizedUsers.length})</span>
         </button>
-        <button type="button" className={activeTab === 'categorias' ? 'btn-primary' : 'btn-secondary'} onClick={() => setActiveTab('categorias')}>
-          <ShieldCheck size={16} style={{ marginRight: '0.4rem' }} />
-          Categorías de acceso
+        <button type="button" className={`!m-0 ${activeTab === 'categorias' ? 'btn-primary' : 'btn-secondary'}`} onClick={() => setActiveTab('categorias')}>
+          <ShieldCheck size={16} />
+          <span>Categorías de Acceso ({normalizedCategories.length})</span>
         </button>
       </div>
 

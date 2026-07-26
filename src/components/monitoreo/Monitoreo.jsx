@@ -147,10 +147,20 @@ export default function Monitoreo() {
   };
 
   return (
-    <div className="fade-in">
-      <div className="header">
-        <h1>{editingId ? 'Editando Monitoreo' : 'Ejecución de Monitoreo'}</h1>
-        <p>Captura el monitoreo principal y añade muestras adicionales si es necesario.</p>
+    <div className="space-y-8 fade-in">
+      {/* Header */}
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-white/10 pb-6">
+        <div>
+          <div className="flex items-center gap-3 mb-1">
+            <h1 className="text-2xl md:text-3xl font-bold text-white tracking-tight">
+              {editingId ? 'Editando Monitoreo' : 'Ejecución de Monitoreo'}
+            </h1>
+            <span className="badge badge-active text-[11px]">Fitosanitario & Campo</span>
+          </div>
+          <p className="text-sm text-[#9CA3AF]">
+            Captura el monitoreo principal y añade sub-muestras por suerte o cultivo activo
+          </p>
+        </div>
       </div>
 
       <div style={{ display: 'flex', gap: '2rem', flexWrap: 'wrap' }}>

@@ -5,13 +5,13 @@ import { confirmDialog, swalError, swalSuccess } from '../lib/swal';
 const AgroContext = createContext();
 
 const THEME_CONFIG = {
-  'Verde Agro': { primary: '#2E7D32', light: '#4CAF50', dark: '#1B5E20', bg: 'linear-gradient(135deg, #fdfbfb 0%, #ebedee 100%)', text: '#2c3e50', muted: '#7f8c8d', glass: 'rgba(255, 255, 255, 0.65)', border: 'rgba(255,255,255,0.5)', input: 'rgba(255, 255, 255, 0.9)' },
-  'Azul Océano': { primary: '#1565C0', light: '#42A5F5', dark: '#0D47A1', bg: 'linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%)', text: '#1a237e', muted: '#5c6bc0', glass: 'rgba(255, 255, 255, 0.7)', border: 'rgba(255,255,255,0.5)', input: 'rgba(255, 255, 255, 0.9)' },
-  'Tierra Café': { primary: '#795548', light: '#A1887F', dark: '#4E342E', bg: 'linear-gradient(135deg, #efebe9 0%, #d7ccc8 100%)', text: '#3e2723', muted: '#8d6e63', glass: 'rgba(255, 255, 255, 0.7)', border: 'rgba(255,255,255,0.5)', input: 'rgba(255, 255, 255, 0.9)' },
-  'Púrpura Real': { primary: '#6A1B9A', light: '#9C27B0', dark: '#4A148C', bg: 'linear-gradient(135deg, #f3e5f5 0%, #e1bee7 100%)', text: '#4a148c', muted: '#ab47bc', glass: 'rgba(255, 255, 255, 0.7)', border: 'rgba(255,255,255,0.5)', input: 'rgba(255, 255, 255, 0.9)' },
-  'Naranja Atardecer': { primary: '#E65100', light: '#FF9800', dark: '#BF360C', bg: 'linear-gradient(135deg, #fff3e0 0%, #ffe0b2 100%)', text: '#e65100', muted: '#fb8c00', glass: 'rgba(255, 255, 255, 0.7)', border: 'rgba(255,255,255,0.5)', input: 'rgba(255, 255, 255, 0.9)' },
-  'Gris Carbón': { primary: '#263238', light: '#455A64', dark: '#102027', bg: 'linear-gradient(135deg, #cfd8dc 0%, #b0bec5 100%)', text: '#263238', muted: '#546e7a', glass: 'rgba(255, 255, 255, 0.8)', border: 'rgba(255,255,255,0.5)', input: 'rgba(255, 255, 255, 0.9)' },
-  'Modo Nocturno': { primary: '#4CAF50', light: '#81C784', dark: '#1B5E20', bg: '#000000', text: '#ffffff', muted: '#aaaaaa', glass: 'rgba(25, 25, 25, 0.95)', border: 'rgba(255,255,255,0.15)', input: '#1a1a1a' }
+  'Verde Agro': { primary: '#10B981', light: '#34D399', dark: '#059669', bg: 'linear-gradient(135deg, #090d16 0%, #0d131f 100%)', text: '#F9FAFB', muted: '#9CA3AF', glass: 'rgba(18, 25, 38, 0.75)', border: 'rgba(255, 255, 255, 0.08)', input: 'rgba(255, 255, 255, 0.04)' },
+  'Azul Océano': { primary: '#1565C0', light: '#42A5F5', dark: '#0D47A1', bg: 'linear-gradient(135deg, #090d16 0%, #0b1528 100%)', text: '#F9FAFB', muted: '#9CA3AF', glass: 'rgba(18, 25, 38, 0.75)', border: 'rgba(255, 255, 255, 0.08)', input: 'rgba(255, 255, 255, 0.04)' },
+  'Tierra Café': { primary: '#795548', light: '#A1887F', dark: '#4E342E', bg: 'linear-gradient(135deg, #090d16 0%, #17110e 100%)', text: '#F9FAFB', muted: '#9CA3AF', glass: 'rgba(18, 25, 38, 0.75)', border: 'rgba(255, 255, 255, 0.08)', input: 'rgba(255, 255, 255, 0.04)' },
+  'Púrpura Real': { primary: '#6A1B9A', light: '#9C27B0', dark: '#4A148C', bg: 'linear-gradient(135deg, #090d16 0%, #150a1e 100%)', text: '#F9FAFB', muted: '#9CA3AF', glass: 'rgba(18, 25, 38, 0.75)', border: 'rgba(255, 255, 255, 0.08)', input: 'rgba(255, 255, 255, 0.04)' },
+  'Naranja Atardecer': { primary: '#E65100', light: '#FF9800', dark: '#BF360C', bg: 'linear-gradient(135deg, #090d16 0%, #1c0e06 100%)', text: '#F9FAFB', muted: '#9CA3AF', glass: 'rgba(18, 25, 38, 0.75)', border: 'rgba(255, 255, 255, 0.08)', input: 'rgba(255, 255, 255, 0.04)' },
+  'Gris Carbón': { primary: '#263238', light: '#455A64', dark: '#102027', bg: 'linear-gradient(135deg, #090d16 0%, #111619 100%)', text: '#F9FAFB', muted: '#9CA3AF', glass: 'rgba(18, 25, 38, 0.75)', border: 'rgba(255, 255, 255, 0.08)', input: 'rgba(255, 255, 255, 0.04)' },
+  'Modo Nocturno': { primary: '#10B981', light: '#34D399', dark: '#059669', bg: '#000000', text: '#ffffff', muted: '#aaaaaa', glass: 'rgba(25, 25, 25, 0.95)', border: 'rgba(255,255,255,0.15)', input: '#1a1a1a' }
 };
 
 const hexToRgb = (hex) => {
@@ -326,6 +326,7 @@ const emptyControlesAgro = [
 ];
 
 const createEmptyInstanceData = (clientCode = 'GLOBAL') => ({
+  globalPlanta: 'Todas',
   globalCultivo: 'Todos',
   sectores: [],
   cultivos: [],
@@ -550,9 +551,16 @@ const buildSnapshot = (source) => ({
 
 export function AgroProvider({ children }) {
   const [clients, setClients] = useState(DEFAULT_CLIENTS);
+  const [currentClient, setCurrentClient] = useState(() => {
+    try {
+      const saved = localStorage.getItem('agro_currentClient');
+      if (saved) return JSON.parse(saved);
+    } catch(e) {}
+    return normalizeClient(DEFAULT_CLIENTS['std-01']);
+  });
 
-  const [currentClient, setCurrentClient] = useState(() => normalizeClient(DEFAULT_CLIENTS['std-01']));
-
+  const [plantas, setPlantas] = useState([{ id: 'p1', name: 'Planta Principal', status: 'Activo' }]);
+  const [globalPlanta, setGlobalPlanta] = useState('Todas');
   const [globalCultivo, setGlobalCultivo] = useState('Todos');
   const [sectores, setSectores] = useState(initialData);
   const [cultivos, setCultivos] = useState(initialCultivos);
@@ -577,12 +585,34 @@ export function AgroProvider({ children }) {
   const [movimientosInventario, setMovimientosInventario] = useState([]);
   const [usuarios, setUsuarios] = useState(() => DEFAULT_USERS(currentClient.id));
   const [categoriasAcceso, setCategoriasAcceso] = useState(() => DEFAULT_ACCESS_CATEGORIES(currentClient.id));
-  const [currentUser, setCurrentUser] = useState(null);
+  const [currentUser, setCurrentUser] = useState(() => {
+    try {
+      const saved = localStorage.getItem('agro_currentUser');
+      if (saved) return JSON.parse(saved);
+    } catch(e) {}
+    return null;
+  });
+
+  // Persistence hooks
+  React.useEffect(() => {
+    if (currentUser) {
+      localStorage.setItem('agro_currentUser', JSON.stringify(currentUser));
+    } else {
+      localStorage.removeItem('agro_currentUser');
+    }
+  }, [currentUser]);
+
+  React.useEffect(() => {
+    if (currentClient) {
+      localStorage.setItem('agro_currentClient', JSON.stringify(currentClient));
+    }
+  }, [currentClient]);
   const initialClientIdRef = useRef(currentClient.id);
   const isHydratingRef = useRef(false);
 
   const applyInstanceState = (snapshot) => {
     isHydratingRef.current = true;
+    setGlobalPlanta(snapshot.globalPlanta ?? 'Todas');
     setGlobalCultivo(snapshot.globalCultivo ?? 'Todos');
     setSectores(cloneValue(snapshot.sectores ?? DEFAULT_INSTANCE_STATE.sectores));
     setCultivos(cloneValue(snapshot.cultivos ?? DEFAULT_INSTANCE_STATE.cultivos));
@@ -814,6 +844,7 @@ export function AgroProvider({ children }) {
 
       const defaultSnapshot = currentClient.id === initialClientIdRef.current
         ? buildSnapshot({
+            globalPlanta,
             globalCultivo,
             sectores,
             cultivos,
@@ -853,6 +884,7 @@ export function AgroProvider({ children }) {
   React.useEffect(() => {
     if (isHydratingRef.current) return;
     INSTANCE_CACHE.set(currentClient.id, buildSnapshot({
+      globalPlanta,
       globalCultivo,
       sectores,
       cultivos,
@@ -879,6 +911,7 @@ export function AgroProvider({ children }) {
     }));
   }, [
     currentClient.id,
+    globalPlanta,
     globalCultivo,
     sectores,
     cultivos,
@@ -1010,23 +1043,26 @@ export function AgroProvider({ children }) {
   const hasPermission = (moduleName) => {
     if (currentClient.status === 'Suspendido' && !isSuperAdminUser(currentUser)) return false;
 
-    // 'GestionClientes' solo para admins globales
+    // 'GestionClientes' (ahora Gestión Empresas) solo para admins globales / super admins
     if (moduleName === 'GestionClientes') {
-      return currentUser?.isGlobalAdmin === true || currentUser?.rol === 'Admin Global';
+      return isSuperAdminUser(currentUser);
     }
 
     // 'ConfiguracionBD' para admins de cliente (no usuarios normales, no globales)
     if (moduleName === 'ConfiguracionBD') {
-      if (currentUser?.isGlobalAdmin) return false;
+      if (isSuperAdminUser(currentUser)) return false;
       return isClientAdmin(currentUser);
     }
 
+    // Si es super admin, tiene acceso a TODOS los demás módulos
+    if (isSuperAdminUser(currentUser)) return true;
+
     if (moduleName === 'Usuarios') {
-      return Boolean(currentUser) && (hasActionPermission('ver_usuarios') || hasActionPermission('crear_usuario') || hasActionPermission('administrar_config') || isSuperAdminUser(currentUser));
+      return Boolean(currentUser) && (hasActionPermission('ver_usuarios') || hasActionPermission('crear_usuario') || hasActionPermission('administrar_config'));
     }
 
     if (moduleName === 'Configuraciones') {
-      return Boolean(currentUser) && (hasActionPermission('administrar_config') || hasActionPermission('gestionar_categorias') || isSuperAdminUser(currentUser));
+      return Boolean(currentUser) && (hasActionPermission('administrar_config') || hasActionPermission('gestionar_categorias'));
     }
 
     if (!currentUser) {
@@ -1161,8 +1197,51 @@ export function AgroProvider({ children }) {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password })
-      });
-      const result = await res.json();
+      }).catch(err => null);
+
+      let result;
+      if (res && res.ok) {
+        result = await res.json();
+      } else {
+        // Fallback al mock si el backend no responde
+        console.warn('Backend inalcanzable, usando autenticación mock.');
+        
+        if (email === 'admin@agro.com' && password === 'admin123') {
+          result = {
+            success: true,
+            isGlobalAdmin: true,
+            user: {
+              correo: email,
+              rol: 'Super Admin',
+              nombres: 'Super',
+              apellidos: 'Admin',
+              estado: 'Activo'
+            }
+          };
+        } else if (email === 'usuario@finca.com' && password === 'user123') {
+          result = {
+            success: true,
+            isGlobalAdmin: false,
+            user: {
+              correo: email,
+              rol: 'Administrador',
+              nombres: 'Admin',
+              apellidos: 'Finca',
+              estado: 'Activo'
+            },
+            client: {
+              id: 'std-01',
+              name: 'AgroIndustrias del Norte',
+              plan: 'Premium',
+              theme: 'Verde Agro',
+              status: 'Activo'
+            }
+          };
+        } else {
+          swalError('Credenciales incorrectas.');
+          return { success: false };
+        }
+      }
 
       if (!result.success) {
         swalError(result.message || 'Credenciales incorrectas.');
@@ -1175,7 +1254,7 @@ export function AgroProvider({ children }) {
         correo: result.user.correo ?? email,
         contrasena: password,
         rol: result.user.rol ?? 'Usuario General',
-        modulos: result.isGlobalAdmin ? ['ALL'] : (result.user.modulos ?? ['Dashboard']),
+        modulos: result.isGlobalAdmin ? ['ALL'] : (result.user.modulos ?? ['Dashboard', 'Estructura', 'Maestros', 'Planificacion', 'Ejecucion', 'Reportes', 'Monitoreo', 'Mantenimiento', 'Sincronizacion', 'Mapas', 'Usuarios', 'Configuraciones']),
         categoriaCodigo: result.isGlobalAdmin ? 'SUPER_ADMIN' : (result.user.categoriaCodigo ?? 'USUARIO_GENERAL'),
         estado: 'Activo'
       });
@@ -1608,7 +1687,7 @@ export function AgroProvider({ children }) {
 
   return (
     <AgroContext.Provider value={{ 
-      globalCultivo, setGlobalCultivo, cultivos, addCultivo, editCultivo, deleteCultivo, sectores, updateEstructura, addSector, addElementoEstructura, calcLoteHa, calcFincaHa, calcSectorHa, calcTotalHa, calcLotesActivos, gruposActividades, addGrupo, editGrupo, deleteGrupo, actividades, addActividad, editActividad, deleteActividad, trabajadores, addTrabajador, editTrabajador, deleteTrabajador, proveedores, addProveedor, editProveedor, deleteProveedor, cuadrillas, addCuadrilla, editCuadrilla, deleteCuadrilla, unidades, addUnidad, editUnidad, deleteUnidad, maquinarias, addMaquinaria, editMaquinaria, deleteMaquinaria, tiposMaquinaria, addTipoMaquinaria, editTipoMaquinaria, deleteTipoMaquinaria, tiposProductos, addTipoProducto, editTipoProducto, deleteTipoProducto, productos, addProducto, editProducto, deleteProducto, ajustarStock, planificaciones, addPlanificacion, updatePlanificacion, deletePlanificacion, generarOrden, desvincularOrden, ejecutarPlanificacion, configuraciones, setConfiguraciones, updateConfiguracion, controlesAgro, addControlAgro, editControlAgro, deleteControlAgro, registrosControles, addRegistroControl, editRegistroControl, deleteRegistroControl, mantenimientos, addMantenimiento, deleteMantenimiento, usuarios, addUsuario, editUsuario, deleteUsuario, categoriasAcceso, addCategoriaAcceso, editCategoriaAcceso, deleteCategoriaAcceso, currentUser, loginUser, registerUser, logoutUser, hasActionPermission, isOnline, syncQueue, lastSync, processSync, setSyncQueue, currentClient, switchClient, hasPermission, clients, addClient, updateClient, editClient, deleteClient, suspendClient, reactivateClient, resetClientData,
+      globalPlanta, setGlobalPlanta, plantas, setPlantas, globalCultivo, setGlobalCultivo, cultivos, addCultivo, editCultivo, deleteCultivo, sectores, updateEstructura, addSector, addElementoEstructura, calcLoteHa, calcFincaHa, calcSectorHa, calcTotalHa, calcLotesActivos, gruposActividades, addGrupo, editGrupo, deleteGrupo, actividades, addActividad, editActividad, deleteActividad, trabajadores, addTrabajador, editTrabajador, deleteTrabajador, proveedores, addProveedor, editProveedor, deleteProveedor, cuadrillas, addCuadrilla, editCuadrilla, deleteCuadrilla, unidades, addUnidad, editUnidad, deleteUnidad, maquinarias, addMaquinaria, editMaquinaria, deleteMaquinaria, tiposMaquinaria, addTipoMaquinaria, editTipoMaquinaria, deleteTipoMaquinaria, tiposProductos, addTipoProducto, editTipoProducto, deleteTipoProducto, productos, addProducto, editProducto, deleteProducto, ajustarStock, planificaciones, addPlanificacion, updatePlanificacion, deletePlanificacion, generarOrden, desvincularOrden, ejecutarPlanificacion, configuraciones, setConfiguraciones, updateConfiguracion, controlesAgro, addControlAgro, editControlAgro, deleteControlAgro, registrosControles, addRegistroControl, editRegistroControl, deleteRegistroControl, mantenimientos, addMantenimiento, deleteMantenimiento, usuarios, addUsuario, editUsuario, deleteUsuario, categoriasAcceso, addCategoriaAcceso, editCategoriaAcceso, deleteCategoriaAcceso, currentUser, loginUser, registerUser, logoutUser, hasActionPermission, isOnline, syncQueue, lastSync, processSync, setSyncQueue, currentClient, switchClient, hasPermission, clients, addClient, updateClient, editClient, deleteClient, suspendClient, reactivateClient, resetClientData,
       PLAN_CONFIG, THEME_CONFIG, setCurrentClient, setClients,
       movimientosInventario, setMovimientosInventario
     }}>

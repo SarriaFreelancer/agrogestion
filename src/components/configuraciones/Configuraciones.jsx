@@ -1,392 +1,271 @@
-import { useState } from 'react';
-import { ChevronDown } from 'lucide-react';
+import React, { useState } from 'react';
 import { useAgro } from '../../context/AgroContext';
+import { Switch } from '../ui/Switch';
 
-export default function Configuraciones() {
-  const {
-    configuraciones,
-    updateConfiguracion,
-    currentClient,
-    clients,
-    updateClient,
-    THEME_CONFIG
-  } = useAgro();
+function Configuraciones() {
+  const { currentClient, configuraciones, updateConfiguracion, currentUser, changeTheme } = useAgro();
+  const isAdminUser = currentUser?.rol === 'Super Admin' || currentUser?.rol === 'Administrador' || currentUser?.modulos?.includes('ALL');
 
-  const isAdminUser = currentClient.modules?.includes('ALL');
-  const [openSection, setOpenSection] = useState('apariencia');
-  const isEnabled = (value) => Number(value) === 1;
+  const [activeTab, setActiveTab] = useState('monitoreo');
+
+  const isEnabled = (val) => Number(val) === 1;
 
   const handleToggle = (key) => {
     const currentValue = configuraciones[key];
-    const nextValue = currentValue === 1 ? 0 : 1;
+    const nextValue = Number(currentValue) === 1 ? 0 : 1;
     updateConfiguracion(key, nextValue);
   };
 
-  const handleLevelNameChange = (key, value) => {
-    updateConfiguracion('estructuraNivelNombres', {
-      ...configuraciones.estructuraNivelNombres,
-      [key]: value
-    });
-  };
-
-  const handleEstructuraNivelesChange = (value) => {
-    updateConfiguracion('estructuraNiveles', Number(value));
-  };
-
-  const handleThemeChange = (newTheme) => {
-    const clientKey = Object.keys(clients).find(k => clients[k].id === currentClient.id);
-    if (clientKey) {
-      updateClient(clientKey, currentClient.plan, currentClient.modules, newTheme);
-    }
-  };
-
-  const sections = [
-    { id: 'insumos',
-      title: 'Insumos',
-      description: 'Validaciones de productos y control de stock.'
+  const menuSections = [
+    {
+      title: 'CONFIGURACIÓN GENERAL',
+      items: [
+        { id: 'datos_empresa', label: 'Datos de Empresa', icon: '🏢' },
+        { id: 'seguridad', label: 'Seguridad & Sesión', icon: '🛡️' },
+        { id: 'respaldos', label: 'Respaldos y SMTP', icon: '🗄️' },
+        { id: 'importacion', label: 'Importación Masiva', icon: '☁️' },
+        { id: 'datos_prueba', label: 'Datos de Prueba', icon: '🗃️' }
+      ]
     },
-    { id: 'maquinaria',
-      title: 'Maquinaria',
-      description: 'Reglas de equipos y validación operativa.'
-    },
-    { id: 'manoObra',
-      title: 'Mano de Obra',
-      description: 'Control de nómina y personal requerido.'
-    },
-    { id: 'monitoreo',
-      title: 'Monitoreo',
-      description: 'Ajustes para capturas de campo y alertas agronómicas.'
-    },
-    { id: 'estructura',
-      title: 'Estructura',
-      description: 'Defina la cantidad de niveles de jerarquía y la descripción global de cada nivel.'
-    },
-    { id: 'maestros',
-      title: 'Maestros',
-      description: 'Habilite o desactive los catálogos que desea utilizar en el sistema.'
-    },
-    { id: 'apariencia',
-      title: 'Apariencia',
-      description: 'Temas visuales de la instancia.'
-    },
-    { id: 'instancia',
-      title: 'Instancia',
-      description: 'Datos de la cuenta activa.'
+    {
+      title: 'CONFIGURACIÓN OPERATIVA',
+      items: [
+        { id: 'insumos', label: 'Insumos', icon: '📦' },
+        { id: 'maquinaria', label: 'Maquinaria', icon: '🚜' },
+        { id: 'mano_obra', label: 'Mano de Obra', icon: '👥' },
+        { id: 'monitoreo', label: 'Monitoreo', icon: '🔬' },
+        { id: 'estructura', label: 'Estructura', icon: '🗺️' },
+        { id: 'maestros', label: 'Maestros', icon: '📚' },
+        { id: 'apariencia', label: 'Apariencia', icon: '🎨' },
+        { id: 'instancia', label: 'Instancia', icon: '⚙️' }
+      ]
     }
   ];
 
-  return (
-    <div className="fade-in">
-      <div className="header">
-        <h1>Configuración del Sistema</h1>
-        <p>Personalice su entorno de trabajo y ajuste las reglas de validación técnica.</p>
-      </div>
+  if (isAdminUser) {
+    menuSections.push({
+      title: 'GESTIÓN DE INFRAESTRUCTURA',
+      items: [
+        { id: 'servidores', label: 'Servidores (Inquilinos)', icon: '🖥️' },
+        { id: 'registros', label: 'Registros del Sistema', icon: '📋' }
+      ]
+    });
+  }
 
-      <div style={{ display: 'grid', gap: '1rem' }}>
-        {sections.map(section => {
-          const isOpen = openSection === section.id;
-          return (
-            <div key={section.id} className="glass-card" style={{ marginBottom: 0 }}>
-              <button
-                type="button"
-                className="config-section-toggle"
-                onClick={() => setOpenSection(isOpen ? null : section.id)}
-              >
-                <div>
-                  <h3>{section.title}</h3>
-                  <p>{section.description}</p>
-                </div>
-                <ChevronDown size={18} className={isOpen ? 'open' : ''} />
-              </button>
+  const renderContent = () => {
+    if (activeTab === 'monitoreo') {
+      return (
+        <div className="space-y-6 w-full max-w-4xl fade-in">
+          {/* Header */}
+          <div className="flex items-center justify-between mb-8">
+            <div className="flex items-center gap-4">
+              <div className="w-12 h-12 rounded-xl bg-emerald-500/10 flex items-center justify-center text-emerald-500 text-2xl border border-emerald-500/20 shadow-[0_0_15px_rgba(16,185,129,0.15)]">
+                🔬
+              </div>
+              <div>
+                <h2 className="text-2xl font-bold text-white tracking-tight">Monitoreo</h2>
+                <p className="text-sm text-gray-400 mt-1">Configure las opciones de monitoreo de su sistema</p>
+              </div>
+            </div>
+            <div className="bg-emerald-500/10 border border-emerald-500/20 px-4 py-3 rounded-xl flex items-center gap-3">
+              <div className="w-6 h-6 rounded-full bg-emerald-500/20 flex items-center justify-center text-emerald-500 text-xs">
+                ✓
+              </div>
+              <div>
+                <h4 className="text-sm font-semibold text-emerald-500">Monitoreo Activo</h4>
+                <p className="text-[11px] text-gray-400">Todas las funciones están habilitadas</p>
+              </div>
+            </div>
+          </div>
 
-              {isOpen && section.id === 'insumos' && (
-                <div className="config-section-body">
-                  <div className="config-option-list" style={{ marginBottom: '1rem' }}>
-                    {[{
-                      id: 'config_insumos',
-                      label: 'Bloque de Insumos',
-                      desc: 'Activa o desactiva la sección operativa de insumos.'
-                    }].map(rule => (
-                      <label key={rule.id} className="config-option-row">
-                        <input
-                          type="checkbox"
-                          checked={isEnabled(configuraciones[rule.id])}
-                          onChange={() => handleToggle(rule.id)}
-                        />
-                        <span>
-                          <strong>{rule.label}</strong>
-                          <small>{rule.desc}</small>
-                        </span>
-                      </label>
-                    ))}
+          {/* Opciones */}
+          <div className="space-y-3">
+            {[
+              { id: 'monitoreo_gps', label: 'GPS del Registrador', desc: 'Adjunta coordenadas al registro si están disponibles.', icon: '📍' },
+              { id: 'monitoreo_alertas', label: 'Mostrar alertas de rango', desc: 'Resalta valores fuera de los rangos definidos.', icon: '🔔' },
+              { id: 'monitoreo_adicionales', label: 'Permitir muestras adicionales', desc: 'Activa el registro de sub-muestras por monitoreo.', icon: '🧪' },
+              { id: 'monitoreo_obs', label: 'Permitir observaciones', desc: 'Agrega un campo de notas al formulario de monitoreo.', icon: '📝' },
+              { id: 'monitoreo_req', label: 'Variables validar requeridas', desc: 'Impide guardar monitoreo si una variable marcada como requerida está vacía.', icon: '⚙️' }
+            ].map(opt => (
+              <div key={opt.id} className="flex items-center justify-between p-4 rounded-xl bg-[#111827] border border-white/5 hover:border-emerald-500/30 transition-colors group relative overflow-hidden">
+                <div className="absolute left-0 top-0 bottom-0 w-1 bg-emerald-500 rounded-l-xl opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                <div className="absolute inset-0 bg-gradient-to-r from-emerald-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none"></div>
+                
+                <div className="flex items-center gap-4 relative z-10">
+                  <div className="w-10 h-10 rounded-full bg-surface border border-white/10 flex items-center justify-center text-gray-400 group-hover:text-emerald-500 group-hover:border-emerald-500/30 transition-colors">
+                    {opt.icon}
                   </div>
-                  <div className="config-option-list">
-                    {[
-                      { id: 'validarInsumos', label: 'Obligar Insumos', desc: 'Requiere productos en fertilizaciones.' },
-                      { id: 'bloquearStockNegativo', label: 'Bloquear Stock Negativo', desc: 'Impide salidas sin existencias.' },
-                      { id: 'registrarGpsInsumos', label: 'Registrar ubicación en insumos', desc: 'Captura coordenadas de inicio y fin para apuntes de insumos.' }
-                    ].map(rule => (
-                      <label key={rule.id} className="config-option-row">
-                        <input
-                          type="checkbox"
-                          checked={isEnabled(configuraciones[rule.id])}
-                          onChange={() => handleToggle(rule.id)}
-                        />
-                        <span>
-                          <strong>{rule.label}</strong>
-                          <small>{rule.desc}</small>
-                        </span>
-                      </label>
-                    ))}
+                  <div>
+                    <h4 className="text-[15px] font-semibold text-white">{opt.label}</h4>
+                    <p className="text-[13px] text-gray-400 mt-0.5">{opt.desc}</p>
                   </div>
                 </div>
-              )}
-
-              {isOpen && section.id === 'maquinaria' && (
-                <div className="config-section-body">
-                  <div className="config-option-list" style={{ marginBottom: '1rem' }}>
-                    {[{
-                      id: 'config_maq',
-                      label: 'Bloque de Maquinaria',
-                      desc: 'Activa o desactiva la sección operativa de maquinaria.'
-                    }].map(rule => (
-                      <label key={rule.id} className="config-option-row">
-                        <input
-                          type="checkbox"
-                          checked={isEnabled(configuraciones[rule.id])}
-                          onChange={() => handleToggle(rule.id)}
-                        />
-                        <span>
-                          <strong>{rule.label}</strong>
-                          <small>{rule.desc}</small>
-                        </span>
-                      </label>
-                    ))}
-                  </div>
-                  <div className="config-option-list">
-                    {[
-                      { id: 'validarMaquinaria', label: 'Obligar Maquinaria', desc: 'Requiere equipo en labores mecánicas.' },
-                      { id: 'registrarGpsMaquinaria', label: 'Registrar ubicación en maquinaria', desc: 'Captura coordenadas de inicio y fin para apuntes de maquinaria.' }
-                    ].map(rule => (
-                      <label key={rule.id} className="config-option-row">
-                        <input
-                          type="checkbox"
-                          checked={isEnabled(configuraciones[rule.id])}
-                          onChange={() => handleToggle(rule.id)}
-                        />
-                        <span>
-                          <strong>{rule.label}</strong>
-                          <small>{rule.desc}</small>
-                        </span>
-                      </label>
-                    ))}
-                  </div>
+                <div className="relative z-10 pr-2">
+                  <Switch 
+                    checked={isEnabled(configuraciones[opt.id] ?? 1)} 
+                    onCheckedChange={() => handleToggle(opt.id)} 
+                  />
                 </div>
-              )}
+              </div>
+            ))}
+          </div>
 
-              {isOpen && section.id === 'manoObra' && (
-                <div className="config-section-body">
-                  <div className="config-option-list" style={{ marginBottom: '1rem' }}>
-                    {[{
-                      id: 'config_mao',
-                      label: 'Bloque de Mano de Obra',
-                      desc: 'Activa o desactiva la sección operativa de mano de obra.'
-                    }].map(rule => (
-                      <label key={rule.id} className="config-option-row">
-                        <input
-                          type="checkbox"
-                          checked={isEnabled(configuraciones[rule.id])}
-                          onChange={() => handleToggle(rule.id)}
-                        />
-                        <span>
-                          <strong>{rule.label}</strong>
-                          <small>{rule.desc}</small>
-                        </span>
-                      </label>
-                    ))}
-                  </div>
-                  <div className="config-option-list">
-                    {[
-                      { id: 'validarNomina', label: 'Obligar Nómina', desc: 'Requiere registro de personal.' },
-                      { id: 'registrarGpsManoObra', label: 'Registrar ubicación en mano de obra', desc: 'Captura coordenadas de inicio y fin para apuntes de mano de obra.' }
-                    ].map(rule => (
-                      <label key={rule.id} className="config-option-row">
-                        <input
-                          type="checkbox"
-                          checked={isEnabled(configuraciones[rule.id])}
-                          onChange={() => handleToggle(rule.id)}
-                        />
-                        <span>
-                          <strong>{rule.label}</strong>
-                          <small>{rule.desc}</small>
-                        </span>
-                      </label>
-                    ))}
-                  </div>
-                </div>
-              )}
+          <div className="mt-8 p-4 rounded-xl border border-emerald-500/20 bg-emerald-500/5 flex gap-4 items-start relative overflow-hidden">
+            <div className="absolute right-0 bottom-0 w-32 h-32 bg-emerald-500/10 rounded-tl-full blur-2xl pointer-events-none"></div>
+            <span className="text-xl">💡</span>
+            <div className="relative z-10">
+              <h4 className="text-sm font-bold text-emerald-500 mb-1">Consejo</h4>
+              <p className="text-xs text-gray-400">Estas configuraciones se aplican a todos los formularios de monitoreo del sistema.</p>
+            </div>
+          </div>
+        </div>
+      );
+    }
 
-              {isOpen && section.id === 'monitoreo' && (
-                <div className="config-section-body">
-                  <div className="config-option-list">
-                    {[
-                      { id: 'registrarGpsMonitoreo', label: 'Registrar GPS', desc: 'Adjunta coordenadas al registro si están disponibles.' },
-                      { id: 'mostrarAlertasMonitoreo', label: 'Mostrar alertas de rango', desc: 'Resalta valores fuera de los rangos definidos.' },
-                      { id: 'permitirMuestrasMonitoreo', label: 'Permitir muestras adicionales', desc: 'Activa el registro de sub-muestras por monitoreo.' },
-                      { id: 'permitirObservacionesMonitoreo', label: 'Permitir observaciones', desc: 'Agrega un campo de notas al formulario de monitoreo.' },
-                      { id: 'validarVariablesRequeridasMonitoreo', label: 'Validar variables requeridas', desc: 'Impide guardar monitoreo si una variable marcada como requerida está vacía.' }
-                    ].map(rule => (
-                      <label key={rule.id} className="config-option-row">
-                        <input
-                          type="checkbox"
-                          checked={configuraciones[rule.id] === 1}
-                          onChange={() => handleToggle(rule.id)}
-                        />
-                        <span>
-                          <strong>{rule.label}</strong>
-                          <small>{rule.desc}</small>
-                        </span>
-                      </label>
-                    ))}
-                  </div>
-                  <div style={{ marginTop: '1rem' }}>
-                    <label className="input-label">Frecuencia predeterminada</label>
-                    <select
-                      className="input-field"
-                      value={configuraciones.frecuenciaMonitoreo}
-                      onChange={(e) => updateConfiguracion('frecuenciaMonitoreo', e.target.value)}
-                    >
-                      <option value="Diaria">Diaria</option>
-                      <option value="Semanal">Semanal</option>
-                      <option value="Mensual">Mensual</option>
-                      <option value="Eventual">Eventual</option>
-                    </select>
-                  </div>
-                </div>
-              )}
+    if (activeTab === 'apariencia') {
+      const themes = [
+        { id: 'Verde Agro', label: 'Verde Agro', desc: 'Inspirado en la naturaleza y el crecimiento agrícola.', img: 'https://images.unsplash.com/photo-1500382017468-9049fed747ef?q=80&w=800&auto=format&fit=crop' },
+        { id: 'Azul Océano', label: 'Azul Océano', desc: 'Transmite confianza, estabilidad y profundidad.', img: 'https://images.unsplash.com/photo-1498623116890-37e912163d5d?q=80&w=800&auto=format&fit=crop' },
+        { id: 'Tierra Café', label: 'Tierra Café', desc: 'Conexión con la tierra, calidez y naturalidad.', img: 'https://images.unsplash.com/photo-1497935586351-b67a49e012bf?q=80&w=800&auto=format&fit=crop' },
+        { id: 'Púrpura Real', label: 'Púrpura Real', desc: 'Elegancia, sofisticación y liderazgo.', img: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=800&auto=format&fit=crop' },
+        { id: 'Naranja Atardecer', label: 'Naranja Atardecer', desc: 'Energía, creatividad y optimismo.', img: 'https://images.unsplash.com/photo-1472214103451-9374bd1c798e?q=80&w=800&auto=format&fit=crop' },
+        { id: 'Gris Carbón', label: 'Gris Carbón', desc: 'Modernidad, equilibrio y profesionalismo.', img: 'https://images.unsplash.com/photo-1464802686167-b939a6910659?q=80&w=800&auto=format&fit=crop' },
+        { id: 'Modo Nocturno', label: 'Modo Nocturno', desc: 'Interfaz oscura para ambientes de baja luz.', img: 'https://images.unsplash.com/photo-1505322022379-7c3353ee6291?q=80&w=800&auto=format&fit=crop' }
+      ];
 
-              {isOpen && section.id === 'estructura' && (
-                <div className="config-section-body">
-                  <div className="input-group">
-                    <label className="input-label">Niveles de jerarquía</label>
-                    <select
-                      className="input-field"
-                      value={configuraciones.estructuraNiveles}
-                      onChange={(e) => handleEstructuraNivelesChange(e.target.value)}
-                    >
-                      {[2, 3, 4].map(level => (
-                        <option key={level} value={level}>{level} niveles</option>
-                      ))}
-                    </select>
-                  </div>
-                  <div className="grid-2" style={{ gap: '1rem', marginTop: '1rem' }}>
-                    {Array.from({ length: configuraciones.estructuraNiveles || 4 }, (_, index) => {
-                      const nivelCount = configuraciones.estructuraNiveles || 4;
-                      const isLastLevel = index === nivelCount - 1;
-                      const key = isLastLevel ? 'nivel4' : `nivel${index + 1}`;
-                      const levelNumber = isLastLevel ? 4 : index + 1;
-                      return (
-                        <div key={key} className="input-group">
-                          <label className="input-label">Nombre global Nivel {levelNumber}</label>
-                          <input
-                            className="input-field"
-                            value={configuraciones.estructuraNivelNombres?.[key] || ''}
-                            onChange={(e) => handleLevelNameChange(key, e.target.value)}
-                            placeholder={`Ej: ${['Sector', 'Finca', 'Lote', 'Suerte', 'Subnivel', 'Subnivel'][index]}`}
-                            disabled={isLastLevel}
-                            style={isLastLevel ? { opacity: 0.6, backgroundColor: 'var(--bg-muted)' } : {}}
-                          />
-                        </div>
-                      );
-                    })}
-                  </div>
-                </div>
-              )}
+      return (
+        <div className="space-y-6 w-full max-w-5xl fade-in">
+          {/* Header */}
+          <div className="flex items-center justify-between mb-8">
+            <div className="flex items-center gap-4">
+              <div className="w-12 h-12 rounded-xl bg-white/5 flex items-center justify-center text-gray-300 text-2xl border border-white/10">
+                🎨
+              </div>
+              <div>
+                <h2 className="text-2xl font-bold text-white tracking-tight">Apariencia</h2>
+                <p className="text-sm text-gray-400 mt-1">Seleccione el esquema de colores para su instancia</p>
+              </div>
+            </div>
+            <div className="bg-surface border border-white/5 px-4 py-3 rounded-xl flex items-center gap-3 max-w-sm">
+              <div className="w-6 h-6 shrink-0 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-gray-400 text-xs">
+                ℹ️
+              </div>
+              <div>
+                <h4 className="text-[12px] font-semibold text-emerald-500 mb-0.5">Información</h4>
+                <p className="text-[11px] text-gray-400 leading-tight">El cambio de apariencia se aplicará inmediatamente en toda la plataforma.</p>
+              </div>
+            </div>
+          </div>
 
-              {isOpen && section.id === 'maestros' && (
-                <div className="config-section-body">
-                  <p style={{ fontSize: '0.9rem', color: 'var(--text-muted)', marginBottom: '1.5rem' }}>
-                    Seleccione los maestros que desea habilitar. Los que no estén seleccionados aparecerán ocultos en el Centro de Maestros.
-                  </p>
-                  <div className="config-option-list">
-                    {[
-                      { id: 'maestro_actividad', label: 'Actividades', icon: '📋' },
-                      { id: 'maestro_maq', label: 'Maquinaria', icon: '🚜' },
-                      { id: 'maestro_mao', label: 'Trabajadores', icon: '👤' },
-                      { id: 'maestro_ins', label: 'Productos', icon: '📦' },
-                      { id: 'maestro_proveedores', label: 'Proveedores', icon: '🏢' },
-                      { id: 'maestro_cultivos', label: 'Cultivos', icon: '🌱' },
-                      { id: 'maestro_controles', label: 'Controles Agro', icon: '🔬' },
-                      { id: 'maestro_tp_act', label: 'Grupos de Actividad', icon: '🏷️' },
-                      { id: 'maestro_tipos_maquinaria', label: 'Tipos de Maquinaria', icon: '⚙️' },
-                      { id: 'maestro_cuadrillas', label: 'Cuadrillas', icon: '👥' },
-                      { id: 'maestro_unidades', label: 'Unidades de Medida', icon: '📏' },
-                      { id: 'maestro_tipos_productos', label: 'Tipos de Productos', icon: '🔖' }
-                    ].map(maestro => (
-                      <label key={maestro.id} className="config-option-row">
-                        <input
-                          type="checkbox"
-                          checked={isEnabled(configuraciones[maestro.id])}
-                          onChange={() => {
-                            const currentValue = configuraciones[maestro.id];
-                            const nextValue = Number(currentValue) === 1 ? 0 : 1;
-                            updateConfiguracion(maestro.id, nextValue);
-                          }}
-                        />
-                        <span>
-                          <strong>{maestro.icon} {maestro.label}</strong>
-                        </span>
-                      </label>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {isOpen && section.id === 'apariencia' && (
-                <div className="config-section-body">
-                  <p style={{ fontSize: '0.9rem', color: 'var(--text-muted)', marginBottom: '1rem' }}>
-                    Seleccione el esquema de colores para su instancia. Los cambios se aplican inmediatamente.
-                  </p>
-                  <div className="grid-2" style={{ gap: '1rem' }}>
-                    {Object.entries(THEME_CONFIG).map(([name, colors]) => (
-                      <button
-                        type="button"
-                        key={name}
-                        onClick={() => handleThemeChange(name)}
-                        className="theme-tile"
-                        style={{
-                          border: currentClient.theme === name ? '3px solid var(--primary-color)' : '1px solid var(--glass-border)'
-                        }}
-                      >
-                        <span className="theme-swatch" style={{ background: colors.primary }} />
-                        <span className="theme-label">
-                          {name}
-                          {currentClient.theme === name && <small>Activo</small>}
-                        </span>
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {isOpen && section.id === 'instancia' && (
-                <div className="config-section-body">
-                  <div className="grid-3" style={{ fontSize: '0.85rem' }}>
-                    <div><strong>Empresa:</strong> {currentClient.name}</div>
-                    <div><strong>Plan:</strong> {currentClient.plan}</div>
-                    {isAdminUser && (
-                      <>
-                        <div><strong>Base:</strong> {currentClient.databaseName || `agroData_${currentClient.id}`}</div>
-                        <div><strong>Usuario BD:</strong> {currentClient.databaseUser || `${currentClient.id}_user`}</div>
-                      </>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+            {themes.map(theme => {
+              const isActive = currentClient.theme === theme.id || (theme.id === 'Verde Agro' && !currentClient.theme);
+              return (
+                <button
+                  key={theme.id}
+                  onClick={() => handleThemeChange(theme.id)}
+                  className={`relative text-left rounded-xl overflow-hidden border transition-all duration-300 group
+                    ${isActive 
+                      ? 'border-emerald-500 shadow-[0_0_20px_rgba(16,185,129,0.15)] bg-[#111827]' 
+                      : 'border-white/5 bg-[#111827] hover:border-white/20'
+                    }
+                  `}
+                >
+                  <div className="h-32 w-full overflow-hidden relative">
+                    <div className="absolute inset-0 bg-gradient-to-t from-[#111827] via-transparent to-transparent z-10"></div>
+                    <img src={theme.img} alt={theme.label} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
+                    {isActive && (
+                      <div className="absolute top-3 right-3 z-20 w-6 h-6 rounded-full bg-emerald-500 text-white flex items-center justify-center text-xs font-bold shadow-lg">
+                        ✓
+                      </div>
                     )}
                   </div>
-                </div>
-              )}
+                  <div className="p-4 relative z-20">
+                    <h4 className={`text-base font-bold mb-1 ${isActive ? 'text-white' : 'text-gray-200'}`}>{theme.label}</h4>
+                    <p className="text-xs text-gray-400 leading-relaxed mb-4 min-h-[36px]">{theme.desc}</p>
+                    <div className="flex items-center gap-2">
+                      <div className={`w-3 h-3 rounded-full ${isActive ? 'bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.8)]' : 'border border-gray-600 bg-transparent'}`}></div>
+                      {isActive && <span className="text-[10px] font-bold text-emerald-500 uppercase tracking-wider bg-emerald-500/10 px-2 py-0.5 rounded">Activo</span>}
+                    </div>
+                  </div>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      );
+    }
+
+    return (
+      <div className="flex items-center justify-center h-full">
+        <div className="text-center">
+          <span className="text-4xl block mb-4 text-gray-600">🚧</span>
+          <h3 className="text-xl font-bold text-white mb-2">Módulo en Construcción</h3>
+          <p className="text-gray-400">Las configuraciones para esta sección estarán disponibles pronto.</p>
+        </div>
+      </div>
+    );
+  };
+
+  return (
+    <div className="flex h-full w-full fade-in gap-5 p-0 bg-[#070b12]">
+      {/* Sidebar de Configuración */}
+      <div className="w-[280px] border-r border-white/5 flex-shrink-0 z-10 bg-[#0d131f] flex flex-col h-full overflow-hidden shadow-2xl">
+        {/* Header */}
+        <div className="px-6 py-8 shrink-0 bg-transparent flex flex-col justify-center">
+          <h1 className="text-2xl font-bold tracking-tight text-white leading-tight mb-1">Configuración</h1>
+          <p className="text-[13px] text-gray-400 leading-normal">Administre sus preferencias</p>
+        </div>
+
+        {/* Lista de Navegación Ordenada */}
+        <div className="px-4 pb-6 overflow-y-auto custom-scrollbar flex-1 space-y-7">
+          {menuSections.map((section, idx) => (
+            <div key={idx} className="space-y-3">
+              {/* Título de Categoría */}
+              <div className="flex items-center gap-2 px-2 mb-2">
+                <h3 className="text-[10px] font-bold tracking-widest uppercase text-gray-500 leading-none">
+                  {section.title}
+                </h3>
+              </div>
+
+              {/* Botones de Ítems */}
+              <div className="space-y-1">
+                {section.items.map((item) => {
+                  const isActive = activeTab === item.id;
+                  return (
+                    <button
+                      key={item.id}
+                      type="button"
+                      onClick={() => setActiveTab(item.id)}
+                      className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-[13px] transition-all duration-200 group ${
+                        isActive 
+                          ? 'bg-emerald-500 text-white font-semibold shadow-lg shadow-emerald-500/20' 
+                          : 'text-gray-400 hover:text-gray-200 hover:bg-white/5'
+                      }`}
+                    >
+                      <span className={`w-5 h-5 flex items-center justify-center shrink-0 transition-colors ${
+                        isActive ? 'text-white' : 'text-gray-500 group-hover:text-gray-300'
+                      }`}>
+                        {item.icon}
+                      </span>
+                      <span className="truncate tracking-wide leading-tight text-left">
+                        {item.label}
+                      </span>
+                    </button>
+                  );
+                })}
+              </div>
             </div>
-          );
-        })}
+          ))}
+        </div>
+      </div>
+
+      {/* Contenido Principal */}
+      <div className="flex-1 overflow-y-auto custom-scrollbar relative bg-transparent p-6 lg:p-10">
+        {renderContent()}
       </div>
     </div>
   );
 }
+
+export default Configuraciones;

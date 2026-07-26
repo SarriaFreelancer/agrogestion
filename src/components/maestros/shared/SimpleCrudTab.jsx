@@ -1,4 +1,5 @@
 import React, { useState, useMemo } from 'react';
+import { Search, Plus, X, Edit2, Trash2, Save } from 'lucide-react';
 
 export default function SimpleCrudTab({ title, data, onAdd, onEdit, onDelete, fields }) {
   const [formData, setFormData] = useState({});
@@ -33,68 +34,118 @@ export default function SimpleCrudTab({ title, data, onAdd, onEdit, onDelete, fi
   };
 
   return (
-    <div>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '0.75rem', marginBottom: '1.5rem' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', flexWrap: 'wrap' }}>
-          <h3 style={{ margin: 0 }}>{title}</h3>
-          <input
-            className="input-field"
-            style={{ maxWidth: '260px', margin: 0, padding: '0.4rem 0.75rem', fontSize: '0.88rem' }}
-            placeholder="Buscar..."
-            value={searchQuery}
-            onChange={e => setSearchQuery(e.target.value)}
-          />
+    <div className="space-y-6">
+      {/* Table Toolbar */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div className="flex items-center gap-3 flex-1 max-w-md">
+          <div className="relative w-full">
+            <Search size={17} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+            <input
+              className="input-field !pl-9"
+              placeholder={`Buscar en ${title.toLowerCase()}...`}
+              value={searchQuery}
+              onChange={e => setSearchQuery(e.target.value)}
+            />
+          </div>
         </div>
-        <button className="btn-primary" onClick={() => { setIsCreating(!isCreating); setEditingId(null); setFormData({}); }}>
-          {(isCreating || editingId) ? 'Cancelar' : '+ Agregar Nuevo'}
+        <button 
+          className={isCreating || editingId ? "btn-secondary !m-0" : "btn-primary !m-0"} 
+          onClick={() => { setIsCreating(!isCreating); setEditingId(null); setFormData({}); }}
+        >
+          {(isCreating || editingId) ? <X size={17} /> : <Plus size={17} />}
+          <span>{(isCreating || editingId) ? 'Cancelar' : 'Agregar Nuevo'}</span>
         </button>
       </div>
 
+      {/* Form Drawer / Panel */}
       {(isCreating || editingId) && (
-        <div style={{ background: 'var(--input-bg)', padding: '1.5rem', borderRadius: '8px', marginBottom: '2rem' }}>
-          <h4>{editingId ? 'Editar' : 'Crear'} Registro</h4>
-          <div className="grid-3" style={{ marginTop: '1rem' }}>
+        <div className="p-6 rounded-2xl bg-white/[0.03] border border-emerald-500/30 backdrop-blur-md space-y-4 fade-in">
+          <div className="flex items-center justify-between border-b border-white/10 pb-3">
+            <h4 className="font-bold text-white text-base">
+              {editingId ? `Editar ${title}` : `Nuevo Registro de ${title}`}
+            </h4>
+            <span className="badge badge-active text-[10px]">Formulario</span>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             {fields.map(f => (
-              <div key={f.key} className="input-group">
+              <div key={f.key} className="input-group !mb-0">
                 <label className="input-label">{f.label}</label>
                 {f.type === 'select' && Array.isArray(f.options) ? (
-                  <select className="input-field" value={formData[f.key] || ''} onChange={e => setFormData({ ...formData, [f.key]: e.target.value })}>
+                  <select 
+                    className="input-field" 
+                    value={formData[f.key] || ''} 
+                    onChange={e => setFormData({ ...formData, [f.key]: e.target.value })}
+                  >
+                    <option value="" disabled className="bg-[#0d131f]">Seleccionar...</option>
                     {f.options.map(option => (
-                      <option key={option} value={option}>{option}</option>
+                      <option key={option} value={option} className="bg-[#0d131f]">{option}</option>
                     ))}
                   </select>
                 ) : (
-                  <input className="input-field" value={formData[f.key] || ''} onChange={e => setFormData({ ...formData, [f.key]: e.target.value })} />
+                  <input 
+                    className="input-field" 
+                    placeholder={`Ingrese ${f.label.toLowerCase()}`}
+                    value={formData[f.key] || ''} 
+                    onChange={e => setFormData({ ...formData, [f.key]: e.target.value })} 
+                  />
                 )}
               </div>
             ))}
-            <div className="input-group" style={{ display: 'flex', alignItems: 'flex-end' }}>
-              <button className="btn-primary" onClick={handleSave} style={{ width: '100%' }}>Guardar</button>
+            <div className="flex items-end md:col-span-1">
+              <button className="btn-primary !w-full !m-0" onClick={handleSave}>
+                <Save size={16} />
+                <span>Guardar Registro</span>
+              </button>
             </div>
           </div>
         </div>
       )}
 
-      <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
-        <thead>
-          <tr style={{ borderBottom: '2px solid var(--primary-light)' }}>
-            {fields.map(f => <th key={f.key} style={{ padding: '0.8rem 0.5rem' }}>{f.label}</th>)}
-            <th style={{ padding: '0.8rem 0.5rem' }}>Acciones</th>
-          </tr>
-        </thead>
-        <tbody>
-          {filteredData.map(item => (
-            <tr key={item.id} style={{ borderBottom: '1px solid var(--glass-border)' }}>
-              {fields.map(f => <td key={f.key} style={{ padding: '0.8rem 0.5rem' }}>{item[f.key]}</td>)}
-              <td style={{ padding: '0.8rem 0.5rem', display: 'flex', gap: '0.5rem' }}>
-                <button className="btn-secondary" style={{ padding: '0.3rem 0.6rem', fontSize: '0.8rem' }} onClick={() => handleEdit(item)}>Editar</button>
-                <button className="btn-secondary" style={{ padding: '0.3rem 0.6rem', fontSize: '0.8rem', background: '#ff5252', color: 'white', border: 'none' }} onClick={() => onDelete(item.id)}>Eliminar</button>
-              </td>
+      {/* Table Container */}
+      <div className="overflow-x-auto rounded-xl border border-white/10">
+        <table className="data-table">
+          <thead>
+            <tr>
+              {fields.map(f => <th key={f.key}>{f.label}</th>)}
+              <th className="w-28 text-right">Acciones</th>
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {filteredData.length === 0 ? (
+              <tr>
+                <td colSpan={fields.length + 1} className="text-center py-12 text-gray-500">
+                  No se encontraron registros para mostrar
+                </td>
+              </tr>
+            ) : (
+              filteredData.map(item => (
+                <tr key={item.id}>
+                  {fields.map(f => <td key={f.key} className="text-white font-medium">{item[f.key]}</td>)}
+                  <td>
+                    <div className="flex items-center justify-end gap-2">
+                      <button 
+                        className="btn-secondary !p-2 !m-0 text-gray-300 hover:text-white" 
+                        title="Editar"
+                        onClick={() => handleEdit(item)}
+                      >
+                        <Edit2 size={15} />
+                      </button>
+                      <button 
+                        className="btn-danger !p-2 !m-0" 
+                        title="Eliminar"
+                        onClick={() => onDelete(item.id)}
+                      >
+                        <Trash2 size={15} />
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              ))
+            )}
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 }
-

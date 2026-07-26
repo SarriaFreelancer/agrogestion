@@ -1,6 +1,23 @@
 @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap');
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
 :root {
+  --color-background: #090d16;
+  --color-surface: #0d131f;
+  
+  --color-primary: #10B981;
+  --color-primary-light: #34D399;
+  --color-primary-dark: #059669;
+  
+  --color-secondary: #6366F1;
+  --color-danger: #EF4444;
+  
+  --color-foreground: #F9FAFB;
+  --color-muted: #9CA3AF;
+  
+  --font-sans: 'Outfit', sans-serif;
   --bg-gradient: linear-gradient(135deg, #fdfbfb 0%, #ebedee 100%);
   --sidebar-bg: #1e1e2f;
   --glass-bg: rgba(255, 255, 255, 0.65);

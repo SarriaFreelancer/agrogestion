@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useAgro } from '../../context/AgroContext';
 import HojaDeVida from './HojaDeVida';
+import { Network, Folder, Home, Package, Sprout, Plus, ChevronRight, ChevronDown, MousePointerClick } from 'lucide-react';
 
 export default function Estructura() {
   const { globalCultivo, cultivos, sectores, updateEstructura, addSector, addElementoEstructura, configuraciones } = useAgro();
@@ -89,19 +90,10 @@ export default function Estructura() {
     <button
       key={suerte.id}
       onClick={() => setSelectedNode(suerte)}
-      style={{
-        textAlign: 'left',
-        padding: '0.4rem 0.7rem',
-        borderRadius: '8px',
-        background: activeNode?.id === suerte.id ? 'var(--primary-light)' : 'var(--input-bg)',
-        color: activeNode?.id === suerte.id ? 'white' : 'var(--text-main)',
-        border: '1px solid var(--glass-border)',
-        cursor: 'pointer',
-        fontSize: '0.8rem',
-        width: '100%'
-      }}
+      className={`w-full text-left p-2.5 rounded-lg border transition-all duration-200 flex items-center gap-2 text-xs font-semibold !m-0 ${activeNode?.id === suerte.id ? 'bg-emerald-500/20 border-emerald-500 text-emerald-300 shadow-[0_0_12px_rgba(16,185,129,0.2)]' : 'bg-white/[0.02] border-white/10 text-gray-300 hover:bg-white/[0.05]'}`}
     >
-      🍃 <strong>{suerte.id}</strong> - {suerte.name}
+      <Sprout size={14} className="text-emerald-400 flex-shrink-0" />
+      <span className="truncate"><strong>{suerte.id}</strong> - {suerte.name}</span>
     </button>
   );
 
@@ -110,45 +102,28 @@ export default function Estructura() {
     const loteExpanded = isExpanded(lote.id);
 
     return (
-      <div key={lote.id} style={{ marginBottom: '0.45rem' }}>
-        <div
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: '0.5rem',
-            justifyContent: 'space-between'
-          }}
-        >
+      <div key={lote.id} className="space-y-1.5 mb-2">
+        <div className="flex items-center gap-2 justify-between">
           <button
             onClick={() => setSelectedNode(lote)}
-            style={{
-              textAlign: 'left',
-              flex: 1,
-              padding: '0.45rem 0.7rem',
-              borderRadius: '8px',
-              background: activeNode?.id === lote.id ? 'var(--primary-light)' : 'var(--input-bg)',
-              color: activeNode?.id === lote.id ? 'white' : 'var(--text-main)',
-              border: '1px solid var(--glass-border)',
-              cursor: 'pointer',
-              fontSize: '0.82rem'
-            }}
+            className={`flex-1 text-left p-2.5 rounded-lg border transition-all duration-200 flex items-center gap-2 text-xs font-semibold !m-0 ${activeNode?.id === lote.id ? 'bg-emerald-500/20 border-emerald-500 text-emerald-300' : 'bg-white/[0.02] border-white/10 text-gray-300 hover:bg-white/[0.05]'}`}
           >
-            📦 <strong>{lote.id}</strong> - {lote.name}
+            <Package size={15} className="text-blue-400 flex-shrink-0" />
+            <span className="truncate"><strong>{lote.id}</strong> - {lote.name}</span>
           </button>
           {canRenderSuertes && loteSuertes.length > 0 && (
             <button
               type="button"
-              className="btn-secondary"
+              className="btn-secondary !p-1.5 !px-2.5 !m-0 text-[11px]"
               onClick={() => toggleNode(lote.id)}
-              style={{ padding: '0.35rem 0.55rem', fontSize: '0.72rem', minWidth: '88px' }}
             >
-              {loteExpanded ? 'Ocultar' : `Ver ${loteSuertes.length}`}
+              {loteExpanded ? 'Ocultar' : `Ver (${loteSuertes.length})`}
             </button>
           )}
         </div>
 
         {canRenderSuertes && loteExpanded && loteSuertes.length > 0 && (
-          <div style={{ paddingLeft: '1.5rem', marginTop: '0.45rem', display: 'grid', gap: '0.35rem' }}>
+          <div className="pl-4 border-l border-white/10 space-y-1.5 ml-2 mt-1.5">
             {loteSuertes.map(renderSuerteItem)}
           </div>
         )}
@@ -161,51 +136,34 @@ export default function Estructura() {
     const fincaLotes = finca.lotes || [];
 
     return (
-      <div key={finca.id} style={{ marginBottom: '0.55rem' }}>
-        <div
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: '0.5rem',
-            justifyContent: 'space-between'
-          }}
-        >
+      <div key={finca.id} className="space-y-2 mb-3">
+        <div className="flex items-center gap-2 justify-between">
           <button
             onClick={() => setSelectedNode(finca)}
-            style={{
-              textAlign: 'left',
-              flex: 1,
-              padding: '0.5rem 0.75rem',
-              borderRadius: '8px',
-              background: activeNode?.id === finca.id ? 'var(--primary-light)' : 'var(--input-bg)',
-              color: activeNode?.id === finca.id ? 'white' : 'var(--text-main)',
-              border: '1px solid var(--glass-border)',
-              cursor: 'pointer',
-              fontSize: '0.84rem'
-            }}
+            className={`flex-1 text-left p-2.5 rounded-lg border transition-all duration-200 flex items-center gap-2 text-xs font-semibold !m-0 ${activeNode?.id === finca.id ? 'bg-emerald-500/20 border-emerald-500 text-emerald-300' : 'bg-white/[0.03] border-white/10 text-gray-200 hover:bg-white/[0.06]'}`}
           >
-            🏠 <strong>{finca.id}</strong> - {finca.name}
+            <Home size={16} className="text-amber-400 flex-shrink-0" />
+            <span className="truncate"><strong>{finca.id}</strong> - {finca.name}</span>
           </button>
           {canRenderLotes && fincaLotes.length > 0 && (
             <button
               type="button"
-              className="btn-secondary"
+              className="btn-secondary !p-1.5 !px-2.5 !m-0 text-[11px]"
               onClick={() => toggleNode(finca.id)}
-              style={{ padding: '0.35rem 0.55rem', fontSize: '0.72rem', minWidth: '88px' }}
             >
-              {fincaExpanded ? 'Ocultar' : `Ver ${fincaLotes.length}`}
+              {fincaExpanded ? 'Ocultar' : `Ver (${fincaLotes.length})`}
             </button>
           )}
         </div>
 
         {canRenderLotes && fincaExpanded && fincaLotes.length > 0 && (
-          <div style={{ paddingLeft: '1.5rem', marginTop: '0.45rem' }}>
+          <div className="pl-4 border-l border-white/10 space-y-1.5 ml-2 mt-1.5">
             {fincaLotes.map(renderLoteNode)}
           </div>
         )}
 
         {structureLevelCount === 3 && canRenderSuertes && fincaExpanded && filterByGlobal(finca.suertes).length > 0 && (
-          <div style={{ paddingLeft: '1.5rem', marginTop: '0.45rem', display: 'grid', gap: '0.35rem' }}>
+          <div className="pl-4 border-l border-white/10 space-y-1.5 ml-2 mt-1.5">
             {filterByGlobal(finca.suertes).map(renderSuerteItem)}
           </div>
         )}
@@ -219,37 +177,20 @@ export default function Estructura() {
     const sectorSuertes = filterByGlobal(sector.suertes);
 
     return (
-      <div key={sector.id} style={{ marginBottom: '0.8rem' }}>
-        <div
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: '0.5rem',
-            justifyContent: 'space-between'
-          }}
-        >
+      <div key={sector.id} className="space-y-2 mb-4">
+        <div className="flex items-center gap-2 justify-between">
           <button
-            style={{
-              cursor: 'pointer',
-              fontWeight: activeNode?.id === sector.id ? 'bold' : 'normal',
-              color: activeNode?.id === sector.id ? 'var(--primary-color)' : 'var(--text-main)',
-              textAlign: 'left',
-              flex: 1,
-              padding: '0.55rem 0.75rem',
-              borderRadius: '10px',
-              border: '1px solid var(--glass-border)',
-              background: activeNode?.id === sector.id ? 'rgba(var(--primary-rgb), 0.08)' : 'var(--input-bg)'
-            }}
+            className={`flex-1 text-left p-3 rounded-xl border transition-all duration-200 flex items-center gap-2.5 text-xs font-bold !m-0 ${activeNode?.id === sector.id ? 'bg-emerald-500/20 border-emerald-500 text-white shadow-[0_0_15px_rgba(16,185,129,0.25)]' : 'bg-white/[0.04] border-white/10 text-gray-100 hover:bg-white/[0.08]'}`}
             onClick={() => setSelectedNode(sector)}
           >
-            📁 <strong>{sector.id}</strong> - {sector.name}
+            <Folder size={17} className="text-emerald-400 flex-shrink-0" />
+            <span className="truncate"><strong>{sector.id}</strong> - {sector.name}</span>
           </button>
           {(sectorFincas.length > 0 || (structureLevelCount === 2 && sectorSuertes.length > 0)) && (
             <button
               type="button"
-              className="btn-secondary"
+              className="btn-secondary !p-2 !px-3 !m-0 text-xs"
               onClick={() => toggleNode(sector.id)}
-              style={{ padding: '0.35rem 0.6rem', fontSize: '0.72rem', minWidth: '92px' }}
             >
               {sectorExpanded ? 'Ocultar' : 'Desglosar'}
             </button>
@@ -257,9 +198,9 @@ export default function Estructura() {
         </div>
 
         {sectorExpanded && (
-          <div style={{ paddingLeft: '1.25rem', marginTop: '0.55rem', borderLeft: '2px dashed var(--glass-border)' }}>
+          <div className="pl-4 border-l-2 border-dashed border-white/15 space-y-2 ml-2 mt-2">
             {structureLevelCount === 2 && sectorSuertes.length > 0 && (
-              <div style={{ display: 'grid', gap: '0.35rem' }}>
+              <div className="space-y-1.5">
                 {sectorSuertes.map(renderSuerteItem)}
               </div>
             )}
@@ -308,77 +249,96 @@ export default function Estructura() {
   };
 
   return (
-    <div>
-      <div className="header">
-        <h1>Estructura Agrícola</h1>
-        <p>Priorización de Código y Nombre en la jerarquía.</p>
+    <div className="space-y-8 fade-in">
+      {/* Header */}
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-white/10 pb-6">
+        <div>
+          <div className="flex items-center gap-3 mb-1">
+            <h1 className="text-2xl md:text-3xl font-bold text-white tracking-tight">Estructura Agrícola</h1>
+            <span className="badge badge-active text-[11px]">{structureLevelCount} Niveles</span>
+          </div>
+          <p className="text-sm text-[#9CA3AF]">
+            Organización y jerarquía territorial del sistema agrícola
+          </p>
+        </div>
       </div>
 
-      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '2rem' }}>
-        <div className="glass-card" style={{ flex: '1 1 320px', minWidth: '320px' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+        {/* Panel Izquierdo: Árbol Jerárquico */}
+        <div className="glass-card !p-6 lg:col-span-5 space-y-4">
+          <div className="flex items-center justify-between border-b border-white/10 pb-4">
             <div>
-              <h3>Jerarquía</h3>
-              <p style={{ margin: 0, fontSize: '0.9rem', color: 'var(--text-muted)' }}>
-                {structureLevelCount} niveles activos: {levelLabels.slice(0, structureLevelCount).join(' › ')}
+              <h3 className="font-bold text-white text-base">Jerarquía Activa</h3>
+              <p className="text-xs text-gray-400 mt-0.5">
+                {levelLabels.slice(0, structureLevelCount).join(' › ')}
               </p>
             </div>
-            <button className="btn-primary" style={{ padding: '0.4rem 0.8rem', fontSize: '0.8rem' }} onClick={() => setCreatingType('Sector')}>
-              + Nuevo {levelLabels[0]}
+            <button className="btn-primary !m-0 !text-xs !py-2" onClick={() => setCreatingType('Sector')}>
+              <Plus size={15} />
+              <span>Nuevo {levelLabels[0]}</span>
             </button>
           </div>
           
-          <div style={{ paddingLeft: '1rem', borderLeft: '2px dashed var(--glass-border)' }}>
+          <div className="pt-2">
             {sectores.map(renderSectorNode)}
           </div>
         </div>
 
-        <div style={{ flex: '1.5 1 320px', minWidth: '320px' }}>
+        {/* Panel Derecho: Detalle o Creación */}
+        <div className="lg:col-span-7 space-y-6">
           {creatingType && (
-            <div className="glass-card" style={{ marginBottom: '1.5rem', border: '2px solid var(--primary-light)' }}>
-              <h3>Crear Nuevo {labelForType(creatingType)} {creatingType !== 'Sector' && `en ${activeNode?.name}`}</h3>
-              <div style={{ marginTop: '1.5rem', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-                
-                <div className="grid-2" style={{gap:'1rem'}}>
-                  <div className="input-group">
-                    <label className="input-label">Código del {creatingType}</label>
-                    <input className="input-field" value={newElementCode} onChange={e => setNewElementCode(e.target.value)} placeholder="Ej: FIN-01" autoFocus />
-                  </div>
-                  <div className="input-group">
-                    <label className="input-label">Nombre del {creatingType}</label>
-                    <input className="input-field" value={newElementName} onChange={e => setNewElementName(e.target.value)} placeholder="Ej: Finca La Esperanza" />
-                  </div>
+            <div className="glass-card !p-6 border-2 border-emerald-500/50 space-y-4 fade-in">
+              <h3 className="text-base font-bold text-white flex items-center gap-2">
+                <Plus size={18} className="text-emerald-400" />
+                <span>Crear Nuevo {labelForType(creatingType)} {creatingType !== 'Sector' && `en ${activeNode?.name}`}</span>
+              </h3>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="input-group !mb-0">
+                  <label className="input-label">Código del {creatingType}</label>
+                  <input className="input-field" value={newElementCode} onChange={e => setNewElementCode(e.target.value)} placeholder="Ej: FIN-01" autoFocus />
                 </div>
-                
-                {creatingType === 'Sector' && (
-                  <div className="input-group">
-                    <label className="input-label">Planta o Cliente</label>
-                    <input className="input-field" value={newSectorPlant} onChange={e => setNewSectorPlant(e.target.value)} placeholder="Ej: Ingenio Central" />
-                  </div>
-                )}
+                <div className="input-group !mb-0">
+                  <label className="input-label">Nombre del {creatingType}</label>
+                  <input className="input-field" value={newElementName} onChange={e => setNewElementName(e.target.value)} placeholder="Ej: Finca La Esperanza" />
+                </div>
+              </div>
+              
+              {creatingType === 'Sector' && (
+                <div className="input-group !mb-0">
+                  <label className="input-label">Planta o Cliente</label>
+                  <input className="input-field" value={newSectorPlant} onChange={e => setNewSectorPlant(e.target.value)} placeholder="Ej: Ingenio Central" />
+                </div>
+              )}
 
-                <div style={{ display: 'flex', gap: '1rem' }}>
-                  <button className="btn-primary" onClick={handleCreate}>✓ Crear {creatingType}</button>
-                  <button className="btn-secondary" onClick={() => setCreatingType(null)}>Cancelar</button>
-                </div>
+              <div className="flex gap-3 pt-2">
+                <button className="btn-primary !m-0" onClick={handleCreate}>✓ Crear {creatingType}</button>
+                <button className="btn-secondary !m-0" onClick={() => setCreatingType(null)}>Cancelar</button>
               </div>
             </div>
           )}
 
           {activeNode ? (
-            <>
-              <div style={{ display: 'flex', gap: '1rem', marginBottom: '1rem' }}>
+            <div className="space-y-6">
+              <div className="flex items-center gap-3">
                 {canCreateChild(activeNode.type) && (
-                  <button className="btn-secondary" onClick={() => setCreatingType(typeForNextChild(activeNode.type))}>
-                    + Agregar {labelForType(typeForNextChild(activeNode.type))}
+                  <button className="btn-secondary !m-0" onClick={() => setCreatingType(typeForNextChild(activeNode.type))}>
+                    <Plus size={16} />
+                    <span>Agregar {labelForType(typeForNextChild(activeNode.type))}</span>
                   </button>
                 )}
               </div>
               <HojaDeVida key={activeNode.id} node={activeNode} onUpdate={handleUpdate} />
-            </>
+            </div>
           ) : (
-            <div className="glass-card" style={{ textAlign: 'center', color: 'var(--text-muted)', padding: '4rem' }}>
-              Selecciona un elemento de la jerarquía.
+            <div className="glass-card !p-12 text-center flex flex-col items-center justify-center">
+              <div className="w-16 h-16 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400 mb-4">
+                <MousePointerClick size={32} />
+              </div>
+              <h3 className="text-lg font-bold text-white mb-2">Seleccione un elemento de la jerarquía</h3>
+              <p className="text-sm text-gray-400 max-w-sm leading-relaxed">
+                Haga clic en cualquier Sector, Finca, Lote o Suerte del árbol para ver y editar su Hoja de Vida.
+              </p>
             </div>
           )}
         </div>

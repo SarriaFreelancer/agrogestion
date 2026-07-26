@@ -6,16 +6,293 @@ generator client {
 }
 
 datasource db {
-  provider = "mysql" // We'll update this dynamically in the backend based on the client configuration
+  provider = "mysql"
   url      = env("DATABASE_URL")
+} // We'll update this dynamically in the backend based on the client configuration
+
+// ==============================
+// SAAS MULTI-TENANT CORE
+// ==============================
+
+enum RoleName {
+  ADMIN
+  SUPERADMIN
+  USER
+}
+
+enum DatabaseEngine {
+  MYSQL
+  POSTGRESQL
+  SQLSERVER
+}
+
+enum DatabaseType {
+  SHARED
+  DEDICATED
+}
+
+model Role {
+  id      Int          @id @default(autoincrement())
+  name    RoleName     @unique
+  users   User[]
+  modules RoleModule[]
+}
+
+model User {
+  id            Int      @id @default(autoincrement())
+  email         String   @unique
+  password      String
+  name          String?
+  roleId        Int?
+  role          Role?    @relation(fields: [roleId], references: [id])
+  
+  companyId     Int?
+  company       Company? @relation(fields: [companyId], references: [id])
+  plantaId      String?
+  planta        Planta?  @relation(fields: [plantaId], references: [id])
+  position      String?
+  preferences   Json?
+  lastLogin     DateTime?
+  
+  auditLogs     AuditLog[]
+  loginHistories LoginHistory[]
+  sessions      UserSession[]
+  
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  
+  @@index([companyId])
+  @@index([plantaId])
+}
+
+model Company {
+  id             Int       @id @default(autoincrement())
+  name           String    @unique
+  planId         String?   
+  maxUsers       Int?      
+  maxProducts    Int?      
+  
+  serverId       String?
+  server         Server?   @relation("ServerCompanies", fields: [serverId], references: [id])
+  ownedServers   Server[]  @relation("CompanyServers")
+  
+  databaseName   String?
+  databaseType   DatabaseType? 
+  currentVersion String?   
+  
+  address        String?
+  city           String?
+  country        String    @default("Colombia")
+  status         String    @default("ACTIVE")  // ACTIVE, SUSPENDED, INACTIVE
+  themeConfig    Json?     
+  
+  setting        CompanySetting?
+  
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+  
+  // Relaciones
+  users          User[]
+  modules        CompanyModule[]
+  auditLogs      AuditLog[]
+  loginHistories LoginHistory[]
+  sessions       UserSession[]
+  
+  // Relaciones Tenantizadas (Agro)
+  plantas        Planta[]
+  sectores       Sector[]
+  fincas         Finca[]
+  lotes          Lote[]
+  suertes        Suerte[]
+  cultivos       Cultivo[]
+  unidades       Unidad[]
+  gruposActividad GrupoActividad[]
+  actividades    Actividad[]
+  tiposProducto  TipoProducto[]
+  productos      Producto[]
+  proveedores    Proveedor[]
+  cuadrillas     Cuadrilla[]
+  trabajadores   Trabajador[]
+  tiposMaquinaria TipoMaquinaria[]
+  maquinarias    Maquinaria[]
+  planificaciones Planificacion[]
+  movimientosInventario MovimientoInventario[]
+  clientesConfig ClienteConfig[]
+
+  @@index([name])
+}
+
+model Server {
+  id       String         @id @default(cuid())
+  name     String
+  engine   DatabaseEngine
+  host     String
+  port     Int
+  username String
+  password String         
+  ssl      Boolean        @default(false)
+  active   Boolean        @default(true)
+  companies Company[]     @relation("ServerCompanies")
+  ownerId   Int?
+  owner     Company?      @relation("CompanyServers", fields: [ownerId], references: [id])
+}
+
+model Module {
+  id          Int             @id @default(autoincrement())
+  name        String          @unique    
+  description String?
+  isActive    Boolean         @default(true)
+  icon        String?                    
+  href        String?                    
+  roles       RoleModule[]
+  companies   CompanyModule[]
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
+}
+
+model RoleModule {
+  roleId   Int
+  moduleId Int
+  role     Role   @relation(fields: [roleId], references: [id])
+  module   Module @relation(fields: [moduleId], references: [id])
+  @@id([roleId, moduleId])
+}
+
+model CompanyModule {
+  companyId Int
+  moduleId  Int
+  company   Company @relation(fields: [companyId], references: [id])
+  module    Module  @relation(fields: [moduleId], references: [id])
+  @@id([companyId, moduleId])
+}
+
+model AuditLog {
+  id              Int      @id @default(autoincrement())
+  companyId       Int?
+  company         Company? @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  userId          Int?
+  user            User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+  module          String   
+  action          String   
+  entity          String   
+  entityId        String?  // Changed to String since many of your entities use UUIDs
+  description     String   @db.Text
+  oldValues       Json?    
+  newValues       Json?    
+  ip              String?
+  browser         String?
+  operatingSystem String?
+  device          String?
+  country         String?
+  city            String?
+  sessionId       String?
+  createdAt       DateTime @default(now())
+  
+  @@index([companyId])
+  @@index([userId])
+  @@index([module])
+  @@index([action])
+  @@index([createdAt])
+}
+
+model LoginHistory {
+  id              Int      @id @default(autoincrement())
+  userId          Int?
+  user            User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+  email           String
+  companyId       Int?
+  company         Company? @relation(fields: [companyId], references: [id])
+  ip              String?
+  browser         String?
+  operatingSystem String?
+  device          String?
+  country         String?
+  city            String?
+  status          String   
+  reason          String?  
+  createdAt       DateTime @default(now())
+  
+  @@index([companyId])
+  @@index([status])
+  @@index([createdAt])
+}
+
+model UserSession {
+  id              Int      @id @default(autoincrement())
+  userId          Int
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  companyId       Int?
+  company         Company? @relation(fields: [companyId], references: [id])
+  token           String   @unique
+  ip              String?
+  browser         String?
+  operatingSystem String?
+  expiresAt       DateTime
+  createdAt       DateTime @default(now())
+  
+  @@index([userId])
+}
+
+model CompanySetting {
+  id                    Int      @id @default(autoincrement())
+  companyId             Int      @unique
+  company               Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  nit                   String?
+  phone                 String?
+  website               String?
+  socialMedia           Json?
+  invoiceConfig         Json?     
+  currency              String   @default("COP")
+  timezone              String   @default("America/Bogota")
+  dateFormat            String   @default("YYYY-MM-DD")
+  currencyFormat        String   @default("es-CO")
+  allowNegativeStock    Boolean  @default(false)
+  automaticCode         Boolean  @default(true)
+  decimals              Int      @default(0)
+  defaultIva            Float    @default(19.0)
+  invoicePrefix         String   @default("VEN")
+  invoiceConsecutive    Int      @default(1)
+  purchasePrefix        String   @default("COM")
+  purchaseConsecutive   Int      @default(1)
+  passwordMinLength     Int      @default(6)
+  maxLoginAttempts      Int      @default(5)
+  sessionTimeoutMinutes Int      @default(60)
+  enable2FA             Boolean  @default(false)
+  enableNotifications   Boolean  @default(true)
+  smtpHost              String?
+  smtpPort              Int?
+  smtpUser              String?
+  smtpPass              String?
+  backupFrequency       String   @default("DAILY")
+  backupTime            String?  @default("02:00")
+  backupDay             Int?     @default(1)
+  backupPath            String?
+  updatedAt             DateTime @updatedAt
 }
 
 // ==============================
 // 1. ESTRUCTURA GEOGRÁFICA
 // ==============================
 
+model Planta {
+  id        String   @id @default(uuid())
+  companyId Int
+  company   Company  @relation(fields: [companyId], references: [id])
+  name      String
+  status    String   @default("ACTIVE")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  cultivos  Cultivo[]
+  users     User[]
+  
+  @@index([companyId])
+}
+
 model Sector {
   id            String   @id @default(uuid())
+  companyId     Int?
+  company       Company? @relation(fields: [companyId], references: [id])
   codigo        String
   name          String
   type          String   @default("Sector")
@@ -23,10 +300,14 @@ model Sector {
   fincas        Finca[]
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
+
+  @@index([companyId])
 }
 
 model Finca {
   id        String   @id @default(uuid())
+  companyId Int?
+  company   Company? @relation(fields: [companyId], references: [id])
   codigo    String?
   name      String
   type      String   @default("Finca")
@@ -35,10 +316,14 @@ model Finca {
   lotes     Lote[]
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  @@index([companyId])
 }
 
 model Lote {
   id        String   @id @default(uuid())
+  companyId Int?
+  company   Company? @relation(fields: [companyId], references: [id])
   codigo    String?
   name      String
   type      String   @default("Lote")
@@ -47,10 +332,14 @@ model Lote {
   suertes   Suerte[]
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  @@index([companyId])
 }
 
 model Suerte {
   id                    String   @id @default(uuid())
+  companyId             Int?
+  company               Company? @relation(fields: [companyId], references: [id])
   codigo                String?
   name                  String
   type                  String   @default("Suerte")
@@ -68,6 +357,8 @@ model Suerte {
   lote                  Lote     @relation(fields: [loteId], references: [id], onDelete: Cascade)
   createdAt             DateTime @default(now())
   updatedAt             DateTime @updatedAt
+
+  @@index([companyId])
 }
 
 // ==============================
@@ -76,32 +367,49 @@ model Suerte {
 
 model Cultivo {
   id        String   @id @default(uuid())
+  companyId Int?
+  company   Company? @relation(fields: [companyId], references: [id])
+  plantaId  String?
+  planta    Planta?  @relation(fields: [plantaId], references: [id])
   codigo    String?
   name      String
   estado    String   @default("Activo")
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  @@index([companyId])
+  @@index([plantaId])
 }
 
 model Unidad {
   id        String   @id @default(uuid())
+  companyId Int?
+  company   Company? @relation(fields: [companyId], references: [id])
   codigo    String
   name      String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  @@index([companyId])
 }
 
 model GrupoActividad {
   id          String      @id @default(uuid())
+  companyId   Int?
+  company     Company?    @relation(fields: [companyId], references: [id])
   codigo      String?
   name        String
   actividades Actividad[]
   createdAt   DateTime    @default(now())
   updatedAt   DateTime    @updatedAt
+
+  @@index([companyId])
 }
 
 model Actividad {
   id                String          @id @default(uuid())
+  companyId         Int?
+  company           Company?        @relation(fields: [companyId], references: [id])
   code              String?
   name              String
   groupId           String?
@@ -112,21 +420,29 @@ model Actividad {
   unidadProduccion  String?
   unidadMedida      String?
   tarifaBase        Float           @default(0)
-  productosEstandar Json? // Array of Product IDs
+  productosEstandar Json? 
   createdAt         DateTime        @default(now())
   updatedAt         DateTime        @updatedAt
+
+  @@index([companyId])
 }
 
 model TipoProducto {
   id        String     @id @default(uuid())
+  companyId Int?
+  company   Company?   @relation(fields: [companyId], references: [id])
   nombre    String
   productos Producto[]
   createdAt DateTime   @default(now())
   updatedAt DateTime   @updatedAt
+
+  @@index([companyId])
 }
 
 model Producto {
   id            String       @id @default(uuid())
+  companyId     Int?
+  company       Company?     @relation(fields: [companyId], references: [id])
   codigo        String?
   nombre        String
   tipoId        String
@@ -136,10 +452,14 @@ model Producto {
   costoUnitario Float        @default(0)
   createdAt     DateTime     @default(now())
   updatedAt     DateTime     @updatedAt
+
+  @@index([companyId])
 }
 
 model Proveedor {
   id        String   @id @default(uuid())
+  companyId Int?
+  company   Company? @relation(fields: [companyId], references: [id])
   nombre    String
   tipo      String
   contacto  String?
@@ -148,6 +468,8 @@ model Proveedor {
   estado    String   @default("Activo")
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  @@index([companyId])
 }
 
 // ==============================
@@ -156,16 +478,22 @@ model Proveedor {
 
 model Cuadrilla {
   id           String       @id @default(uuid())
+  companyId    Int?
+  company      Company?     @relation(fields: [companyId], references: [id])
   codigo       String?
   nombre       String
   jefeId       String?
   trabajadores Trabajador[]
   createdAt    DateTime     @default(now())
   updatedAt    DateTime     @updatedAt
+
+  @@index([companyId])
 }
 
 model Trabajador {
   id             String     @id @default(uuid())
+  companyId      Int?
+  company        Company?   @relation(fields: [companyId], references: [id])
   identificacion String
   nombre         String
   apellido       String
@@ -175,18 +503,26 @@ model Trabajador {
   cuadrilla      Cuadrilla? @relation(fields: [cuadrillaId], references: [id])
   createdAt      DateTime   @default(now())
   updatedAt      DateTime   @updatedAt
+
+  @@index([companyId])
 }
 
 model TipoMaquinaria {
   id          String       @id @default(uuid())
+  companyId   Int?
+  company     Company?     @relation(fields: [companyId], references: [id])
   nombre      String
   maquinarias Maquinaria[]
   createdAt   DateTime     @default(now())
   updatedAt   DateTime     @updatedAt
+
+  @@index([companyId])
 }
 
 model Maquinaria {
   id                       String         @id @default(uuid())
+  companyId                Int?
+  company                  Company?       @relation(fields: [companyId], references: [id])
   codigo                   String
   name                     String
   tipoId                   String
@@ -198,6 +534,8 @@ model Maquinaria {
   ultimoMantenimientoHoras Float?
   createdAt                DateTime       @default(now())
   updatedAt                DateTime       @updatedAt
+
+  @@index([companyId])
 }
 
 // ==============================
@@ -206,6 +544,8 @@ model Maquinaria {
 
 model Planificacion {
   id                  String   @id @default(uuid())
+  companyId           Int?
+  company             Company? @relation(fields: [companyId], references: [id])
   ordenCode           String?
   estado              String   @default("Borrador")
   actividadId         String
@@ -218,19 +558,25 @@ model Planificacion {
   prioridad           String?
   notas               String?
   insumosJson         Json?
-  ejecucionesJson     Json? // Stored as JSON to simplify complex relational syncing in phase 1
+  ejecucionesJson     Json? 
   createdAt           DateTime @default(now())
   updatedAt           DateTime @updatedAt
+
+  @@index([companyId])
 }
 
 model MovimientoInventario {
   id            String   @id @default(uuid())
+  companyId     Int?
+  company       Company? @relation(fields: [companyId], references: [id])
   fecha         DateTime @default(now())
   productoId    String
-  tipo          String // Entrada | Salida
+  tipo          String 
   cantidad      Float
   motivo        String?
   costoUnitario Float    @default(0)
+
+  @@index([companyId])
 }
 
 // ==============================
@@ -238,8 +584,12 @@ model MovimientoInventario {
 // ==============================
 
 model ClienteConfig {
-  id     String  @id @default(uuid())
-  clave  String  @unique
-  valor  Json
-  modulo String?
+  id        String   @id @default(uuid())
+  companyId Int?
+  company   Company? @relation(fields: [companyId], references: [id])
+  clave     String   @unique
+  valor     Json
+  modulo    String?
+
+  @@index([companyId])
 }

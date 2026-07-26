@@ -270,14 +270,24 @@ export default function Reportes() {
   };
 
   return (
-    <div className="fade-in">
-      <div className="header">
-        <h1>Centro de Reportes</h1>
+    <div className="space-y-8 fade-in">
+      {/* Header */}
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-white/10 pb-6">
+        <div>
+          <div className="flex items-center gap-3 mb-1">
+            <h1 className="text-2xl md:text-3xl font-bold text-white tracking-tight">Centro de Reportes & Analítica</h1>
+            <span className="badge badge-info text-[11px]">Exportación Excel</span>
+          </div>
+          <p className="text-sm text-[#9CA3AF]">
+            Informes detallados de actividades, monitoreo, movimientos de inventario y rentabilidad
+          </p>
+        </div>
       </div>
 
-      <div className="tabs-container" style={{ display: 'flex', gap: '0.5rem', overflowX: 'auto' }}>
-        <button className={activeTab === 'actividades' ? 'btn-primary' : 'btn-secondary'} onClick={() => setActiveTab('actividades')}>Actividades</button>
-        <button className={activeTab === 'monitoreo' ? 'btn-primary' : 'btn-secondary'} onClick={() => setActiveTab('monitoreo')}>Monitoreo</button>
+      {/* Tabs */}
+      <div className="flex items-center gap-2 border-b border-white/10 pb-4 overflow-x-auto">
+        <button className={`!m-0 ${activeTab === 'actividades' ? 'btn-primary' : 'btn-secondary'}`} onClick={() => setActiveTab('actividades')}>Actividades</button>
+        <button className={`!m-0 ${activeTab === 'monitoreo' ? 'btn-primary' : 'btn-secondary'}`} onClick={() => setActiveTab('monitoreo')}>Monitoreo</button>
         <button className={activeTab === 'inventario' ? 'btn-primary' : 'btn-secondary'} onClick={() => setActiveTab('inventario')}>Inventario Suertes</button>
         <button className={activeTab === 'rentabilidad' ? 'btn-primary' : 'btn-secondary'} onClick={() => setActiveTab('rentabilidad')}>💰 Rentabilidad</button>
         <button className={activeTab === 'kardex' ? 'btn-primary' : 'btn-secondary'} onClick={() => setActiveTab('kardex')}>📦 Kardex</button>

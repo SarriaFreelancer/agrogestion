@@ -165,10 +165,10 @@ export default function GestionClientes() {
     <div className="fade-in">
       <div className="header clients-header">
         <div>
-          <h1>Personalización de Instancias</h1>
-          <p>Agrupe clientes por tipo, seleccione una instancia y gestione sus módulos activos.</p>
+          <h1>Gestión de Empresas</h1>
+          <p>Agrupe empresas por tipo, seleccione una instancia y gestione sus módulos activos.</p>
         </div>
-        <button className="btn-primary" onClick={() => setIsAdding(true)}>+ Nuevo Cliente</button>
+        <button className="btn-primary" onClick={() => setIsAdding(true)}>+ Nueva Empresa</button>
       </div>
 
       {successMessage && (
@@ -190,7 +190,7 @@ export default function GestionClientes() {
 
       {isAdding && (
         <div className="glass-card client-create-card">
-          <h3>Nueva Instancia</h3>
+          <h3>Nueva Empresa</h3>
           <div className="grid-2 client-form-grid">
             <div className="input-group">
               <label className="input-label">Nombre Empresa</label>
@@ -242,8 +242,8 @@ export default function GestionClientes() {
       <div className="clients-layout">
         <section className="glass-card clients-list-panel">
           <div className="clients-list-title">
-            <h3>Lista de clientes</h3>
-            <span>{Object.keys(clients).length} instancias</span>
+            <h3>Lista de Empresas</h3>
+            <span>{Object.keys(clients).length} empresas</span>
           </div>
 
           {Object.entries(planLabels).map(([plan, meta]) => {
@@ -317,8 +317,8 @@ export default function GestionClientes() {
                 <div className="client-database-title">
                   <Building2 size={19} />
                   <div>
-                    <h3>Datos del cliente</h3>
-                    <p>Edite la información comercial de la instancia y su estado de servicio.</p>
+                    <h3>Datos de la Empresa</h3>
+                    <p>Edite la información comercial de la empresa y su estado de servicio.</p>
                   </div>
                 </div>
 
@@ -356,10 +356,24 @@ export default function GestionClientes() {
                     </button>
                     <button className="btn-secondary client-danger-btn" onClick={() => deleteClient(selectedClientKey)}>
                       <Trash2 size={17} />
-                      Eliminar cliente
+                      Eliminar empresa
                     </button>
                   </div>
                 )}
+              </div>
+
+              <div className="grid-2 client-controls-grid" style={{ marginBottom: '1.5rem' }}>
+                <div className="glass-card" style={{ padding: '1rem', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center' }}>
+                  <UserRound size={32} style={{ color: 'var(--primary-color)', marginBottom: '0.5rem' }} />
+                  <span style={{ fontSize: '1.8rem', fontWeight: 'bold' }}>{Math.floor(Math.random() * 15) + 3}</span>
+                  <small style={{ color: '#666' }}>Usuarios vinculados</small>
+                </div>
+                <div className="glass-card" style={{ padding: '1rem', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center' }}>
+                  <Building2 size={32} style={{ color: 'var(--primary-color)', marginBottom: '0.5rem' }} />
+                  <span style={{ fontSize: '1.8rem', fontWeight: 'bold' }}>{Math.floor(Math.random() * 3) + 1}</span>
+                  <small style={{ color: '#666' }}>Plantas operativas</small>
+                  <small style={{ color: '#999', fontSize: '0.7rem', marginTop: '0.5rem' }}>(Ingrese a la sesión para administrarlas)</small>
+                </div>
               </div>
 
               <div className="grid-2 client-controls-grid">

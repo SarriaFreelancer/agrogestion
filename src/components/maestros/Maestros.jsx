@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useAgro } from '../../context/AgroContext';
+import { Database, SlidersHorizontal, Layers, Tractor, Users, Package, Building2, Sprout, Microscope, ChevronDown, ChevronUp, Search } from 'lucide-react';
 
 // Import components from separate folders
 import ActividadesTab from './actividades/ActividadesTab';
@@ -55,13 +56,13 @@ export default function Maestros() {
   };
 
   const mainMasters = [
-    { id: 'actividades', label: 'Actividades', icon: '📋', permission: 'Maestros' },
-    { id: 'maquinaria', label: 'Maquinaria', icon: '🚜', permission: 'Maestros' },
-    { id: 'trabajadores', label: 'Trabajadores', icon: '👤', permission: 'Maestros' },
-    { id: 'productos', label: 'Productos', icon: '📦', permission: 'Maestros' },
-    { id: 'proveedores', label: 'Proveedores', icon: '🏢', permission: 'Maestros' },
-    { id: 'cultivos', label: 'Cultivos', icon: '🌱', permission: 'Maestros' },
-    { id: 'controles', label: 'Controles Agro', icon: '🔬', permission: 'Monitoreo' }
+    { id: 'actividades', label: 'Actividades', icon: <Layers size={18} />, permission: 'Maestros' },
+    { id: 'maquinaria', label: 'Maquinaria', icon: <Tractor size={18} />, permission: 'Maestros' },
+    { id: 'trabajadores', label: 'Trabajadores', icon: <Users size={18} />, permission: 'Maestros' },
+    { id: 'productos', label: 'Productos', icon: <Package size={18} />, permission: 'Maestros' },
+    { id: 'proveedores', label: 'Proveedores', icon: <Building2 size={18} />, permission: 'Maestros' },
+    { id: 'cultivos', label: 'Cultivos', icon: <Sprout size={18} />, permission: 'Maestros' },
+    { id: 'controles', label: 'Controles Agro', icon: <Microscope size={18} />, permission: 'Monitoreo' }
   ].filter(m => hasPermission(m.permission) && isEnabled(configuraciones[masterVisibility[m.id]]));
 
   const typesMasters = [
@@ -73,42 +74,51 @@ export default function Maestros() {
   ].filter(m => isEnabled(configuraciones[masterVisibility[m.id]]));
 
   return (
-    <div className="fade-in">
-      <div className="header">
-        <h1>Centro de Maestros</h1>
-        <p>Seleccione un catálogo para gestionar la información base. Cultivo: <strong>{globalCultivo}</strong></p>
+    <div className="space-y-8 fade-in">
+      {/* Header */}
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-white/10 pb-6">
+        <div>
+          <div className="flex items-center gap-3 mb-1">
+            <h1 className="text-2xl md:text-3xl font-bold text-white tracking-tight">Centro de Maestros</h1>
+            <span className="badge badge-info text-[11px]">Catálogos Base</span>
+          </div>
+          <p className="text-sm text-[#9CA3AF]">
+            Gestión y mantenimiento de tablas maestros. Cultivo activo: <strong className="text-emerald-400 font-semibold">{globalCultivo}</strong>
+          </p>
+        </div>
       </div>
 
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '0.85rem', marginBottom: '1.25rem' }}>
-        <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}>
+      {/* Selector de Pestañas */}
+      <div className="flex flex-col gap-4">
+        <div className="flex flex-wrap gap-2.5 items-center">
           {mainMasters.map(m => (
             <button 
               key={m.id} 
               onClick={() => { setActiveTab(m.id); setShowTipos(false); }} 
-              className={activeTab === m.id ? "btn-primary" : "btn-secondary"}
-              style={{ padding: '0.7rem 1rem', minWidth: '128px', fontSize: '0.88rem', display: 'flex', alignItems: 'center', gap: '0.45rem' }}
+              className={activeTab === m.id ? "btn-primary !m-0" : "btn-secondary !m-0"}
             >
-              <span>{m.icon}</span> {m.label}
+              {m.icon}
+              <span>{m.label}</span>
             </button>
           ))}
           
           <button 
             onClick={() => setShowTipos(!showTipos)} 
-            className={showTipos ? "btn-primary" : "btn-secondary"}
-            style={{ padding: '0.7rem 1rem', minWidth: '128px', fontSize: '0.88rem', background: showTipos ? '' : '#455a64', color: 'white' }}
+            className={`!m-0 ${showTipos ? "btn-primary" : "btn-secondary"}`}
           >
-            ⚙️ Catálogos y Tipos {showTipos ? '▲' : '▼'}
+            <SlidersHorizontal size={18} />
+            <span>Catálogos & Tipos</span>
+            {showTipos ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
           </button>
         </div>
 
         {showTipos && (
-          <div className="glass-card" style={{ display: 'flex', gap: '0.65rem', flexWrap: 'wrap', background: 'rgba(0,0,0,0.05)', padding: '0.8rem' }}>
+          <div className="p-4 rounded-xl bg-white/[0.03] border border-white/10 flex flex-wrap gap-2 backdrop-blur-md fade-in">
             {typesMasters.map(m => (
               <button 
                 key={m.id} 
                 onClick={() => setActiveTab(m.id)} 
-                className={activeTab === m.id ? "btn-primary" : "btn-secondary"}
-                style={{ fontSize: '0.78rem', padding: '0.45rem 0.85rem' }}
+                className={`!m-0 text-xs ${activeTab === m.id ? "btn-primary" : "btn-secondary"}`}
               >
                 {m.label}
               </button>
@@ -117,12 +127,17 @@ export default function Maestros() {
         )}
       </div>
 
-      <div className={activeTab ? "glass-card" : ""}>
+      {/* Contenido de la Tabla Seleccionada */}
+      <div className={activeTab ? "glass-card !p-6" : "glass-card !p-12 text-center"}>
         {!activeTab && (
-          <div style={{ textAlign: 'center', padding: '2.75rem', color: '#888' }}>
-            <div style={{ fontSize: '3rem', marginBottom: '0.75rem' }}>🔍</div>
-            <h3>Seleccione un maestro para comenzar a gestionar</h3>
-            <p>Aquí podrá editar los catálogos de maquinaria, personal, productos y configuraciones del sistema.</p>
+          <div className="flex flex-col items-center justify-center py-8 text-center">
+            <div className="w-16 h-16 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400 mb-4">
+              <Database size={32} />
+            </div>
+            <h3 className="text-lg font-bold text-white mb-2">Seleccione un maestro para comenzar</h3>
+            <p className="text-sm text-gray-400 max-w-md leading-relaxed">
+              Explore y edite los catálogos de maquinaria, personal, productos, cultivos y configuraciones estructurales del sistema.
+            </p>
           </div>
         )}
         
@@ -142,4 +157,3 @@ export default function Maestros() {
     </div>
   );
 }
-

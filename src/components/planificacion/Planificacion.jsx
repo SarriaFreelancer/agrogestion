@@ -251,12 +251,6 @@ export default function Planificacion() {
     }
   };
 
-  const handleBorrar = async (planId) => {
-    if (await confirmDialog('¿Seguro que deseas eliminar esta planificación?', { title: 'Eliminar planificación' })) {
-      deletePlanificacion(planId);
-    }
-  };
-
   const startEdit = (plan) => {
     let planDate = plan.fecha;
     if (planDate && planDate.includes('/')) {
@@ -275,28 +269,40 @@ export default function Planificacion() {
     setEditPlan(null);
   };
 
-  // --- RENDER ---
   return (
-    <div>
-      <div className="header">
-        <h1>Módulo de Planificación</h1>
-        <p>Genera, edita y consulta planificaciones. Cultivo: <strong>{globalCultivo}</strong></p>
+    <div className="space-y-8 fade-in">
+      {/* Header */}
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-white/10 pb-6">
+        <div>
+          <div className="flex items-center gap-3 mb-1">
+            <h1 className="text-2xl md:text-3xl font-bold text-white tracking-tight">Módulo de Planificación</h1>
+            <span className="badge badge-active text-[11px]">Programación & Órdenes</span>
+          </div>
+          <p className="text-sm text-[#9CA3AF]">
+            Genera, edita y consulta planificaciones agrícolas para el cultivo <strong className="text-emerald-400 font-semibold">{globalCultivo}</strong>
+          </p>
+        </div>
       </div>
 
-      <div className="tabs-container">
-        <button className={mainTab === 'planificar' ? 'btn-primary' : 'btn-secondary'} onClick={() => setMainTab('planificar')}>Nueva Planificación</button>
-        <button className={mainTab === 'mostrar' ? 'btn-primary' : 'btn-secondary'} onClick={() => setMainTab('mostrar')}>Mostrar (Historial)</button>
+      {/* Tabs */}
+      <div className="flex items-center gap-3 border-b border-white/10 pb-4">
+        <button className={`!m-0 ${mainTab === 'planificar' ? 'btn-primary' : 'btn-secondary'}`} onClick={() => setMainTab('planificar')}>
+          <span>Nueva Planificación</span>
+        </button>
+        <button className={`!m-0 ${mainTab === 'mostrar' ? 'btn-primary' : 'btn-secondary'}`} onClick={() => setMainTab('mostrar')}>
+          <span>Mostrar (Historial)</span>
+        </button>
       </div>
 
       {mainTab === 'planificar' && (
-        <div className="fade-in">
+        <div className="space-y-6 fade-in">
           {mensajeExito && (
-            <div style={{ background: '#e8f5e9', color: '#2e7d32', padding: '1rem', borderRadius: '8px', marginBottom: '1.5rem', fontWeight: 'bold' }}>
+            <div className="p-4 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-300 font-bold text-sm">
               {mensajeExito}
             </div>
           )}
 
-          <div className="grid-2" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '2rem', marginBottom: '2rem' }}>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             {/* Lado izquierdo */}
             <div>
               <div className="glass-card" style={{ marginBottom: '1.5rem' }}>

@@ -10,8 +10,13 @@ import { open } from 'sqlite';
 const { Pool } = pg;
 const app = express();
 
+import saasRoutes from './src/backend/routes/saas.routes.js';
+
 app.use(cors());
 app.use(express.json());
+
+// Montamos el nuevo módulo de rutas SaaS
+app.use('/api/saas', saasRoutes);
 
 const tableMap = {
   Cultivo: 'cultivos',
@@ -766,6 +771,9 @@ app.post('/api/test-connection', async (req, res) => {
   if (engine === 'Global') return res.json({ success: true, message: 'Global SQLite connected' });
   
   const host = getHost(connectionData);
+  if (!host && actualEngine !== 'Firebase' && actualEngine !== 'Global') {
+    return res.status(400).json({ success: false, message: 'Host no configurado para el motor de base de datos' });
+  }
   const port = connectionData.port;
 
   try {
@@ -814,6 +822,10 @@ app.post('/api/sync-data', async (req, res) => {
   const tableName = engine === 'Global' && model === 'UsuarioGlobal' ? 'usuarios_clientes' : getTableName(model);
 
   try {
+    if (!host && actualEngine !== 'Firebase' && actualEngine !== 'Global') {
+      return res.status(400).json({ success: false, message: 'Host no configurado para el motor de base de datos' });
+    }
+
     if (actualEngine === 'Global') {
       const db = await getGlobalDb();
       if (action === 'add' || action === 'edit') {
@@ -992,6 +1004,10 @@ app.post('/api/load-data', async (req, res) => {
       return res.json({ success: true, data: rows });
     }
 
+    if (!host && actualEngine !== 'Firebase') {
+      return res.status(400).json({ success: false, message: 'Host no configurado para el motor de base de datos' });
+    }
+
     switch (actualEngine) {
       case 'MySQL': {
         const connection = await getMySqlConnection(connectionData, database);
@@ -1044,6 +1060,10 @@ app.post('/api/init-db', async (req, res) => {
   const { port, username, password, database, sid, tnsName } = connectionData;
 
   try {
+    if (!host && actualEngine !== 'Firebase' && actualEngine !== 'Global') {
+      return res.status(400).json({ success: false, message: 'Host no configurado para el motor de base de datos' });
+    }
+
     switch (actualEngine) {
       case 'MySQL': {
         const connection = await getMySqlConnection(connectionData, database);
