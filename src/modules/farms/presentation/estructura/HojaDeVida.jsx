@@ -53,7 +53,7 @@ export default function HojaDeVida({ node, onUpdate }) {
   };
 
   const handleDelete = () => {
-    deleteEstructura(node.id);
+    deleteEstructura(node.id, node.type);
   };
 
   if (!node) return null;

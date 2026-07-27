@@ -1,10 +1,11 @@
 import { useState } from 'react';
 import { confirmDialog } from '@/utils/swal';
-import { GLOBAL_CONFIG_DEFAULTS } from '../mocks';
+import { GLOBAL_CONFIG_DEFAULTS, initialPlantas } from '../mocks';
 
 export function useConfiguracion(syncToDatabase) {
   const [globalPlanta, setGlobalPlanta] = useState('Todas');
   const [globalCultivo, setGlobalCultivo] = useState('Todos');
+  const [plantas, setPlantas] = useState(initialPlantas);
   const [configuraciones, setConfiguraciones] = useState({ ...GLOBAL_CONFIG_DEFAULTS });
   const [categoriasAcceso, setCategoriasAcceso] = useState([]);
   const [usuarios, setUsuarios] = useState([]);
@@ -47,6 +48,7 @@ export function useConfiguracion(syncToDatabase) {
   return {
     globalPlanta, setGlobalPlanta, updateGlobalPlanta,
     globalCultivo, setGlobalCultivo, updateGlobalCultivo,
+    plantas, setPlantas,
     configuraciones, setConfiguraciones, updateConfiguracion,
     categoriasAcceso, setCategoriasAcceso, addCategoria, editCategoria, deleteCategoria,
     usuarios, setUsuarios, addUsuario, editUsuario, deleteUsuario

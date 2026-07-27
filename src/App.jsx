@@ -23,6 +23,7 @@ import GestionClientes from '@/modules/configuration/presentation/configuracione
 import InstallPWA from '@/components/InstallPWA';
 import MainLayout from './shared/components/layout/MainLayout';
 import Sidebar from './shared/components/layout/Sidebar';
+import ContextBar from './shared/components/layout/ContextBar';
 
 function AppContent() {
   const [currentView, setCurrentView] = useState('dashboard');
@@ -127,7 +128,9 @@ function AppContent() {
             </button>
           </div>
           
-          <div className="w-full h-full animate-in fade-in zoom-in-95 duration-200">
+          <ContextBar />
+          
+          <div className="w-full h-full animate-in fade-in zoom-in-95 duration-200 overflow-y-auto">
             {renderView()}
           </div>
         </div>

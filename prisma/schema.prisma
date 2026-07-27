@@ -296,6 +296,8 @@ model Sector {
   codigo        String
   name          String
   type          String   @default("Sector")
+  plantaId      String
+  planta        Planta   @relation(fields: [plantaId], references: [id])
   plantaCliente String?
   fincas        Finca[]
   createdAt     DateTime @default(now())
@@ -369,8 +371,8 @@ model Cultivo {
   id        String   @id @default(uuid())
   companyId Int?
   company   Company? @relation(fields: [companyId], references: [id])
-  plantaId  String?
-  planta    Planta?  @relation(fields: [plantaId], references: [id])
+  plantaId  String
+  planta    Planta   @relation(fields: [plantaId], references: [id])
   codigo    String?
   name      String
   estado    String   @default("Activo")

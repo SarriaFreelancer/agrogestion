@@ -148,8 +148,13 @@ export const DEFAULT_USERS = (clientCode = 'GLOBAL') => ([
   }
 ]);
 
+export const initialPlantas = [
+  { id: 'PLN-01', codigo: 'PLN-01', name: 'Ingenio Central', status: 'ACTIVE', companyId: 1 },
+  { id: 'PLN-02', codigo: 'PLN-02', name: 'Planta Sur', status: 'ACTIVE', companyId: 1 }
+];
+
 export const initialData = [
-  { id: 'SEC-01', name: 'Sector Norte', type: 'Sector', plantaCliente: 'Ingenio Central',
+  { id: 'SEC-01', name: 'Sector Norte', type: 'Sector', plantaId: 'PLN-01',
     fincas: [
       { id: 'FIN-01', name: 'Finca La Esperanza', type: 'Finca',
         lotes: [
@@ -168,7 +173,7 @@ export const initialData = [
       }
     ]
   },
-  { id: 'SEC-02', name: 'Sector Sur', type: 'Sector', plantaCliente: 'Planta Sur',
+  { id: 'SEC-02', name: 'Sector Sur', type: 'Sector', plantaId: 'PLN-02',
     fincas: [
       { id: 'FIN-02', name: 'Finca El Tesoro', type: 'Finca', lotes: [] }
     ]
@@ -182,9 +187,9 @@ export const initialGrupos = [
 ];
 
 export const initialCultivos = [
-  { id: 'CAN', name: 'Caña', estado: 'Activo' },
-  { id: 'MAN', name: 'Mango', estado: 'Activo' },
-  { id: 'NAR', name: 'Naranja', estado: 'Activo' }
+  { id: 'CAN-01', codigo: 'CAN', name: 'Caña', estado: 'Activo', plantaId: 'PLN-01' },
+  { id: 'MAN-01', codigo: 'MAN', name: 'Mango', estado: 'Activo', plantaId: 'PLN-01' },
+  { id: 'NAR-02', codigo: 'NAR', name: 'Naranja', estado: 'Activo', plantaId: 'PLN-02' }
 ];
 
 export const initialActividades = [
@@ -260,6 +265,7 @@ export const emptyControlesAgro = [
 export const createEmptyInstanceData = (clientCode = 'GLOBAL') => ({
   globalPlanta: 'Todas',
   globalCultivo: 'Todos',
+  plantas: [...initialPlantas],
   sectores: [],
   cultivos: [],
   gruposActividades: [],

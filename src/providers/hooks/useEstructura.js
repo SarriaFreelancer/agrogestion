@@ -3,9 +3,6 @@ import { confirmDialog } from '@/utils/swal';
 
 export function useEstructura(syncToDatabase) {
   const [sectores, setSectores] = useState([]);
-  const [plantas, setPlantas] = useState([{ id: 'p1', nombre: 'Planta Principal', status: 'Activo' }]);
-  const [globalPlanta, setGlobalPlanta] = useState('Todas');
-  const [globalCultivo, setGlobalCultivo] = useState('Todos');
   // Helpers
   const calcLoteHa = (lote) => lote.suertes?.reduce((acc, s) => acc + (s.hectareas || 0), 0) || 0;
   const calcFincaHa = (finca) => finca.lotes?.reduce((acc, l) => acc + calcLoteHa(l), 0) || 0;
@@ -24,17 +21,17 @@ export function useEstructura(syncToDatabase) {
     return activos;
   };
 
-  const updateNode = (nodes, id, newProps) => {
+  const updateNode = (nodes, id, newProps, type = null) => {
     return nodes.map(node => {
-      if (node.id === id) return { ...node, ...newProps };
-      if (node.fincas) return { ...node, fincas: updateNode(node.fincas, id, newProps) };
-      if (node.lotes) return { ...node, lotes: updateNode(node.lotes, id, newProps) };
-      if (node.suertes) return { ...node, suertes: updateNode(node.suertes, id, newProps) };
+      if (node.id === id && (!type || node.type === type)) return { ...node, ...newProps };
+      if (node.fincas) return { ...node, fincas: updateNode(node.fincas, id, newProps, type) };
+      if (node.lotes) return { ...node, lotes: updateNode(node.lotes, id, newProps, type) };
+      if (node.suertes) return { ...node, suertes: updateNode(node.suertes, id, newProps, type) };
       return node;
     });
   };
 
-  const updateEstructura = (id, newProps) => setSectores(updateNode(sectores, id, newProps));
+  const updateEstructura = (id, newProps, type = null) => setSectores(updateNode(sectores, id, newProps, type));
 
   const addElementoEstructura = (parentId, parentType, elemento) => {
     const newNode = { ...elemento, id: elemento.id || Date.now().toString(), type: elemento.type };
@@ -57,7 +54,7 @@ export function useEstructura(syncToDatabase) {
 
   const addNode = (nodes, parentId, newNode, parentType) => {
     return nodes.map(node => {
-      if (node.id === parentId) {
+      if (node.id === parentId && (!parentType || node.type === parentType)) {
         if (newNode.type === 'Suerte') return { ...node, suertes: [...(node.suertes || []), newNode] };
         if (newNode.type === 'Finca') return { ...node, fincas: [...(node.fincas || []), { ...newNode, lotes: [], suertes: [] }] };
         if (newNode.type === 'Lote') return { ...node, lotes: [...(node.lotes || []), { ...newNode, suertes: [] }] };
@@ -68,16 +65,15 @@ export function useEstructura(syncToDatabase) {
     });
   };
 
-  const removeNode = (nodes, id) => nodes.filter(node => node.id !== id).map(node => ({ ...node, fincas: node.fincas ? removeNode(node.fincas, id) : undefined, lotes: node.lotes ? removeNode(node.lotes, id) : undefined, suertes: node.suertes ? removeNode(node.suertes, id) : undefined }));
-  const deleteEstructura = async (id) => { 
+  const removeNode = (nodes, id, type = null) => nodes.filter(node => !(node.id === id && (!type || node.type === type))).map(node => ({ ...node, fincas: node.fincas ? removeNode(node.fincas, id, type) : undefined, lotes: node.lotes ? removeNode(node.lotes, id, type) : undefined, suertes: node.suertes ? removeNode(node.suertes, id, type) : undefined }));
+  const deleteEstructura = async (id, type = null) => { 
     if (await confirmDialog('¿Eliminar?', { title: 'Eliminar estructura' })) {
-        setSectores(removeNode(sectores, id)); 
+        setSectores(removeNode(sectores, id, type)); 
     }
   };
 
   return {
     sectores, setSectores, updateEstructura, addSector, addElementoEstructura, deleteEstructura,
-    calcTotalHa, calcLotesActivos, calcLoteHa, calcFincaHa, calcSectorHa,
-    plantas, setPlantas, globalPlanta, setGlobalPlanta, globalCultivo, setGlobalCultivo
+    calcTotalHa, calcLotesActivos, calcLoteHa, calcFincaHa, calcSectorHa
   };
 }
