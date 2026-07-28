@@ -8,6 +8,7 @@ import { PLAN_CONFIG, THEME_CONFIG } from './mocks';
 // Custom Hooks Modulares
 import { useConfiguracion } from './hooks/useConfiguracion';
 import { useEstructura } from './hooks/useEstructura';
+import { useEmpresas } from './hooks/useEmpresas';
 import { useMonitoreo } from './hooks/useMonitoreo';
 import { useOperaciones } from './hooks/useOperaciones';
 import { useHydration } from './hooks/useHydration';
@@ -34,6 +35,9 @@ export function AgroProvider({ children }) {
   
   // 2. Estructura Agrícola
   const estructura = useEstructura(syncToDatabase);
+
+  // 2.5. Empresas
+  const empresasHook = useEmpresas(syncToDatabase);
 
   // 3. Maestros
   const actividades = useActividades(syncToDatabase);
@@ -72,7 +76,8 @@ export function AgroProvider({ children }) {
     setMantenimientos: monitoreo.setMantenimientos,
     setPlanificaciones: operaciones.setPlanificaciones,
     setUsuarios: config.setUsuarios,
-    setCategoriasAcceso: config.setCategoriasAcceso
+    setCategoriasAcceso: config.setCategoriasAcceso,
+    setEmpresas: empresasHook.setEmpresas
   };
 
   const { isHydrating, isHydratingRef } = useHydration(currentClient, setters);
@@ -107,6 +112,7 @@ export function AgroProvider({ children }) {
   const value = {
     ...config,
     ...estructura,
+    ...empresasHook,
     ...actividades,
     ...cuadrillas,
     ...cultivos,

@@ -1,462 +1,384 @@
 import { useMemo, useState } from 'react';
-import { Building2, CheckCircle2, ChevronDown, Database, DoorOpen, Globe2, KeyRound, Palette, RefreshCcw, Settings2, ShieldCheck, Trash2, UserRound, Users } from 'lucide-react';
+import { Building2, Plus, Pencil, Trash2, Users, MapPin, ShieldCheck, CheckCircle2, XCircle, Search, ChevronDown, ChevronRight, Settings2 } from 'lucide-react';
 import { useAgro } from '@/providers/AgroContext';
-import DatabaseConnectionConfig from '@/modules/configuration/presentation/configuraciones/DatabaseConnectionConfig';
+import { MODULES_PRINCIPALES, MODULES_CONFIGURACION } from '@/providers/mocks';
+
+const PLANES = ['Basico', 'Intermedio', 'Premium', 'Empresarial'];
+const ESTADOS = ['Activa', 'Inactiva'];
+
+const planColors = {
+  Basico: 'bg-gray-500/20 text-gray-300',
+  Intermedio: 'bg-blue-500/20 text-blue-300',
+  Premium: 'bg-amber-500/20 text-amber-300',
+  Empresarial: 'bg-purple-500/20 text-purple-300'
+};
+
+const emptyEmpresaForm = () => ({
+  nit: '',
+  name: '',
+  pais: 'Colombia',
+  ciudad: '',
+  estado: 'Activa',
+  plan: 'Basico',
+  maxUsuarios: 10,
+  maxPlantas: 2,
+  modulosPrincipales: ['Dashboard'],
+  modulosConfiguracion: ['Usuarios']
+});
 
 export default function GestionClientes() {
-  const { clients, updateClient, editClient, deleteClient, suspendClient, reactivateClient, resetClientData, addClient, switchClient, currentClient, currentUser, PLAN_CONFIG, THEME_CONFIG } = useAgro();
-  const isAdminUser = currentUser?.rol === 'Super Admin' || currentUser?.rol === 'Administrador' || currentUser?.modulos?.includes('ALL');
-  const firstClientKey = Object.keys(clients)[0] || '';
-  const activeClientKey = Object.keys(clients).find(key => clients[key].id === currentClient.id) || firstClientKey;
-  const [selectedClientKey, setSelectedClientKey] = useState(activeClientKey);
-  const [isAdding, setIsAdding] = useState(false);
-  const [successMessage, setSuccessMessage] = useState('');
-  const [newClientName, setNewClientName] = useState('');
-  const [newClientId, setNewClientId] = useState('');
-  const [newClientPlan, setNewClientPlan] = useState('Estándar');
-  const [newClientTheme, setNewClientTheme] = useState('Verde Agro');
-  const [newDatabaseName, setNewDatabaseName] = useState('');
-  const [newDatabaseUser, setNewDatabaseUser] = useState('');
-  const [newDatabasePassword, setNewDatabasePassword] = useState('');
-  const [newDatabaseConfig, setNewDatabaseConfig] = useState({
-    databaseEngine: 'SQL Server',
-    connectionData: {}
-  });
-  const [openClientGroup, setOpenClientGroup] = useState(null);
+  const { empresas, addEmpresa, editEmpresa, deleteEmpresa, usuarios, plantas, currentUser } = useAgro();
 
-  const allModules = [
-    { key: 'Dashboard', label: 'Dashboard' },
-    { key: 'Estructura', label: 'Estructura' },
-    { key: 'Maestros', label: 'Maestros' },
-    { key: 'Planificacion', label: 'Planificación' },
-    { key: 'Ejecucion', label: 'Ejecución' },
-    { key: 'Reportes', label: 'Informes' },
-    { key: 'Monitoreo', label: 'Monitoreo' },
-    { key: 'Mantenimiento', label: 'Mantenimiento' },
-    { key: 'Mapas', label: 'Mapas' },
-    { key: 'Sincronizacion', label: 'Sincronización' }
-  ];
+  const isSuperAdmin = currentUser?.rol === 'Super Admin';
 
-  const groupedClients = useMemo(() => {
-    const groups = {
-      'Estándar': [],
-      Premium: [],
-      Admin: []
-    };
+  const [formData, setFormData] = useState(emptyEmpresaForm());
+  const [editingId, setEditingId] = useState(null);
+  const [isFormOpen, setIsFormOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [expandedRow, setExpandedRow] = useState(null);
 
-    Object.entries(clients).forEach(([key, client]) => {
-      const plan = groups[client.plan] ? client.plan : 'Estándar';
-      groups[plan].push([key, client]);
-    });
-
-    return groups;
-  }, [clients]);
-
-  const selectedClient = clients[selectedClientKey] || clients[firstClientKey];
-  const selectedTheme = THEME_CONFIG[selectedClient?.theme || 'Verde Agro'] || THEME_CONFIG['Verde Agro'];
-  const selectedModules = selectedClient?.modules || [];
-  const hasGlobalAccess = selectedModules.includes('ALL');
-
-  const planLabels = {
-    'Estándar': {
-      title: 'Clientes estándar',
-      subtitle: 'Operación base',
-      icon: Building2
-    },
-    Premium: {
-      title: 'Clientes premium',
-      subtitle: 'Funciones ampliadas',
-      icon: Users
-    },
-    Admin: {
-      title: 'Global admin',
-      subtitle: 'Acceso total',
-      icon: Globe2
-    }
-  };
-
-  const handleCreate = () => {
-    if (!newClientName || !newClientId) {
-      alert('Complete los datos');
-      return;
-    }
-
-    const key = newClientId.toLowerCase();
-    addClient(key, { id: newClientId,
-      name: newClientName,
-      plan: newClientPlan,
-      theme: newClientTheme,
-      databaseName: newDatabaseName || `agroData_${newClientId}`,
-      databaseUser: newDatabaseUser || `${newClientId}_user`,
-      databasePassword: newDatabasePassword,
-      databaseEngine: newDatabaseConfig.databaseEngine,
-      connectionData: newDatabaseConfig.connectionData
-    });
-    
-    // Limpiar formulario y cerrar modal
-    setSelectedClientKey(key);
-    setNewClientName('');
-    setNewClientId('');
-    setNewDatabaseName('');
-    setNewDatabaseUser('');
-    setNewDatabasePassword('');
-    setNewDatabaseConfig({
-      databaseEngine: 'SQL Server',
-      connectionData: {}
-    });
-    setIsAdding(false);
-    
-    // Mostrar mensaje de éxito
-    setSuccessMessage('Cliente creado con éxito');
-    setTimeout(() => setSuccessMessage(''), 3000);
-  };
-
-  const handlePlanChange = (clientKey, plan) => {
-    updateClient(clientKey, plan);
-  };
-
-  const handleThemeChange = (clientKey, theme) => {
-    const client = clients[clientKey];
-    updateClient(clientKey, client.plan, client.modules, theme);
-  };
-
-  const handleDatabaseChange = (clientKey, field, value) => {
-    const client = clients[clientKey];
-    updateClient(clientKey, client.plan, client.modules, client.theme, {
-      [field]: value
-    });
-  };
-
-  const handleClientFieldChange = (clientKey, field, value) => {
-    editClient(clientKey, { [field]: value });
-  };
-
-  const handleEnterClient = () => {
-    if (selectedClient.status === 'Suspendido') {
-      alert('Esta instancia está suspendida por falta de pago.');
-      return;
-    }
-
-    switchClient(selectedClientKey);
-  };
-
-  const toggleModule = (clientKey, moduleKey) => {
-    const client = clients[clientKey];
-    const currentModules = client.modules || [];
-
-    if (currentModules.includes('ALL')) return;
-
-    const newModules = currentModules.includes(moduleKey)
-      ? currentModules.filter(module => module !== moduleKey)
-      : [...currentModules, moduleKey];
-
-    updateClient(clientKey, client.plan, newModules, client.theme);
-  };
-
-  if (!isAdminUser) {
+  // Permisos
+  if (!isSuperAdmin) {
     return (
-      <div className="glass-card fade-in client-empty-detail">
-        Esta secciÃ³n solo estÃ¡ disponible para el usuario administrador.
+      <div className="flex items-center justify-center h-full p-10">
+        <div className="glass-card max-w-lg text-center p-10 fade-in">
+          <ShieldCheck size={48} className="text-red-400 mx-auto mb-4" />
+          <h2 className="text-xl font-bold text-[var(--text-contrast)] mb-2">Acceso Restringido</h2>
+          <p className="text-[var(--text-muted)]">Esta sección solo está disponible para el usuario <strong>Super Admin</strong>.</p>
+        </div>
       </div>
     );
   }
 
+  const filteredEmpresas = useMemo(() => {
+    if (!searchQuery) return empresas;
+    const q = searchQuery.toLowerCase();
+    return empresas.filter(e =>
+      e.name?.toLowerCase().includes(q) ||
+      e.nit?.toLowerCase().includes(q) ||
+      e.ciudad?.toLowerCase().includes(q) ||
+      e.plan?.toLowerCase().includes(q)
+    );
+  }, [empresas, searchQuery]);
+
+  const getUserCount = (empresaId) => usuarios?.filter(u => u.empresaId === empresaId).length || 0;
+  const getPlantaCount = (empresaId) => plantas?.filter(p => p.companyId === empresaId || p.empresaId === empresaId).length || 0;
+  const getUsersForEmpresa = (empresaId) => usuarios?.filter(u => u.empresaId === empresaId) || [];
+
+  const startCreating = () => {
+    setFormData(emptyEmpresaForm());
+    setEditingId(null);
+    setIsFormOpen(true);
+  };
+
+  const startEditing = (empresa) => {
+    setFormData({
+      nit: empresa.nit || '',
+      name: empresa.name || '',
+      pais: empresa.pais || 'Colombia',
+      ciudad: empresa.ciudad || '',
+      estado: empresa.estado || 'Activa',
+      plan: empresa.plan || 'Basico',
+      maxUsuarios: empresa.maxUsuarios || 10,
+      maxPlantas: empresa.maxPlantas || 2,
+      modulosPrincipales: empresa.modulosPrincipales || ['Dashboard'],
+      modulosConfiguracion: empresa.modulosConfiguracion || ['Usuarios']
+    });
+    setEditingId(empresa.id);
+    setIsFormOpen(true);
+  };
+
+  const cancelForm = () => {
+    setFormData(emptyEmpresaForm());
+    setEditingId(null);
+    setIsFormOpen(false);
+  };
+
+  const handleSubmit = () => {
+    if (!formData.nit || !formData.name) {
+      alert('Complete al menos el NIT y el Nombre de la empresa.');
+      return;
+    }
+
+    if (editingId) {
+      editEmpresa(editingId, formData);
+    } else {
+      addEmpresa({ ...formData, id: `EMP-${String(Date.now()).slice(-6)}` });
+    }
+    cancelForm();
+  };
+
+  const toggleModuloPrincipal = (key) => {
+    setFormData(prev => ({
+      ...prev,
+      modulosPrincipales: prev.modulosPrincipales.includes(key)
+        ? prev.modulosPrincipales.filter(m => m !== key)
+        : [...prev.modulosPrincipales, key]
+    }));
+  };
+
+  const toggleModuloConfig = (key) => {
+    setFormData(prev => ({
+      ...prev,
+      modulosConfiguracion: prev.modulosConfiguracion.includes(key)
+        ? prev.modulosConfiguracion.filter(m => m !== key)
+        : [...prev.modulosConfiguracion, key]
+    }));
+  };
+
   return (
-    <div className="space-y-8 fade-in p-6 lg:p-10 h-full w-full overflow-y-auto custom-scrollbar bg-transparent">
-      <div className="header clients-header">
+    <div className="space-y-6 fade-in p-6 lg:p-10 h-full w-full overflow-y-auto custom-scrollbar">
+      {/* Header */}
+      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
         <div>
-          <h1>Gestión de Empresas</h1>
-          <p>Agrupe empresas por tipo, seleccione una instancia y gestione sus módulos activos.</p>
+          <h1 className="text-2xl font-extrabold text-[var(--text-contrast)]">Gestión de Empresas</h1>
+          <p className="text-sm text-[var(--text-muted)] mt-1">Administre las empresas clientes, sus planes, módulos habilitados y estado de licencia.</p>
         </div>
-        <button className="btn-primary" onClick={() => setIsAdding(true)}>+ Nueva Empresa</button>
+        <button className="btn-primary flex items-center gap-2 self-start" onClick={startCreating}>
+          <Plus size={16} /> Nueva Empresa
+        </button>
       </div>
 
-      {successMessage && (
-        <div style={{
-          background: '#d4edda',
-          color: '#155724',
-          padding: '1rem',
-          borderRadius: '8px',
-          marginBottom: '1.5rem',
-          border: '1px solid #c3e6cb',
-          display: 'flex',
-          alignItems: 'center',
-          gap: '0.75rem'
-        }}>
-          <CheckCircle2 size={20} />
-          <span>{successMessage}</span>
+      {/* Buscador */}
+      <div className="glass-card !p-3">
+        <div className="relative">
+          <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--text-muted)]" />
+          <input
+            className="input-field !pl-10 !mb-0"
+            placeholder="Buscar por nombre, NIT, ciudad o plan..."
+            value={searchQuery}
+            onChange={e => setSearchQuery(e.target.value)}
+          />
         </div>
-      )}
+      </div>
 
-      {isAdding && (
-        <div className="glass-card client-create-card">
-          <h3>Nueva Empresa</h3>
-          <div className="grid-2 client-form-grid">
-            <div className="input-group">
-              <label className="input-label">Nombre Empresa</label>
-              <input className="input-field" value={newClientName} onChange={e => setNewClientName(e.target.value)} />
-            </div>
-            <div className="input-group">
-              <label className="input-label">ID Instancia</label>
-              <input
-                className="input-field"
-                value={newClientId}
-                onChange={e => {
-                  setNewClientId(e.target.value);
-                  if (!newDatabaseName) setNewDatabaseName(`agroData_${e.target.value}`);
-                  if (!newDatabaseUser) setNewDatabaseUser(`${e.target.value}_user`);
-                }}
-              />
-            </div>
-          </div>
-          <div className="grid-2 client-form-grid">
-            <div className="input-group">
-              <label className="input-label">Plan Inicial</label>
-              <select className="input-field" value={newClientPlan} onChange={e => setNewClientPlan(e.target.value)}>
-                {Object.keys(PLAN_CONFIG).map(plan => <option key={plan} value={plan}>{plan}</option>)}
-              </select>
-            </div>
-            <div className="input-group">
-              <label className="input-label">Tema de Color</label>
-              <select className="input-field" value={newClientTheme} onChange={e => setNewClientTheme(e.target.value)}>
-                {Object.keys(THEME_CONFIG).map(theme => <option key={theme} value={theme}>{theme}</option>)}
-              </select>
-            </div>
-          </div>
+      <div className={`grid gap-6 ${isFormOpen ? 'lg:grid-cols-12' : 'lg:grid-cols-1'}`}>
+        {/* Tabla de Empresas */}
+        <div className={isFormOpen ? 'lg:col-span-7' : ''}>
+          <div className="glass-card !p-0 overflow-hidden">
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="border-b border-[var(--glass-border)]">
+                    <th className="text-left px-4 py-3 text-[var(--text-muted)] font-semibold text-xs uppercase tracking-wider"></th>
+                    <th className="text-left px-4 py-3 text-[var(--text-muted)] font-semibold text-xs uppercase tracking-wider">NIT/Código</th>
+                    <th className="text-left px-4 py-3 text-[var(--text-muted)] font-semibold text-xs uppercase tracking-wider">Nombre</th>
+                    <th className="text-left px-4 py-3 text-[var(--text-muted)] font-semibold text-xs uppercase tracking-wider">País</th>
+                    <th className="text-left px-4 py-3 text-[var(--text-muted)] font-semibold text-xs uppercase tracking-wider">Ciudad</th>
+                    <th className="text-center px-4 py-3 text-[var(--text-muted)] font-semibold text-xs uppercase tracking-wider">Estado</th>
+                    <th className="text-center px-4 py-3 text-[var(--text-muted)] font-semibold text-xs uppercase tracking-wider">Plan</th>
+                    <th className="text-center px-4 py-3 text-[var(--text-muted)] font-semibold text-xs uppercase tracking-wider">Usuarios</th>
+                    <th className="text-center px-4 py-3 text-[var(--text-muted)] font-semibold text-xs uppercase tracking-wider">Acciones</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {filteredEmpresas.length === 0 ? (
+                    <tr>
+                      <td colSpan={9} className="text-center py-12 text-[var(--text-muted)]">
+                        <Building2 size={40} className="mx-auto mb-3 opacity-30" />
+                        <p>No se encontraron empresas</p>
+                      </td>
+                    </tr>
+                  ) : (
+                    filteredEmpresas.map(empresa => {
+                      const userCount = getUserCount(empresa.id);
+                      const empresaUsers = getUsersForEmpresa(empresa.id);
+                      const isExpanded = expandedRow === empresa.id;
 
-          <div style={{ marginTop: '2rem', paddingTop: '2rem', borderTop: '1px solid #eee' }}>
-            <DatabaseConnectionConfig
-              clientData={newDatabaseConfig}
-              onUpdate={setNewDatabaseConfig}
-              isNewClient={true}
-            />
-          </div>
-
-          <div className="client-form-actions" style={{ marginTop: '2rem' }}>
-            <button className="btn-primary" onClick={handleCreate}>Crear</button>
-            <button className="btn-secondary" onClick={() => setIsAdding(false)}>Cancelar</button>
+                      return (
+                        <>
+                          <tr
+                            key={empresa.id}
+                            className={`border-b border-[var(--glass-border)] hover:bg-[var(--glass-bg)] transition-colors cursor-pointer ${editingId === empresa.id ? 'bg-primary/5' : ''}`}
+                            onClick={() => setExpandedRow(isExpanded ? null : empresa.id)}
+                          >
+                            <td className="px-4 py-3 text-[var(--text-muted)]">
+                              {isExpanded ? <ChevronDown size={16} /> : <ChevronRight size={16} />}
+                            </td>
+                            <td className="px-4 py-3 text-[var(--text-contrast)] font-mono text-xs">{empresa.nit}</td>
+                            <td className="px-4 py-3 text-[var(--text-contrast)] font-semibold">{empresa.name}</td>
+                            <td className="px-4 py-3 text-[var(--text-muted)]">{empresa.pais}</td>
+                            <td className="px-4 py-3 text-[var(--text-muted)]">{empresa.ciudad}</td>
+                            <td className="px-4 py-3 text-center">
+                              <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold ${empresa.estado === 'Activa' ? 'bg-green-500/20 text-green-400' : 'bg-red-500/20 text-red-400'}`}>
+                                {empresa.estado === 'Activa' ? <CheckCircle2 size={12} /> : <XCircle size={12} />}
+                                {empresa.estado}
+                              </span>
+                            </td>
+                            <td className="px-4 py-3 text-center">
+                              <span className={`inline-block px-2.5 py-1 rounded-full text-xs font-bold ${planColors[empresa.plan] || 'bg-gray-500/20 text-gray-300'}`}>
+                                {empresa.plan}
+                              </span>
+                            </td>
+                            <td className="px-4 py-3 text-center">
+                              <span className="inline-flex items-center gap-1 text-[var(--text-contrast)] font-bold">
+                                <Users size={14} className="text-primary" /> {userCount}
+                              </span>
+                            </td>
+                            <td className="px-4 py-3 text-center" onClick={e => e.stopPropagation()}>
+                              <div className="flex items-center justify-center gap-2">
+                                <button
+                                  className="p-1.5 rounded-lg hover:bg-blue-500/20 text-blue-400 transition-colors"
+                                  onClick={() => startEditing(empresa)}
+                                  title="Editar"
+                                >
+                                  <Pencil size={15} />
+                                </button>
+                                <button
+                                  className="p-1.5 rounded-lg hover:bg-red-500/20 text-red-400 transition-colors"
+                                  onClick={() => deleteEmpresa(empresa.id)}
+                                  title="Eliminar"
+                                >
+                                  <Trash2 size={15} />
+                                </button>
+                              </div>
+                            </td>
+                          </tr>
+                          {/* Fila expandida - Usuarios de la empresa */}
+                          {isExpanded && (
+                            <tr key={`${empresa.id}-users`} className="bg-[var(--glass-bg)]">
+                              <td colSpan={9} className="px-6 py-4">
+                                <div className="flex items-center gap-2 mb-3">
+                                  <Users size={16} className="text-primary" />
+                                  <span className="text-sm font-bold text-[var(--text-contrast)]">
+                                    Usuarios de {empresa.name} ({empresaUsers.length})
+                                  </span>
+                                </div>
+                                {empresaUsers.length === 0 ? (
+                                  <p className="text-xs text-[var(--text-muted)] italic pl-6">Sin usuarios asignados a esta empresa.</p>
+                                ) : (
+                                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2 pl-6">
+                                    {empresaUsers.map(user => (
+                                      <div key={user.id} className="flex items-center gap-3 bg-[var(--glass-bg)] border border-[var(--glass-border)] rounded-lg px-3 py-2">
+                                        <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center text-primary font-bold text-xs">
+                                          {(user.nombres || 'U')[0]}
+                                        </div>
+                                        <div className="overflow-hidden">
+                                          <p className="text-xs font-semibold text-[var(--text-contrast)] truncate">{user.nombres} {user.apellidos}</p>
+                                          <p className="text-[10px] text-[var(--text-muted)] truncate">{user.correo} · {user.rol}</p>
+                                        </div>
+                                      </div>
+                                    ))}
+                                  </div>
+                                )}
+                              </td>
+                            </tr>
+                          )}
+                        </>
+                      );
+                    })
+                  )}
+                </tbody>
+              </table>
+            </div>
           </div>
         </div>
-      )}
 
-      <div className="clients-layout">
-        <section className="glass-card clients-list-panel">
-          <div className="clients-list-title">
-            <h3>Lista de Empresas</h3>
-            <span>{Object.keys(clients).length} empresas</span>
-          </div>
+        {/* Panel Derecho: Formulario */}
+        {isFormOpen && (
+          <div className="lg:col-span-5">
+            <div className="glass-card !p-6 space-y-5 fade-in sticky top-0">
+              <h3 className="text-base font-bold text-[var(--text-contrast)] flex items-center gap-2">
+                {editingId ? <Pencil size={18} className="text-primary" /> : <Plus size={18} className="text-primary" />}
+                {editingId ? 'Editar Empresa' : 'Nueva Empresa'}
+              </h3>
 
-          {Object.entries(planLabels).map(([plan, meta]) => {
-            const Icon = meta.icon;
-            const group = groupedClients[plan] || [];
-
-            return (
-              <div className="client-group" key={plan}>
-                <button
-                  type="button"
-                  className={`client-group-header client-group-toggle ${openClientGroup === plan ? 'open' : ''}`}
-                  onClick={() => setOpenClientGroup(openClientGroup === plan ? null : plan)}
-                >
-                  <div>
-                    <Icon size={18} />
-                    <strong>{meta.title}</strong>
-                  </div>
-                  <span>{group.length}</span>
-                  <ChevronDown size={17} />
-                </button>
-                <small>{meta.subtitle}</small>
-
-                {openClientGroup === plan && (
-                  <div className="client-group-list">
-                    {group.length === 0 && <div className="client-empty">Sin clientes en este grupo</div>}
-                    {group.map(([key, client]) => (
-                      <button
-                        type="button"
-                        key={key}
-                        className={`client-list-item ${selectedClientKey === key ? 'active' : ''}`}
-                        onClick={() => setSelectedClientKey(key)}
-                      >
-                        <span className="client-list-avatar" style={{ background: THEME_CONFIG[client.theme || 'Verde Agro']?.primary || 'var(--primary-color)' }}>
-                          {client.name.charAt(0).toUpperCase()}
-                        </span>
-                        <span>
-                          <strong>{client.name}</strong>
-                          <small>{client.id} · {client.status === 'Suspendido' ? 'Suspendido' : client.databaseName}</small>
-                        </span>
-                        {client.id === currentClient.id && <CheckCircle2 size={17} />}
-                      </button>
-                    ))}
-                  </div>
-                )}
-              </div>
-            );
-          })}
-        </section>
-
-        <section className="glass-card client-detail-panel">
-          {selectedClient ? (
-            <>
-              <div className="client-detail-head">
-                <div>
-                  <div className="client-badges">
-                    <span className="client-plan-badge">{selectedClient.plan}</span>
-                    <span className="client-theme-badge" style={{ background: selectedTheme.primary }}>{selectedClient.theme || 'Verde Agro'}</span>
-                    {selectedClient.id === currentClient.id && <span className="client-active-badge">Sesión activa</span>}
-                    {selectedClient.status === 'Suspendido' && <span className="client-suspended-badge">Suspendido</span>}
-                  </div>
-                  <h2>{selectedClient.name}</h2>
-                  <p>ID Instancia: {selectedClient.id}</p>
+              {/* Campos principales */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="input-group !mb-0">
+                  <label className="input-label">NIT / Código</label>
+                  <input className="input-field" value={formData.nit} onChange={e => setFormData(p => ({ ...p, nit: e.target.value }))} placeholder="900123456-1" />
                 </div>
-                <button className="btn-secondary client-enter-btn" onClick={handleEnterClient} disabled={selectedClient.status === 'Suspendido'}>
-                  <DoorOpen size={17} />
-                  {selectedClient.id === currentClient.id ? 'Sesión activa' : 'Entrar'}
-                </button>
-              </div>
-
-              <div className="client-database-card">
-                <div className="client-database-title">
-                  <Building2 size={19} />
-                  <div>
-                    <h3>Datos de la Empresa</h3>
-                    <p>Edite la información comercial de la empresa y su estado de servicio.</p>
-                  </div>
+                <div className="input-group !mb-0">
+                  <label className="input-label">Nombre de la Empresa</label>
+                  <input className="input-field" value={formData.name} onChange={e => setFormData(p => ({ ...p, name: e.target.value }))} placeholder="Ingenio La Cabaña" />
                 </div>
-
-                <div className="grid-3 client-controls-grid">
-                  <div className="input-group">
-                    <label className="input-label">Empresa</label>
-                    <input className="input-field" value={selectedClient.name || ''} onChange={(e) => handleClientFieldChange(selectedClientKey, 'name', e.target.value)} />
-                  </div>
-                  <div className="input-group">
-                    <label className="input-label">Estado servicio</label>
-                    <select
-                      className="input-field"
-                      value={selectedClient.status || 'Activo'}
-                      onChange={(e) => e.target.value === 'Suspendido' ? suspendClient(selectedClientKey, selectedClient.suspendedReason || 'Pago pendiente') : reactivateClient(selectedClientKey)}
-                      disabled={hasGlobalAccess}
-                    >
-                      <option value="Activo">Activo</option>
-                      <option value="Suspendido">Suspendido por pago</option>
-                    </select>
-                  </div>
+                <div className="input-group !mb-0">
+                  <label className="input-label">País</label>
+                  <input className="input-field" value={formData.pais} onChange={e => setFormData(p => ({ ...p, pais: e.target.value }))} placeholder="Colombia" />
                 </div>
-
-                {selectedClient.status === 'Suspendido' && (
-                  <div className="input-group">
-                    <label className="input-label">Motivo de suspensión</label>
-                    <input className="input-field" value={selectedClient.suspendedReason || ''} onChange={(e) => handleClientFieldChange(selectedClientKey, 'suspendedReason', e.target.value)} />
-                  </div>
-                )}
-
-                {!hasGlobalAccess && (
-                  <div className="client-form-actions">
-                    <button className="btn-secondary" onClick={() => resetClientData(selectedClientKey)}>
-                      <RefreshCcw size={17} />
-                      Reiniciar datos
-                    </button>
-                    <button className="btn-secondary client-danger-btn" onClick={() => deleteClient(selectedClientKey)}>
-                      <Trash2 size={17} />
-                      Eliminar empresa
-                    </button>
-                  </div>
-                )}
-              </div>
-
-              <div className="grid-2 client-controls-grid" style={{ marginBottom: '1.5rem' }}>
-                <div className="glass-card" style={{ padding: '1rem', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center' }}>
-                  <UserRound size={32} style={{ color: 'var(--primary-color)', marginBottom: '0.5rem' }} />
-                  <span style={{ fontSize: '1.8rem', fontWeight: 'bold' }}>{Math.floor(Math.random() * 15) + 3}</span>
-                  <small style={{ color: '#666' }}>Usuarios vinculados</small>
-                </div>
-                <div className="glass-card" style={{ padding: '1rem', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center' }}>
-                  <Building2 size={32} style={{ color: 'var(--primary-color)', marginBottom: '0.5rem' }} />
-                  <span style={{ fontSize: '1.8rem', fontWeight: 'bold' }}>{Math.floor(Math.random() * 3) + 1}</span>
-                  <small style={{ color: '#666' }}>Plantas operativas</small>
-                  <small style={{ color: '#999', fontSize: '0.7rem', marginTop: '0.5rem' }}>(Ingrese a la sesión para administrarlas)</small>
+                <div className="input-group !mb-0">
+                  <label className="input-label">Ciudad</label>
+                  <input className="input-field" value={formData.ciudad} onChange={e => setFormData(p => ({ ...p, ciudad: e.target.value }))} placeholder="Cali" />
                 </div>
               </div>
 
-              <div className="grid-2 client-controls-grid">
-                <div className="input-group">
-                  <label className="input-label">
-                    <Settings2 size={16} />
-                    Plan
-                  </label>
-                  <select className="input-field" value={selectedClient.plan} onChange={(e) => handlePlanChange(selectedClientKey, e.target.value)}>
-                    {Object.keys(PLAN_CONFIG).map(plan => <option key={plan} value={plan}>{plan}</option>)}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="input-group !mb-0">
+                  <label className="input-label">Estado</label>
+                  <select className="input-field" value={formData.estado} onChange={e => setFormData(p => ({ ...p, estado: e.target.value }))}>
+                    {ESTADOS.map(e => <option key={e} value={e}>{e}</option>)}
                   </select>
                 </div>
-                <div className="input-group">
-                  <label className="input-label">
-                    <Palette size={16} />
-                    Tema
-                  </label>
-                  <select className="input-field" value={selectedClient.theme || 'Verde Agro'} onChange={(e) => handleThemeChange(selectedClientKey, e.target.value)}>
-                    {Object.keys(THEME_CONFIG).map(theme => <option key={theme} value={theme}>{theme}</option>)}
+                <div className="input-group !mb-0">
+                  <label className="input-label">Plan Actual</label>
+                  <select className="input-field" value={formData.plan} onChange={e => setFormData(p => ({ ...p, plan: e.target.value }))}>
+                    {PLANES.map(p => <option key={p} value={p}>{p}</option>)}
                   </select>
                 </div>
               </div>
 
-              <div className="client-database-card">
-                <div className="client-database-title">
-                  <Database size={19} />
-                  <div>
-                    <h3>Conexión de base de datos</h3>
-                    <p>Configure el motor y parámetros de conexión para esta instancia.</p>
-                  </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="input-group !mb-0">
+                  <label className="input-label">Usuarios Máximos</label>
+                  <input className="input-field" type="number" min={1} value={formData.maxUsuarios} onChange={e => setFormData(p => ({ ...p, maxUsuarios: parseInt(e.target.value) || 1 }))} />
                 </div>
-
-                <DatabaseConnectionConfig
-                  key={selectedClientKey}
-                  clientData={{
-                    databaseEngine: selectedClient.databaseEngine,
-                    connectionData: selectedClient.connectionData || {}
-                  }}
-                  onUpdate={(config) => {
-                    const client = clients[selectedClientKey];
-                    updateClient(selectedClientKey, client.plan, client.modules, client.theme, {
-                      databaseEngine: config.databaseEngine,
-                      connectionData: config.connectionData
-                    });
-                  }}
-                  isNewClient={false}
-                />
-              </div>
-
-              <div className="client-modules-head">
-                <div>
-                  <h3>Módulos habilitados</h3>
-                  <p>{hasGlobalAccess ? 'El administrador global tiene acceso a todos los módulos.' : 'Active o desactive los módulos disponibles para esta instancia.'}</p>
+                <div className="input-group !mb-0">
+                  <label className="input-label">Plantas Máximas</label>
+                  <input className="input-field" type="number" min={1} value={formData.maxPlantas} onChange={e => setFormData(p => ({ ...p, maxPlantas: parseInt(e.target.value) || 1 }))} />
                 </div>
-                <span>{hasGlobalAccess ? 'ALL' : `${selectedModules.length}/${allModules.length}`}</span>
               </div>
 
-              <div className="client-modules-grid">
-                {allModules.map(module => {
-                  const isEnabled = hasGlobalAccess || selectedModules.includes(module.key);
-
-                  return (
-                    <button
-                      type="button"
-                      key={module.key}
-                      className={`client-module-chip ${isEnabled ? 'enabled' : ''}`}
-                      onClick={() => toggleModule(selectedClientKey, module.key)}
-                      disabled={hasGlobalAccess}
-                    >
-                      {isEnabled ? <CheckCircle2 size={17} /> : <ShieldCheck size={17} />}
-                      <span>{module.label}</span>
-                    </button>
-                  );
-                })}
+              {/* Módulos del Menú Principal */}
+              <div className="pt-4 border-t border-[var(--glass-border)]">
+                <h4 className="text-sm font-bold text-[var(--text-contrast)] flex items-center gap-2 mb-3">
+                  <Settings2 size={16} className="text-primary" />
+                  Módulos del Menú Principal
+                </h4>
+                <div className="grid grid-cols-2 gap-2">
+                  {MODULES_PRINCIPALES.map(mod => {
+                    const isChecked = formData.modulosPrincipales.includes(mod.key);
+                    return (
+                      <label key={mod.key} className={`flex items-center gap-2 px-3 py-2 rounded-lg border cursor-pointer transition-all text-xs ${isChecked ? 'border-primary/50 bg-primary/10 text-[var(--text-contrast)]' : 'border-[var(--glass-border)] bg-transparent text-[var(--text-muted)] hover:border-[var(--glass-border)]'}`}>
+                        <input type="checkbox" className="accent-[var(--primary-color)] w-3.5 h-3.5" checked={isChecked} onChange={() => toggleModuloPrincipal(mod.key)} />
+                        {mod.label}
+                      </label>
+                    );
+                  })}
+                </div>
               </div>
-            </>
-          ) : (
-            <div className="client-empty-detail">Seleccione un cliente para ver su configuración.</div>
-          )}
-        </section>
+
+              {/* Módulos de Configuración */}
+              <div className="pt-4 border-t border-[var(--glass-border)]">
+                <h4 className="text-sm font-bold text-[var(--text-contrast)] flex items-center gap-2 mb-2">
+                  <ShieldCheck size={16} className="text-amber-400" />
+                  Módulos de Configuración
+                </h4>
+                <p className="text-[10px] text-[var(--text-muted)] mb-3">Solo disponibles para roles Admin de la empresa.</p>
+                <div className="grid grid-cols-2 gap-2">
+                  {MODULES_CONFIGURACION.map(mod => {
+                    const isChecked = formData.modulosConfiguracion.includes(mod.key);
+                    return (
+                      <label key={mod.key} className={`flex items-center gap-2 px-3 py-2 rounded-lg border cursor-pointer transition-all text-xs ${isChecked ? 'border-amber-500/50 bg-amber-500/10 text-[var(--text-contrast)]' : 'border-[var(--glass-border)] bg-transparent text-[var(--text-muted)]'}`}>
+                        <input type="checkbox" className="accent-amber-400 w-3.5 h-3.5" checked={isChecked} onChange={() => toggleModuloConfig(mod.key)} />
+                        {mod.label}
+                      </label>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* Botones */}
+              <div className="flex gap-3 pt-4 border-t border-[var(--glass-border)]">
+                <button className="btn-primary flex-1" onClick={handleSubmit}>
+                  {editingId ? '✓ Guardar Cambios' : '✓ Crear Empresa'}
+                </button>
+                <button className="btn-secondary" onClick={cancelForm}>Cancelar</button>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
 }
-
-

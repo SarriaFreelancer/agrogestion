@@ -127,7 +127,9 @@ const emptyUserForm = (clientId = '') => ({
   modulos: ['Dashboard'],
   estado: 'Activo',
   fechaIngreso: '',
-  clienteCodigo: clientId
+  clienteCodigo: clientId,
+  empresaId: '',
+  plantaId: 'Todas'
 });
 
 const emptyCategoryForm = (clientId = '') => ({
@@ -152,7 +154,9 @@ export default function Usuarios() {
     deleteCategoriaAcceso,
     currentClient,
     currentUser,
-    hasActionPermission
+    hasActionPermission,
+    empresas,
+    plantas
   } = useAgro();
 
   const [activeTab, setActiveTab] = useState('usuarios');
@@ -245,7 +249,9 @@ export default function Usuarios() {
       modulos: userForm.rol === 'Super Admin' ? ['ALL'] : userForm.modulos,
       estado: userForm.estado,
       fechaIngreso: userForm.fechaIngreso,
-      clienteCodigo: currentClient.id
+      clienteCodigo: currentClient.id,
+      empresaId: userForm.empresaId,
+      plantaId: userForm.plantaId
     };
 
     if (editingUserId) {
@@ -490,6 +496,24 @@ export default function Usuarios() {
                     <select className="input-field" value={userForm.estado} onChange={e => setUserForm({ ...userForm, estado: e.target.value })}>
                       <option value="Activo">Activo</option>
                       <option value="Inactivo">Inactivo</option>
+                    </select>
+                  </div>
+                  <div className="input-group">
+                    <label className="input-label">Empresa</label>
+                    <select className="input-field" value={userForm.empresaId} onChange={e => setUserForm({ ...userForm, empresaId: e.target.value, plantaId: 'Todas' })}>
+                      <option value="">— Sin empresa —</option>
+                      {(empresas || []).map(emp => (
+                        <option key={emp.id} value={emp.id}>{emp.name}</option>
+                      ))}
+                    </select>
+                  </div>
+                  <div className="input-group">
+                    <label className="input-label">Planta</label>
+                    <select className="input-field" value={userForm.plantaId} onChange={e => setUserForm({ ...userForm, plantaId: e.target.value })} disabled={!userForm.empresaId}>
+                      <option value="Todas">Todas las plantas</option>
+                      {(plantas || []).filter(p => !userForm.empresaId || String(p.companyId) === String(userForm.empresaId) || p.empresaId === userForm.empresaId).map(pl => (
+                        <option key={pl.id} value={pl.id}>{pl.name || pl.nombre}</option>
+                      ))}
                     </select>
                   </div>
                   <div className="input-group" style={{ gridColumn: 'span 2' }}>

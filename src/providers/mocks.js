@@ -12,10 +12,75 @@ export const THEME_CONFIG = {
 };
 
 export const PLAN_CONFIG = {
-  'Estándar': ['Dashboard', 'Estructura', 'Maestros', 'Ejecucion', 'Reportes'],
-  'Premium': ['Dashboard', 'Estructura', 'Maestros', 'Ejecucion', 'Reportes', 'Monitoreo', 'Mantenimiento', 'Mapas'],
-  'Admin': ['ALL']
+  'Basico': ['Dashboard', 'Estructura', 'Maestros', 'Ejecucion', 'Reportes'],
+  'Intermedio': ['Dashboard', 'Estructura', 'Maestros', 'Ejecucion', 'Reportes', 'Monitoreo', 'Mantenimiento'],
+  'Premium': ['Dashboard', 'Estructura', 'Maestros', 'Ejecucion', 'Reportes', 'Monitoreo', 'Mantenimiento', 'Mapas', 'Sincronizacion'],
+  'Empresarial': ['ALL']
 };
+
+export const MODULES_PRINCIPALES = [
+  { key: 'Dashboard', label: 'Dashboard' },
+  { key: 'Estructura', label: 'Estructura Agrícola' },
+  { key: 'Maestros', label: 'Maestros' },
+  { key: 'Planificacion', label: 'Planificación' },
+  { key: 'Ejecucion', label: 'Ejecución (Campo)' },
+  { key: 'Reportes', label: 'Reportes' },
+  { key: 'Monitoreo', label: 'Monitoreo' },
+  { key: 'Mantenimiento', label: 'Mantenimiento' },
+  { key: 'Sincronizacion', label: 'Sincronización' },
+  { key: 'Mapas', label: 'Mapas' }
+];
+
+export const MODULES_CONFIGURACION = [
+  { key: 'Usuarios', label: 'Usuarios' },
+  { key: 'Configuraciones', label: 'Configuraciones' },
+  { key: 'GestionEmpresas', label: 'Gestión Empresas' }
+];
+
+export const initialEmpresas = [
+  {
+    id: 'EMP-001',
+    nit: '900123456-1',
+    name: 'Ingenio La Cabaña',
+    pais: 'Colombia',
+    ciudad: 'Cali',
+    estado: 'Activa',
+    plan: 'Premium',
+    maxUsuarios: 20,
+    maxPlantas: 5,
+    modulosPrincipales: ['Dashboard', 'Estructura', 'Maestros', 'Planificacion', 'Ejecucion', 'Reportes', 'Monitoreo', 'Mantenimiento', 'Mapas'],
+    modulosConfiguracion: ['Usuarios', 'Configuraciones'],
+    createdAt: '2026-01-15'
+  },
+  {
+    id: 'EMP-002',
+    nit: '800654321-7',
+    name: 'AgroSur S.A.S.',
+    pais: 'Colombia',
+    ciudad: 'Palmira',
+    estado: 'Activa',
+    plan: 'Basico',
+    maxUsuarios: 10,
+    maxPlantas: 2,
+    modulosPrincipales: ['Dashboard', 'Estructura', 'Maestros', 'Ejecucion', 'Reportes'],
+    modulosConfiguracion: ['Usuarios'],
+    createdAt: '2026-03-20'
+  },
+  {
+    id: 'EMP-003',
+    nit: '901987654-3',
+    name: 'Frutas del Pacífico',
+    pais: 'Colombia',
+    ciudad: 'Buenaventura',
+    estado: 'Inactiva',
+    plan: 'Intermedio',
+    maxUsuarios: 15,
+    maxPlantas: 3,
+    modulosPrincipales: ['Dashboard', 'Estructura', 'Maestros', 'Ejecucion', 'Reportes', 'Monitoreo'],
+    modulosConfiguracion: ['Usuarios', 'Configuraciones'],
+    createdAt: '2026-02-10'
+  }
+];
 
 export const GLOBAL_CONFIG_DEFAULTS = {
   config_insumos: 1,
@@ -144,7 +209,60 @@ export const DEFAULT_USERS = (clientCode = 'GLOBAL') => ([
     rol: 'Super Admin',
     categoriaCodigo: 'SUPER_ADMIN',
     modulos: ['ALL'],
-    estado: 'Activo'
+    estado: 'Activo',
+    empresaId: '',
+    plantaId: 'Todas'
+  },
+  {
+    id: 'USR-0002',
+    code: 'USR-0002',
+    codigo: 'USR-0002',
+    clienteCodigo: clientCode,
+    nombres: 'Carlos',
+    apellidos: 'Gómez',
+    cedula: '1234567890',
+    correo: 'carlos@ingeniolacabana.com',
+    contrasena: 'User123!',
+    rol: 'Administrador',
+    categoriaCodigo: 'ADMIN',
+    modulos: ['Dashboard', 'Estructura', 'Maestros', 'Planificacion', 'Ejecucion', 'Reportes', 'Monitoreo', 'Usuarios', 'Configuraciones'],
+    estado: 'Activo',
+    empresaId: 'EMP-001',
+    plantaId: 'Todas'
+  },
+  {
+    id: 'USR-0003',
+    code: 'USR-0003',
+    codigo: 'USR-0003',
+    clienteCodigo: clientCode,
+    nombres: 'María',
+    apellidos: 'López',
+    cedula: '0987654321',
+    correo: 'maria@ingeniolacabana.com',
+    contrasena: 'User123!',
+    rol: 'Usuario General',
+    categoriaCodigo: 'USUARIO_GENERAL',
+    modulos: ['Dashboard', 'Estructura', 'Reportes'],
+    estado: 'Activo',
+    empresaId: 'EMP-001',
+    plantaId: 'PLN-01'
+  },
+  {
+    id: 'USR-0004',
+    code: 'USR-0004',
+    codigo: 'USR-0004',
+    clienteCodigo: clientCode,
+    nombres: 'Pedro',
+    apellidos: 'Martínez',
+    cedula: '5566778899',
+    correo: 'pedro@agrosur.com',
+    contrasena: 'User123!',
+    rol: 'Administrador',
+    categoriaCodigo: 'ADMIN',
+    modulos: ['Dashboard', 'Estructura', 'Maestros', 'Ejecucion', 'Reportes', 'Usuarios'],
+    estado: 'Activo',
+    empresaId: 'EMP-002',
+    plantaId: 'Todas'
   }
 ]);
 
@@ -266,6 +384,7 @@ export const createEmptyInstanceData = (clientCode = 'GLOBAL') => ({
   globalPlanta: 'Todas',
   globalCultivo: 'Todos',
   plantas: [...initialPlantas],
+  empresas: [...initialEmpresas],
   sectores: [],
   cultivos: [],
   gruposActividades: [],

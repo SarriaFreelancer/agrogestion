@@ -67,10 +67,12 @@ model User {
 
 model Company {
   id             Int       @id @default(autoincrement())
+  nit            String?   @unique
   name           String    @unique
   planId         String?   
   maxUsers       Int?      
   maxProducts    Int?      
+  maxPlantas     Int?
   
   serverId       String?
   server         Server?   @relation("ServerCompanies", fields: [serverId], references: [id])
@@ -84,7 +86,9 @@ model Company {
   city           String?
   country        String    @default("Colombia")
   status         String    @default("ACTIVE")  // ACTIVE, SUSPENDED, INACTIVE
-  themeConfig    Json?     
+  themeConfig    Json?
+  modulosPrincipales   Json?
+  modulosConfiguracion Json?
   
   setting        CompanySetting?
   
@@ -285,6 +289,7 @@ model Planta {
   
   cultivos  Cultivo[]
   users     User[]
+  sectores  Sector[]
   
   @@index([companyId])
 }
