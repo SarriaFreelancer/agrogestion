@@ -9,6 +9,9 @@ import {
   Sparkles, 
   Search, 
   Maximize2, 
+  Minimize2,
+  ChevronDown,
+  ChevronUp,
   Info, 
   Activity,
   Droplets,
@@ -20,7 +23,10 @@ import {
   Crosshair,
   ShieldCheck,
   Calendar,
-  Layers3
+  Layers3,
+  Dot,
+  RotateCcw,
+  X
 } from 'lucide-react';
 import { notifySuccess, notifyError } from '@/utils/swal';
 
@@ -37,6 +43,8 @@ export default function MapaCalor() {
   const [showLaborsLayer, setShowLaborsLayer] = useState(true);
   const [showMonitoreosLayer, setShowMonitoreosLayer] = useState(true);
   const [showLoteBounds, setShowLoteBounds] = useState(true);
+  const [showVertexPoints, setShowVertexPoints] = useState(true); // Punto a punto de cada geocerca
+  const [isPanelMinimized, setIsPanelMinimized] = useState(false); // Minimizar panel para jugar con el mapa
 
   // Geofence GPS Simulator & Validator state
   const [testGps, setTestGps] = useState({ lat: '3.4530', lng: '-76.5330' });
@@ -155,14 +163,30 @@ export default function MapaCalor() {
     }
   }, [mapType]);
 
-  // Dibujar polígonos de geocercas y marcadores
+  // Handler para re-centrar el mapa a todos los polígonos
+  const handleResetMapView = () => {
+    if (!mapInstance.current || !window.L) return;
+    const allPoints = [];
+    allSuertes.forEach(s => {
+      if (s.geometria && Array.isArray(s.geometria)) {
+        s.geometria.forEach(pt => {
+          if (Array.isArray(pt) && pt.length >= 2) allPoints.push(pt);
+        });
+      }
+    });
+    if (allPoints.length > 0) {
+      mapInstance.current.fitBounds(window.L.latLngBounds(allPoints), { padding: [40, 40], maxZoom: 16 });
+    }
+  };
+
+  // Dibujar polígonos de geocercas, vértices punto a punto y marcadores
   useEffect(() => {
     if (!mapInstance.current || !markersLayer.current || !window.L) return;
 
     markersLayer.current.clearLayers();
     const boundsPoints = [];
 
-    // 1. Dibujar Geocercas de Suertes / Lotes
+    // 1. Dibujar Geocercas de Suertes / Lotes con sus vértices punto a punto
     allSuertes.forEach(suerte => {
       if (suerte.geometria && Array.isArray(suerte.geometria) && suerte.geometria.length >= 3) {
         let strokeColor = '#10b981';
@@ -186,6 +210,7 @@ export default function MapaCalor() {
           strokeColor = '#0891B2';
         }
 
+        // Dibujar polígono de la suerte
         const polygon = window.L.polygon(suerte.geometria, {
           color: strokeColor,
           weight: 2.5,
@@ -194,8 +219,46 @@ export default function MapaCalor() {
           dashArray: showLoteBounds ? '4, 4' : null
         }).addTo(markersLayer.current);
 
-        suerte.geometria.forEach(pt => {
-          if (Array.isArray(pt) && pt.length >= 2) boundsPoints.push(pt);
+        // Recolectar puntos para auto-fit y dibujar vértices punto a punto
+        suerte.geometria.forEach((pt, vertexIdx) => {
+          if (Array.isArray(pt) && pt.length >= 2) {
+            boundsPoints.push(pt);
+
+            // Dibujar marcador de punto/vértice GPS
+            if (showVertexPoints) {
+              const vertexMarker = window.L.circleMarker(pt, {
+                radius: 4.5,
+                fillColor: '#ffffff',
+                color: strokeColor,
+                weight: 2,
+                opacity: 1,
+                fillOpacity: 1
+              }).addTo(markersLayer.current);
+
+              vertexMarker.bindTooltip(`
+                <div style="font-size: 11px; font-weight: 600; padding: 2px;">
+                  <span style="color: ${strokeColor}; font-weight: bold;">📍 Vértice ${vertexIdx + 1} - ${suerte.name}</span><br/>
+                  <span style="font-family: monospace; color: #475569;">${pt[0].toFixed(5)}, ${pt[1].toFixed(5)}</span>
+                </div>
+              `, { sticky: true, className: 'leaflet-custom-tooltip' });
+
+              vertexMarker.on('click', (e) => {
+                window.L.DomEvent.stopPropagation(e);
+                setTestGps({
+                  lat: pt[0].toFixed(5),
+                  lng: pt[1].toFixed(5)
+                });
+                setSelectedSuerte({
+                  suerte,
+                  lote: suerte.loteName,
+                  finca: suerte.fincaName,
+                  sector: suerte.sectorName,
+                  cultivo: suerte.cultivo || 'Caña de Azúcar',
+                  selectedVertex: { index: vertexIdx + 1, lat: pt[0], lng: pt[1] }
+                });
+              });
+            }
+          }
         });
 
         polygon.on('click', () => {
@@ -285,7 +348,7 @@ export default function MapaCalor() {
       });
     }
 
-  }, [sectores, showNdviSimulation, showLaborsLayer, showMonitoreosLayer, showLoteBounds, mapType, planificaciones, registrosConGps]);
+  }, [sectores, showNdviSimulation, showLaborsLayer, showMonitoreosLayer, showLoteBounds, showVertexPoints, mapType, planificaciones, registrosConGps]);
 
   // Point in Polygon helper for Geofence validation
   const isPointInPoly = (point, vs) => {
@@ -393,6 +456,20 @@ export default function MapaCalor() {
             </button>
           </div>
 
+          {/* Puntos / Vértices GPS Punto a Punto Toggle */}
+          <button
+            onClick={() => setShowVertexPoints(!showVertexPoints)}
+            title="Activar/Desactivar puntos vértices de cada geocerca"
+            className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 ${
+              showVertexPoints
+                ? 'bg-cyan-600 text-white shadow-md'
+                : 'bg-slate-100 dark:bg-white/10 text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white border border-slate-200 dark:border-white/10'
+            }`}
+          >
+            <MapPin size={14} className={showVertexPoints ? "text-white" : "text-cyan-600 dark:text-cyan-400"} />
+            <span>{showVertexPoints ? 'Puntos GPS ON' : 'Puntos GPS OFF'}</span>
+          </button>
+
           {/* NDVI Toggle */}
           <button
             onClick={() => setShowNdviSimulation(!showNdviSimulation)}
@@ -418,15 +495,44 @@ export default function MapaCalor() {
             <Layers3 size={14} className={showLoteBounds ? "text-white" : "text-emerald-600 dark:text-emerald-400"} />
             <span>{showLoteBounds ? 'Geocercas ON' : 'Geocercas OFF'}</span>
           </button>
+
+          {/* Reset / Center View Button */}
+          <button
+            onClick={handleResetMapView}
+            title="Centrar vista a todas las geocercas"
+            className="p-1.5 rounded-xl bg-slate-100 dark:bg-white/10 text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white border border-slate-200 dark:border-white/10 transition-all"
+          >
+            <RotateCcw size={14} />
+          </button>
         </div>
 
-        {/* Right Info Pill */}
-        <div className="pointer-events-auto hidden md:flex items-center gap-3 bg-white/95 dark:bg-slate-900/90 backdrop-blur-md border border-slate-200 dark:border-slate-700/60 px-4 py-2 rounded-2xl text-xs shadow-2xl text-slate-800 dark:text-white">
-          <span className="text-slate-500 dark:text-slate-400">Superficie Delimitada:</span>
-          <strong className="text-emerald-700 dark:text-emerald-400 font-extrabold">{totalHaCount.toFixed(1)} Ha</strong>
-          <span className="text-slate-300 dark:text-slate-600">|</span>
-          <span className="text-slate-500 dark:text-slate-400">Total Suertes/Lotes:</span>
-          <strong className="text-slate-900 dark:text-white font-bold">{totalSuertesCount}</strong>
+        {/* Right Info Pill & Minimize Bottom Panel Button */}
+        <div className="flex items-center gap-2 pointer-events-auto">
+          <div className="hidden md:flex items-center gap-3 bg-white/95 dark:bg-slate-900/90 backdrop-blur-md border border-slate-200 dark:border-slate-700/60 px-4 py-2 rounded-2xl text-xs shadow-2xl text-slate-800 dark:text-white">
+            <span className="text-slate-500 dark:text-slate-400">Superficie Delimitada:</span>
+            <strong className="text-emerald-700 dark:text-emerald-400 font-extrabold">{totalHaCount.toFixed(1)} Ha</strong>
+            <span className="text-slate-300 dark:text-slate-600">|</span>
+            <span className="text-slate-500 dark:text-slate-400">Total Suertes/Lotes:</span>
+            <strong className="text-slate-900 dark:text-white font-bold">{totalSuertesCount}</strong>
+          </div>
+
+          <button
+            onClick={() => setIsPanelMinimized(!isPanelMinimized)}
+            className="flex items-center gap-1.5 bg-white/95 dark:bg-slate-900/90 backdrop-blur-md border border-slate-200 dark:border-slate-700/60 px-3 py-2 rounded-2xl text-xs font-bold shadow-2xl text-slate-800 dark:text-white hover:bg-slate-50 dark:hover:bg-slate-800 transition-all"
+            title={isPanelMinimized ? "Expandir panel de geocercas" : "Minimizar panel para ver todo el mapa"}
+          >
+            {isPanelMinimized ? (
+              <>
+                <ChevronUp size={16} className="text-emerald-500" />
+                <span>Mostrar Panel</span>
+              </>
+            ) : (
+              <>
+                <ChevronDown size={16} className="text-slate-500" />
+                <span>Minimizar Panel</span>
+              </>
+            )}
+          </button>
         </div>
 
       </div>
@@ -434,99 +540,146 @@ export default function MapaCalor() {
       {/* ── LEAFLET MAP CONTAINER ─────────────────────────────────────── */}
       <div ref={mapRef} className="h-full w-full z-0 relative" />
 
-      {/* ── BOTTOM DRAWER & GEOFENCE VALIDATOR ────────────────────────── */}
-      <div className="absolute bottom-4 left-4 right-4 z-[400] grid grid-cols-1 md:grid-cols-12 gap-3 pointer-events-none">
-        
-        {/* Left 7 cols: Geofence GPS Device Validator Tool */}
-        <div className="md:col-span-7 pointer-events-auto bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl border border-slate-200 dark:border-slate-700/70 p-4 rounded-3xl shadow-2xl space-y-3 text-slate-800 dark:text-slate-100">
-          <div className="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 pb-2">
-            <div className="flex items-center gap-2">
-              <Navigation size={16} className="text-cyan-600 dark:text-cyan-400" />
-              <h4 className="text-xs font-extrabold uppercase tracking-wider text-slate-900 dark:text-white">
-                Validador de Geocerca GPS en Terreno
-              </h4>
-            </div>
-            <span className="text-[10px] text-emerald-700 dark:text-emerald-400 font-bold bg-emerald-500/15 px-2 py-0.5 rounded-full border border-emerald-500/30">
-              Antifraude / Control de Campo
-            </span>
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 text-xs">
-            <div>
-              <label className="text-[10px] text-slate-600 dark:text-slate-400 font-bold block mb-1">Latitud GPS</label>
-              <input 
-                type="text" 
-                value={testGps.lat} 
-                onChange={e => setTestGps({ ...testGps, lat: e.target.value })}
-                className="w-full px-2.5 py-1.5 bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl text-xs font-mono text-slate-900 dark:text-white focus:outline-none focus:border-cyan-500"
-              />
-            </div>
-            <div>
-              <label className="text-[10px] text-slate-600 dark:text-slate-400 font-bold block mb-1">Longitud GPS</label>
-              <input 
-                type="text" 
-                value={testGps.lng} 
-                onChange={e => setTestGps({ ...testGps, lng: e.target.value })}
-                className="w-full px-2.5 py-1.5 bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl text-xs font-mono text-slate-900 dark:text-white focus:outline-none focus:border-cyan-500"
-              />
-            </div>
-            <div className="flex items-end">
-              <button
-                onClick={handleValidateGps}
-                className="w-full py-2 bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white font-bold rounded-xl text-xs flex items-center justify-center gap-1.5 shadow-lg transition-all"
-              >
-                <Crosshair size={14} /> Validar Geocerca
-              </button>
-            </div>
-          </div>
-
-          {validationResult && (
-            <div className={`p-2.5 rounded-2xl text-xs border flex items-start gap-2 ${
-              validationResult.valid 
-                ? 'bg-emerald-500/15 border-emerald-500/30 text-emerald-800 dark:text-emerald-200' 
-                : 'bg-rose-500/15 border-rose-500/30 text-rose-800 dark:text-rose-200'
-            }`}>
-              {validationResult.valid ? <CheckCircle2 size={16} className="text-emerald-600 dark:text-emerald-400 shrink-0 mt-0.5" /> : <AlertTriangle size={16} className="text-rose-600 dark:text-rose-400 shrink-0 mt-0.5" />}
-              <div>
-                <strong className="block font-bold">{validationResult.valid ? 'Labor Verificada en Polígono Correcto' : 'Alerta de Desviación GPS'}</strong>
-                <p className="text-[11px] opacity-90 mt-0.5">{validationResult.message}</p>
+      {/* ── BOTTOM DRAWER & GEOFENCE VALIDATOR (COLLAPSIBLE) ─────────── */}
+      {isPanelMinimized ? (
+        /* Floating Minimized Bar */
+        <div className="absolute bottom-4 right-4 z-[400] pointer-events-auto">
+          <button
+            onClick={() => setIsPanelMinimized(false)}
+            className="flex items-center gap-2.5 bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl border border-slate-200 dark:border-slate-700/70 px-4 py-2.5 rounded-2xl shadow-2xl text-slate-800 dark:text-white hover:border-emerald-500 transition-all group"
+          >
+            <Navigation size={16} className="text-cyan-500 group-hover:scale-110 transition-transform" />
+            <div className="text-left">
+              <div className="text-xs font-extrabold flex items-center gap-2">
+                <span>Panel de Geocerca & Lote</span>
+                <span className="text-[10px] text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 px-1.5 py-0.2 rounded font-bold">Minimizado</span>
               </div>
+              <p className="text-[10px] text-slate-500 dark:text-slate-400">Clic para abrir validador y detalles agronómicos</p>
             </div>
-          )}
+            <ChevronUp size={18} className="text-slate-400 group-hover:text-emerald-500 ml-1 transition-colors" />
+          </button>
         </div>
-
-        {/* Right 5 cols: Selected Polygon Details / Legend */}
-        <div className="md:col-span-5 pointer-events-auto bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl border border-slate-200 dark:border-slate-700/70 p-4 rounded-3xl shadow-2xl space-y-2 text-slate-800 dark:text-slate-100">
-          {selectedSuerte ? (
-            <div className="space-y-2 text-xs">
-              <div className="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 pb-2">
-                <strong className="text-sm text-slate-900 dark:text-white font-bold">{selectedSuerte.suerte.name}</strong>
-                <span className="text-[10px] px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-800 dark:text-emerald-400 font-bold">
-                  {selectedSuerte.cultivo}
+      ) : (
+        /* Expanded Grid Drawer */
+        <div className="absolute bottom-4 left-4 right-4 z-[400] grid grid-cols-1 md:grid-cols-12 gap-3 pointer-events-none transition-all duration-300">
+          
+          {/* Left 7 cols: Geofence GPS Device Validator Tool */}
+          <div className="md:col-span-7 pointer-events-auto bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl border border-slate-200 dark:border-slate-700/70 p-4 rounded-3xl shadow-2xl space-y-3 text-slate-800 dark:text-slate-100">
+            <div className="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 pb-2">
+              <div className="flex items-center gap-2">
+                <Navigation size={16} className="text-cyan-600 dark:text-cyan-400" />
+                <h4 className="text-xs font-extrabold uppercase tracking-wider text-slate-900 dark:text-white">
+                  Validador de Geocerca GPS en Terreno
+                </h4>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="text-[10px] text-emerald-700 dark:text-emerald-400 font-bold bg-emerald-500/15 px-2 py-0.5 rounded-full border border-emerald-500/30">
+                  Antifraude / Control de Campo
                 </span>
-              </div>
-              <div className="grid grid-cols-2 gap-2 text-[11px] text-slate-600 dark:text-slate-300">
-                <div>Finca: <strong className="text-slate-900 dark:text-white">{selectedSuerte.finca}</strong></div>
-                <div>Lote: <strong className="text-slate-900 dark:text-white">{selectedSuerte.lote}</strong></div>
-                <div>Área: <strong className="text-emerald-700 dark:text-emerald-400 font-bold">{selectedSuerte.suerte.hectareas || 0} Ha</strong></div>
-                <div>Sector: <strong className="text-cyan-700 dark:text-cyan-400 font-bold">{selectedSuerte.sector}</strong></div>
+                <button
+                  onClick={() => setIsPanelMinimized(true)}
+                  className="p-1 text-slate-400 hover:text-slate-600 dark:hover:text-white rounded-lg transition-colors"
+                  title="Minimizar panel"
+                >
+                  <Minimize2 size={14} />
+                </button>
               </div>
             </div>
-          ) : (
-            <div className="space-y-2 text-xs">
-              <span className="text-[11px] font-bold text-slate-700 dark:text-slate-300 uppercase block tracking-wider">Leyenda de Capas Jerárquicas</span>
-              <div className="grid grid-cols-2 gap-2 text-[11px] text-slate-800 dark:text-slate-200 font-medium">
-                <div className="flex items-center gap-1.5"><span className="w-3 h-3 rounded-full bg-emerald-500 shrink-0" /> Caña (Verde)</div>
-                <div className="flex items-center gap-1.5"><span className="w-3 h-3 rounded-full bg-amber-500 shrink-0" /> Café (Ámbar)</div>
-                <div className="flex items-center gap-1.5"><span className="w-3 h-3 rounded-full bg-purple-500 shrink-0" /> Aguacate (Púrpura)</div>
-                <div className="flex items-center gap-1.5"><span className="w-3 h-3 rounded-full bg-blue-500 shrink-0" /> Labores OT (Azul)</div>
-              </div>
-              <p className="text-[10px] text-slate-500 dark:text-slate-400">Haz clic en cualquier geocerca para inspeccionar su delimitación.</p>
-            </div>
-          )}
-        </div>
 
-      </div>
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 text-xs">
+              <div>
+                <label className="text-[10px] text-slate-600 dark:text-slate-400 font-bold block mb-1">Latitud GPS</label>
+                <input 
+                  type="text" 
+                  value={testGps.lat} 
+                  onChange={e => setTestGps({ ...testGps, lat: e.target.value })}
+                  className="w-full px-2.5 py-1.5 bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl text-xs font-mono text-slate-900 dark:text-white focus:outline-none focus:border-cyan-500"
+                />
+              </div>
+              <div>
+                <label className="text-[10px] text-slate-600 dark:text-slate-400 font-bold block mb-1">Longitud GPS</label>
+                <input 
+                  type="text" 
+                  value={testGps.lng} 
+                  onChange={e => setTestGps({ ...testGps, lng: e.target.value })}
+                  className="w-full px-2.5 py-1.5 bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl text-xs font-mono text-slate-900 dark:text-white focus:outline-none focus:border-cyan-500"
+                />
+              </div>
+              <div className="flex items-end">
+                <button
+                  onClick={handleValidateGps}
+                  className="w-full py-2 bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white font-bold rounded-xl text-xs flex items-center justify-center gap-1.5 shadow-lg transition-all"
+                >
+                  <Crosshair size={14} /> Validar Geocerca
+                </button>
+              </div>
+            </div>
+
+            {validationResult && (
+              <div className={`p-2.5 rounded-2xl text-xs border flex items-start gap-2 ${
+                validationResult.valid 
+                  ? 'bg-emerald-500/15 border-emerald-500/30 text-emerald-800 dark:text-emerald-200' 
+                  : 'bg-rose-500/15 border-rose-500/30 text-rose-800 dark:text-rose-200'
+              }`}>
+                {validationResult.valid ? <CheckCircle2 size={16} className="text-emerald-600 dark:text-emerald-400 shrink-0 mt-0.5" /> : <AlertTriangle size={16} className="text-rose-600 dark:text-rose-400 shrink-0 mt-0.5" />}
+                <div>
+                  <strong className="block font-bold">{validationResult.valid ? 'Labor Verificada en Polígono Correcto' : 'Alerta de Desviación GPS'}</strong>
+                  <p className="text-[11px] opacity-90 mt-0.5">{validationResult.message}</p>
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Right 5 cols: Selected Polygon Details / Legend */}
+          <div className="md:col-span-5 pointer-events-auto bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl border border-slate-200 dark:border-slate-700/70 p-4 rounded-3xl shadow-2xl space-y-2 text-slate-800 dark:text-slate-100">
+            {selectedSuerte ? (
+              <div className="space-y-2 text-xs">
+                <div className="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 pb-2">
+                  <strong className="text-sm text-slate-900 dark:text-white font-bold">{selectedSuerte.suerte.name}</strong>
+                  <div className="flex items-center gap-2">
+                    <span className="text-[10px] px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-800 dark:text-emerald-400 font-bold">
+                      {selectedSuerte.cultivo}
+                    </span>
+                    <button
+                      onClick={() => setSelectedSuerte(null)}
+                      className="text-slate-400 hover:text-slate-600 dark:hover:text-white"
+                      title="Cerrar selección"
+                    >
+                      <X size={14} />
+                    </button>
+                  </div>
+                </div>
+                <div className="grid grid-cols-2 gap-2 text-[11px] text-slate-600 dark:text-slate-300">
+                  <div>Hacienda/Finca: <strong className="text-slate-900 dark:text-white">{selectedSuerte.finca}</strong></div>
+                  <div>Lote: <strong className="text-slate-900 dark:text-white">{selectedSuerte.lote}</strong></div>
+                  <div>Superficie: <strong className="text-emerald-700 dark:text-emerald-400 font-bold">{selectedSuerte.suerte.hectareas || 0} Ha</strong></div>
+                  <div>Sector: <strong className="text-cyan-700 dark:text-cyan-400 font-bold">{selectedSuerte.sector}</strong></div>
+                </div>
+                {selectedSuerte.selectedVertex && (
+                  <div className="p-2 bg-cyan-500/10 border border-cyan-500/20 rounded-xl text-[11px] text-cyan-800 dark:text-cyan-300 flex items-center justify-between">
+                    <span>📍 <strong>Vértice #{selectedSuerte.selectedVertex.index}</strong>: {selectedSuerte.selectedVertex.lat.toFixed(5)}, {selectedSuerte.selectedVertex.lng.toFixed(5)}</span>
+                  </div>
+                )}
+              </div>
+            ) : (
+              <div className="space-y-2 text-xs">
+                <div className="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 pb-1">
+                  <span className="text-[11px] font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider">Leyenda de Capas Jerárquicas</span>
+                  <span className="text-[10px] text-slate-500 dark:text-slate-400">{allSuertes.length} Geocercas</span>
+                </div>
+                <div className="grid grid-cols-2 gap-2 text-[11px] text-slate-800 dark:text-slate-200 font-medium">
+                  <div className="flex items-center gap-1.5"><span className="w-3 h-3 rounded-full bg-emerald-500 shrink-0" /> Caña (Verde)</div>
+                  <div className="flex items-center gap-1.5"><span className="w-3 h-3 rounded-full bg-amber-500 shrink-0" /> Café (Ámbar)</div>
+                  <div className="flex items-center gap-1.5"><span className="w-3 h-3 rounded-full bg-purple-500 shrink-0" /> Aguacate (Púrpura)</div>
+                  <div className="flex items-center gap-1.5"><span className="w-3 h-3 rounded-full bg-blue-500 shrink-0" /> Labores OT (Azul)</div>
+                </div>
+                <p className="text-[10px] text-slate-500 dark:text-slate-400">Haz clic en cualquier geocerca o vértice para inspeccionar o validar su delimitación.</p>
+              </div>
+            )}
+          </div>
+
+        </div>
+      )}
 
     </div>
   );
