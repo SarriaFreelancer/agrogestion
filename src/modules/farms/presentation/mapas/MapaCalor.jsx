@@ -139,7 +139,10 @@ export default function MapaCalor() {
     }
   }, []);
 
-  // Cambiar tipo de mapa base (Todos 100% libres y sin API Key)
+  // CARTO Basemaps API Key oficial
+  const CARTO_API_KEY = 'cb1_4dz5_1_6e0c0b2aaa6bc37eadf27bcd';
+
+  // Cambiar tipo de mapa base
   useEffect(() => {
     if (!mapInstance.current || !baseTileLayer.current || !window.L) return;
 
@@ -148,7 +151,7 @@ export default function MapaCalor() {
     } else if (mapType === 'osm') {
       baseTileLayer.current.setUrl('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png');
     } else if (mapType === 'dark') {
-      baseTileLayer.current.setUrl('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png');
+      baseTileLayer.current.setUrl(`https://basemaps.cartocdn.com/rastertiles/dark_all/{z}/{x}/{y}.png?key=${CARTO_API_KEY}`);
     }
   }, [mapType]);
 
