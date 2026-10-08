@@ -353,24 +353,24 @@ export default function MapaCalor() {
   };
 
   return (
-    <div className="h-full w-full flex flex-col fade-in relative overflow-hidden bg-[#090d16] text-[var(--text-contrast)]">
+    <div className="h-full w-full flex flex-col fade-in relative overflow-hidden bg-slate-100 dark:bg-[#090d16] text-[var(--text-contrast)]">
       
       {/* ── TOP FLOATING CONTROL BAR ──────────────────────────────────── */}
       <div className="absolute top-4 left-4 right-4 z-[400] flex flex-wrap items-center justify-between gap-3 pointer-events-none">
         
         {/* Left Pills & Map Mode */}
-        <div className="flex flex-wrap items-center gap-2 pointer-events-auto bg-slate-900/90 backdrop-blur-md border border-slate-700/60 p-2 rounded-2xl shadow-2xl">
+        <div className="flex flex-wrap items-center gap-2 pointer-events-auto bg-white/95 dark:bg-slate-900/90 backdrop-blur-md border border-slate-200 dark:border-slate-700/60 p-2 rounded-2xl shadow-2xl text-slate-800 dark:text-white">
           <div className="flex items-center gap-2 px-3 py-1 bg-emerald-500/10 border border-emerald-500/20 rounded-xl">
-            <MapIcon size={16} className="text-emerald-400" />
-            <span className="text-xs font-bold text-emerald-300">GIS & Geocercas</span>
+            <MapIcon size={16} className="text-emerald-600 dark:text-emerald-400" />
+            <span className="text-xs font-bold text-emerald-700 dark:text-emerald-300">GIS & Geocercas</span>
           </div>
 
           {/* Base Layer Switcher: 1. Satélite (Esri), 2. Modo Calles, 3. Modo Oscuro (Carto) */}
-          <div className="flex items-center gap-1 bg-white/[0.06] p-1 rounded-xl border border-white/10">
+          <div className="flex items-center gap-1 bg-slate-100 dark:bg-white/[0.06] p-1 rounded-xl border border-slate-200 dark:border-white/10">
             <button
               onClick={() => setMapType('satellite')}
               className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 ${
-                mapType === 'satellite' ? 'bg-emerald-600 text-white shadow-md' : 'text-slate-300 hover:text-white'
+                mapType === 'satellite' ? 'bg-emerald-600 text-white shadow-md' : 'text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white'
               }`}
             >
               <span>🛰️ Satélite (Esri)</span>
@@ -378,7 +378,7 @@ export default function MapaCalor() {
             <button
               onClick={() => setMapType('osm')}
               className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 ${
-                mapType === 'osm' ? 'bg-blue-600 text-white shadow-md' : 'text-slate-300 hover:text-white'
+                mapType === 'osm' ? 'bg-blue-600 text-white shadow-md' : 'text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white'
               }`}
             >
               <span>🗺️ Modo Calles</span>
@@ -386,7 +386,7 @@ export default function MapaCalor() {
             <button
               onClick={() => setMapType('dark')}
               className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 ${
-                mapType === 'dark' ? 'bg-indigo-600 text-white shadow-md' : 'text-slate-300 hover:text-white'
+                mapType === 'dark' ? 'bg-indigo-600 text-white shadow-md' : 'text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white'
               }`}
             >
               <span>🌙 Modo Oscuro (Carto)</span>
@@ -399,10 +399,10 @@ export default function MapaCalor() {
             className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 ${
               showNdviSimulation
                 ? 'bg-purple-600 text-white shadow-lg shadow-purple-900/40'
-                : 'bg-white/10 text-slate-300 hover:text-white'
+                : 'bg-slate-100 dark:bg-white/10 text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white border border-slate-200 dark:border-white/10'
             }`}
           >
-            <Sparkles size={14} />
+            <Sparkles size={14} className={showNdviSimulation ? "text-white" : "text-purple-600 dark:text-purple-400"} />
             <span>{showNdviSimulation ? 'NDVI Activo' : 'Capa NDVI'}</span>
           </button>
 
@@ -412,21 +412,21 @@ export default function MapaCalor() {
             className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 ${
               showLoteBounds
                 ? 'bg-emerald-600 text-white shadow-md'
-                : 'bg-white/10 text-slate-300 hover:text-white'
+                : 'bg-slate-100 dark:bg-white/10 text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white border border-slate-200 dark:border-white/10'
             }`}
           >
-            <Layers3 size={14} />
+            <Layers3 size={14} className={showLoteBounds ? "text-white" : "text-emerald-600 dark:text-emerald-400"} />
             <span>{showLoteBounds ? 'Geocercas ON' : 'Geocercas OFF'}</span>
           </button>
         </div>
 
         {/* Right Info Pill */}
-        <div className="pointer-events-auto hidden md:flex items-center gap-3 bg-slate-900/90 backdrop-blur-md border border-slate-700/60 px-4 py-2 rounded-2xl text-xs shadow-2xl">
-          <span className="text-slate-400">Superficie Delimitada:</span>
-          <strong className="text-emerald-400 font-extrabold">{totalHaCount.toFixed(1)} Ha</strong>
-          <span className="text-slate-600">|</span>
-          <span className="text-slate-400">Total Suertes/Lotes:</span>
-          <strong className="text-white font-bold">{totalSuertesCount}</strong>
+        <div className="pointer-events-auto hidden md:flex items-center gap-3 bg-white/95 dark:bg-slate-900/90 backdrop-blur-md border border-slate-200 dark:border-slate-700/60 px-4 py-2 rounded-2xl text-xs shadow-2xl text-slate-800 dark:text-white">
+          <span className="text-slate-500 dark:text-slate-400">Superficie Delimitada:</span>
+          <strong className="text-emerald-700 dark:text-emerald-400 font-extrabold">{totalHaCount.toFixed(1)} Ha</strong>
+          <span className="text-slate-300 dark:text-slate-600">|</span>
+          <span className="text-slate-500 dark:text-slate-400">Total Suertes/Lotes:</span>
+          <strong className="text-slate-900 dark:text-white font-bold">{totalSuertesCount}</strong>
         </div>
 
       </div>
@@ -438,36 +438,36 @@ export default function MapaCalor() {
       <div className="absolute bottom-4 left-4 right-4 z-[400] grid grid-cols-1 md:grid-cols-12 gap-3 pointer-events-none">
         
         {/* Left 7 cols: Geofence GPS Device Validator Tool */}
-        <div className="md:col-span-7 pointer-events-auto bg-slate-900/95 backdrop-blur-xl border border-slate-700/70 p-4 rounded-3xl shadow-2xl space-y-3">
-          <div className="flex items-center justify-between border-b border-slate-800 pb-2">
+        <div className="md:col-span-7 pointer-events-auto bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl border border-slate-200 dark:border-slate-700/70 p-4 rounded-3xl shadow-2xl space-y-3 text-slate-800 dark:text-slate-100">
+          <div className="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 pb-2">
             <div className="flex items-center gap-2">
-              <Navigation size={16} className="text-cyan-400" />
-              <h4 className="text-xs font-extrabold uppercase tracking-wider text-white">
+              <Navigation size={16} className="text-cyan-600 dark:text-cyan-400" />
+              <h4 className="text-xs font-extrabold uppercase tracking-wider text-slate-900 dark:text-white">
                 Validador de Geocerca GPS en Terreno
               </h4>
             </div>
-            <span className="text-[10px] text-emerald-400 font-bold bg-emerald-500/10 px-2 py-0.5 rounded-full border border-emerald-500/20">
+            <span className="text-[10px] text-emerald-700 dark:text-emerald-400 font-bold bg-emerald-500/15 px-2 py-0.5 rounded-full border border-emerald-500/30">
               Antifraude / Control de Campo
             </span>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 text-xs">
             <div>
-              <label className="text-[10px] text-slate-400 font-bold block mb-1">Latitud GPS</label>
+              <label className="text-[10px] text-slate-600 dark:text-slate-400 font-bold block mb-1">Latitud GPS</label>
               <input 
                 type="text" 
                 value={testGps.lat} 
                 onChange={e => setTestGps({ ...testGps, lat: e.target.value })}
-                className="w-full px-2.5 py-1.5 bg-slate-800 border border-slate-700 rounded-xl text-xs font-mono text-white focus:outline-none focus:border-cyan-400"
+                className="w-full px-2.5 py-1.5 bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl text-xs font-mono text-slate-900 dark:text-white focus:outline-none focus:border-cyan-500"
               />
             </div>
             <div>
-              <label className="text-[10px] text-slate-400 font-bold block mb-1">Longitud GPS</label>
+              <label className="text-[10px] text-slate-600 dark:text-slate-400 font-bold block mb-1">Longitud GPS</label>
               <input 
                 type="text" 
                 value={testGps.lng} 
                 onChange={e => setTestGps({ ...testGps, lng: e.target.value })}
-                className="w-full px-2.5 py-1.5 bg-slate-800 border border-slate-700 rounded-xl text-xs font-mono text-white focus:outline-none focus:border-cyan-400"
+                className="w-full px-2.5 py-1.5 bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl text-xs font-mono text-slate-900 dark:text-white focus:outline-none focus:border-cyan-500"
               />
             </div>
             <div className="flex items-end">
@@ -483,10 +483,10 @@ export default function MapaCalor() {
           {validationResult && (
             <div className={`p-2.5 rounded-2xl text-xs border flex items-start gap-2 ${
               validationResult.valid 
-                ? 'bg-emerald-500/15 border-emerald-500/30 text-emerald-200' 
-                : 'bg-rose-500/15 border-rose-500/30 text-rose-200'
+                ? 'bg-emerald-500/15 border-emerald-500/30 text-emerald-800 dark:text-emerald-200' 
+                : 'bg-rose-500/15 border-rose-500/30 text-rose-800 dark:text-rose-200'
             }`}>
-              {validationResult.valid ? <CheckCircle2 size={16} className="text-emerald-400 shrink-0 mt-0.5" /> : <AlertTriangle size={16} className="text-rose-400 shrink-0 mt-0.5" />}
+              {validationResult.valid ? <CheckCircle2 size={16} className="text-emerald-600 dark:text-emerald-400 shrink-0 mt-0.5" /> : <AlertTriangle size={16} className="text-rose-600 dark:text-rose-400 shrink-0 mt-0.5" />}
               <div>
                 <strong className="block font-bold">{validationResult.valid ? 'Labor Verificada en Polígono Correcto' : 'Alerta de Desviación GPS'}</strong>
                 <p className="text-[11px] opacity-90 mt-0.5">{validationResult.message}</p>
@@ -496,32 +496,32 @@ export default function MapaCalor() {
         </div>
 
         {/* Right 5 cols: Selected Polygon Details / Legend */}
-        <div className="md:col-span-5 pointer-events-auto bg-slate-900/95 backdrop-blur-xl border border-slate-700/70 p-4 rounded-3xl shadow-2xl space-y-2">
+        <div className="md:col-span-5 pointer-events-auto bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl border border-slate-200 dark:border-slate-700/70 p-4 rounded-3xl shadow-2xl space-y-2 text-slate-800 dark:text-slate-100">
           {selectedSuerte ? (
             <div className="space-y-2 text-xs">
-              <div className="flex items-center justify-between border-b border-slate-800 pb-2">
-                <strong className="text-sm text-white">{selectedSuerte.suerte.name}</strong>
-                <span className="text-[10px] px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 font-bold">
+              <div className="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 pb-2">
+                <strong className="text-sm text-slate-900 dark:text-white font-bold">{selectedSuerte.suerte.name}</strong>
+                <span className="text-[10px] px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-800 dark:text-emerald-400 font-bold">
                   {selectedSuerte.cultivo}
                 </span>
               </div>
-              <div className="grid grid-cols-2 gap-2 text-[11px] text-slate-300">
-                <div>Finca: <strong className="text-white">{selectedSuerte.finca}</strong></div>
-                <div>Lote: <strong className="text-white">{selectedSuerte.lote}</strong></div>
-                <div>Área: <strong className="text-emerald-400">{selectedSuerte.suerte.hectareas || 0} Ha</strong></div>
-                <div>Sector: <strong className="text-cyan-400">{selectedSuerte.sector}</strong></div>
+              <div className="grid grid-cols-2 gap-2 text-[11px] text-slate-600 dark:text-slate-300">
+                <div>Finca: <strong className="text-slate-900 dark:text-white">{selectedSuerte.finca}</strong></div>
+                <div>Lote: <strong className="text-slate-900 dark:text-white">{selectedSuerte.lote}</strong></div>
+                <div>Área: <strong className="text-emerald-700 dark:text-emerald-400 font-bold">{selectedSuerte.suerte.hectareas || 0} Ha</strong></div>
+                <div>Sector: <strong className="text-cyan-700 dark:text-cyan-400 font-bold">{selectedSuerte.sector}</strong></div>
               </div>
             </div>
           ) : (
             <div className="space-y-2 text-xs">
-              <span className="text-[11px] font-bold text-slate-400 uppercase block">Leyenda de Capas Jerárquicas</span>
-              <div className="grid grid-cols-2 gap-2 text-[11px]">
-                <div className="flex items-center gap-1.5"><span className="w-3 h-3 rounded-full bg-emerald-500" /> Caña (Verde)</div>
-                <div className="flex items-center gap-1.5"><span className="w-3 h-3 rounded-full bg-amber-500" /> Café (Ámbar)</div>
-                <div className="flex items-center gap-1.5"><span className="w-3 h-3 rounded-full bg-purple-500" /> Aguacate (Púrpura)</div>
-                <div className="flex items-center gap-1.5"><span className="w-3 h-3 rounded-full bg-blue-500" /> Labores OT (Azul)</div>
+              <span className="text-[11px] font-bold text-slate-700 dark:text-slate-300 uppercase block tracking-wider">Leyenda de Capas Jerárquicas</span>
+              <div className="grid grid-cols-2 gap-2 text-[11px] text-slate-800 dark:text-slate-200 font-medium">
+                <div className="flex items-center gap-1.5"><span className="w-3 h-3 rounded-full bg-emerald-500 shrink-0" /> Caña (Verde)</div>
+                <div className="flex items-center gap-1.5"><span className="w-3 h-3 rounded-full bg-amber-500 shrink-0" /> Café (Ámbar)</div>
+                <div className="flex items-center gap-1.5"><span className="w-3 h-3 rounded-full bg-purple-500 shrink-0" /> Aguacate (Púrpura)</div>
+                <div className="flex items-center gap-1.5"><span className="w-3 h-3 rounded-full bg-blue-500 shrink-0" /> Labores OT (Azul)</div>
               </div>
-              <p className="text-[10px] text-slate-400">Haz clic en cualquier geocerca para inspeccionar su delimitación.</p>
+              <p className="text-[10px] text-slate-500 dark:text-slate-400">Haz clic en cualquier geocerca para inspeccionar su delimitación.</p>
             </div>
           )}
         </div>
