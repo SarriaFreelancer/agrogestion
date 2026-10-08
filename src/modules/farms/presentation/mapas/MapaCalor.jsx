@@ -19,7 +19,8 @@ import {
   Navigation,
   Crosshair,
   ShieldCheck,
-  Calendar
+  Calendar,
+  Layers3
 } from 'lucide-react';
 import { notifySuccess, notifyError } from '@/utils/swal';
 
@@ -30,50 +31,100 @@ export default function MapaCalor() {
   const markersLayer = useRef(null);
   const baseTileLayer = useRef(null);
 
-  const [mapType, setMapType] = useState('dark'); // 'dark' | 'satellite' | 'osm'
+  const [mapType, setMapType] = useState('osm'); // 'osm' | 'dark' | 'satellite'
   const [selectedSuerte, setSelectedSuerte] = useState(null);
   const [showNdviSimulation, setShowNdviSimulation] = useState(false);
   const [showLaborsLayer, setShowLaborsLayer] = useState(true);
   const [showMonitoreosLayer, setShowMonitoreosLayer] = useState(true);
-  const [selectedHierarchyLevel, setSelectedHierarchyLevel] = useState('ALL'); // 'ALL' | 'Finca' | 'Lote' | 'Suerte'
+  const [showLoteBounds, setShowLoteBounds] = useState(true);
 
   // Geofence GPS Simulator & Validator state
-  const [testGps, setTestGps] = useState({ lat: '3.5285', lng: '-76.2980' });
+  const [testGps, setTestGps] = useState({ lat: '3.4530', lng: '-76.5330' });
   const [validationResult, setValidationResult] = useState(null);
-  const [selectedPlanToValidate, setSelectedPlanToValidate] = useState('');
+
+  // Helper recursivo para extraer todas las suertes y lotes sin importar el nivel de anidamiento
+  const extractAllSuertesAndLotes = (nodes) => {
+    const suertes = [];
+    const lotes = [];
+
+    const traverse = (node, ctx = {}) => {
+      if (!node) return;
+      const currentCtx = {
+        sector: node.type === 'Sector' ? (node.name || node.nombre) : (ctx.sector || 'Sector Principal'),
+        finca: node.type === 'Finca' ? (node.name || node.nombre) : (ctx.finca || 'Hacienda Principal'),
+        lote: node.type === 'Lote' ? (node.name || node.nombre) : (ctx.lote || 'Lote Principal')
+      };
+
+      // Si es un Lote, guardar
+      if (node.type === 'Lote' || (node.suertes && Array.isArray(node.suertes))) {
+        lotes.push({
+          ...node,
+          name: node.name || node.nombre || `Lote ${node.id}`,
+          fincaName: currentCtx.finca,
+          sectorName: currentCtx.sector
+        });
+      }
+
+      // Si tiene suertes directas
+      if (node.suertes && Array.isArray(node.suertes)) {
+        node.suertes.forEach(st => {
+          const sName = st.name || st.nombre || `Suerte ${st.id}`;
+          const sHa = Number(st.hectareas || st.area || st.ha || 0);
+          const sCultivo = st.cultivo || 'Caña de Azúcar';
+          const sGeom = st.geometria || st.coordenadas || st.polygon || st.coords || (
+            st.lat && st.lng ? [
+              [st.lat - 0.002, st.lng - 0.002],
+              [st.lat + 0.002, st.lng - 0.002],
+              [st.lat + 0.002, st.lng + 0.002],
+              [st.lat - 0.002, st.lng + 0.002]
+            ] : null
+          );
+
+          suertes.push({
+            ...st,
+            name: sName,
+            hectareas: sHa,
+            cultivo: sCultivo,
+            geometria: sGeom,
+            fincaName: currentCtx.finca,
+            loteName: currentCtx.lote,
+            sectorName: currentCtx.sector
+          });
+        });
+      }
+
+      // Recorrer hijos
+      if (node.zonas && Array.isArray(node.zonas)) node.zonas.forEach(child => traverse(child, currentCtx));
+      if (node.sectores && Array.isArray(node.sectores)) node.sectores.forEach(child => traverse(child, currentCtx));
+      if (node.fincas && Array.isArray(node.fincas)) node.fincas.forEach(child => traverse(child, currentCtx));
+      if (node.lotes && Array.isArray(node.lotes)) node.lotes.forEach(child => traverse(child, currentCtx));
+    };
+
+    (nodes || []).forEach(n => traverse(n));
+    return { suertes, lotes };
+  };
+
+  const { suertes: allSuertes, lotes: allLotes } = extractAllSuertesAndLotes(sectores);
 
   // Filtrar registros que tengan coordenadas
   const registrosConGps = (registrosControles || []).filter(r => r.lat && r.lng);
 
-  // Estadísticas rápidas
-  let totalSuertes = 0;
-  let totalHa = 0;
-  let suertesList = [];
+  // Estadísticas de superficie
+  const totalSuertesCount = allSuertes.length;
+  const totalHaCount = allSuertes.reduce((acc, s) => acc + Number(s.hectareas || 0), 0);
 
-  sectores?.forEach(s => {
-    s.fincas?.forEach(f => {
-      f.lotes?.forEach(l => {
-        l.suertes?.forEach(st => {
-          totalSuertes++;
-          totalHa += Number(st.hectareas || 0);
-          suertesList.push({ ...st, fincaName: f.name, loteName: l.name, sectorName: s.name });
-        });
-      });
-    });
-  });
-
-  // Inicializar mapa
+  // Inicializar mapa Leaflet
   useEffect(() => {
     if (!mapInstance.current && window.L && mapRef.current) {
       mapInstance.current = window.L.map(mapRef.current, {
         zoomControl: false
-      }).setView([3.5285, -76.2980], 14);
+      }).setView([3.4530, -76.5330], 14);
 
       window.L.control.zoom({ position: 'bottomright' }).addTo(mapInstance.current);
 
-      // Default CartoDB Dark Matter (Free, keyless, high contrast)
-      baseTileLayer.current = window.L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
-        attribution: '© OpenStreetMap, © CartoDB Dark'
+      // Default OpenStreetMap (Modo Calles en Español)
+      baseTileLayer.current = window.L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '© OpenStreetMap contributors'
       }).addTo(mapInstance.current);
 
       markersLayer.current = window.L.layerGroup().addTo(mapInstance.current);
@@ -92,90 +143,89 @@ export default function MapaCalor() {
   useEffect(() => {
     if (!mapInstance.current || !baseTileLayer.current || !window.L) return;
 
-    if (mapType === 'satellite') {
-      baseTileLayer.current.setUrl('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}');
+    if (mapType === 'osm') {
+      baseTileLayer.current.setUrl('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png');
     } else if (mapType === 'dark') {
       baseTileLayer.current.setUrl('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png');
-    } else {
-      baseTileLayer.current.setUrl('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png');
+    } else if (mapType === 'satellite') {
+      baseTileLayer.current.setUrl('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}');
     }
   }, [mapType]);
 
-  // Dibujar capas jerárquicas y marcadores
+  // Dibujar polígonos de geocercas y marcadores
   useEffect(() => {
     if (!mapInstance.current || !markersLayer.current || !window.L) return;
 
     markersLayer.current.clearLayers();
+    const boundsPoints = [];
 
-    // 1. Polígonos de Suertes y Lotes con colores jerárquicos
-    sectores?.forEach(s => {
-      s.fincas?.forEach(f => {
-        f.lotes?.forEach(l => {
-          l.suertes?.forEach(suerte => {
-            const coords = suerte.geometria && suerte.geometria.length > 2 
-              ? suerte.geometria 
-              : [
-                  [(suerte.lat || 3.5285) - 0.003, (suerte.lng || -76.2980) - 0.003],
-                  [(suerte.lat || 3.5285) + 0.003, (suerte.lng || -76.2980) - 0.003],
-                  [(suerte.lat || 3.5285) + 0.003, (suerte.lng || -76.2980) + 0.003],
-                  [(suerte.lat || 3.5285) - 0.003, (suerte.lng || -76.2980) + 0.003]
-                ];
+    // 1. Dibujar Geocercas de Suertes / Lotes
+    allSuertes.forEach(suerte => {
+      if (suerte.geometria && Array.isArray(suerte.geometria) && suerte.geometria.length >= 3) {
+        let strokeColor = '#10b981';
+        let fillColor = '#10b981';
+        
+        if (showNdviSimulation) {
+          const hash = (suerte.name || suerte.id || 'A').charCodeAt(0) % 3;
+          fillColor = hash === 0 ? '#10b981' : hash === 1 ? '#fbbf24' : '#ef4444';
+          strokeColor = hash === 0 ? '#059669' : hash === 1 ? '#d97706' : '#dc2626';
+        } else if (suerte.cultivo?.toLowerCase().includes('caña')) {
+          fillColor = '#10B981';
+          strokeColor = '#059669';
+        } else if (suerte.cultivo?.toLowerCase().includes('café')) {
+          fillColor = '#F59E0B';
+          strokeColor = '#D97706';
+        } else if (suerte.cultivo?.toLowerCase().includes('aguacate')) {
+          fillColor = '#8B5CF6';
+          strokeColor = '#7C3AED';
+        } else if (suerte.cultivo?.toLowerCase().includes('palma')) {
+          fillColor = '#06B6D4';
+          strokeColor = '#0891B2';
+        }
 
-            let strokeColor = '#10b981'; // Suerte default emerald
-            let fillColor = '#10b981';
-            
-            if (showNdviSimulation) {
-              const hash = (suerte.name || suerte.id || 'A').charCodeAt(0) % 3;
-              fillColor = hash === 0 ? '#10b981' : hash === 1 ? '#fbbf24' : '#ef4444';
-              strokeColor = hash === 0 ? '#059669' : hash === 1 ? '#d97706' : '#dc2626';
-            } else if (suerte.cultivo === 'Caña de Azúcar') {
-              fillColor = '#10B981';
-              strokeColor = '#059669';
-            } else if (suerte.cultivo === 'Café Arábica Especial') {
-              fillColor = '#F59E0B';
-              strokeColor = '#D97706';
-            } else if (suerte.cultivo === 'Aguacate Hass') {
-              fillColor = '#8B5CF6';
-              strokeColor = '#7C3AED';
-            }
+        const polygon = window.L.polygon(suerte.geometria, {
+          color: strokeColor,
+          weight: 2.5,
+          fillColor: fillColor,
+          fillOpacity: showNdviSimulation ? 0.65 : 0.40,
+          dashArray: showLoteBounds ? '4, 4' : null
+        }).addTo(markersLayer.current);
 
-            const polygon = window.L.polygon(coords, {
-              color: strokeColor,
-              weight: 2.5,
-              fillColor: fillColor,
-              fillOpacity: showNdviSimulation ? 0.65 : 0.40
-            }).addTo(markersLayer.current);
+        suerte.geometria.forEach(pt => {
+          if (Array.isArray(pt) && pt.length >= 2) boundsPoints.push(pt);
+        });
 
-            polygon.on('click', () => {
-              setSelectedSuerte({
-                suerte,
-                lote: l.name,
-                finca: f.name,
-                sector: s.name,
-                cultivo: suerte.cultivo || 'Caña de Azúcar'
-              });
-            });
-
-            polygon.bindTooltip(`
-              <div style="font-size: 11px; padding: 2px;">
-                <strong style="color: #10B981;">${suerte.name}</strong><br/>
-                <span>Lote: ${l.name} · Finca: ${f.name}</span><br/>
-                <span>Área: ${suerte.hectareas || 0} Ha · ${suerte.cultivo || 'Caña'}</span>
-              </div>
-            `, {
-              sticky: true,
-              className: 'leaflet-custom-tooltip'
-            });
+        polygon.on('click', () => {
+          setSelectedSuerte({
+            suerte,
+            lote: suerte.loteName,
+            finca: suerte.fincaName,
+            sector: suerte.sectorName,
+            cultivo: suerte.cultivo || 'Caña de Azúcar'
           });
         });
-      });
+
+        polygon.bindTooltip(`
+          <div style="font-size: 12px; font-weight: 600; padding: 4px; line-height: 1.4;">
+            <strong style="color: #059669; font-size: 13px;">${suerte.name}</strong><br/>
+            <span>🌾 Cultivo: ${suerte.cultivo}</span><br/>
+            <span>📍 Lote: ${suerte.loteName} · ${suerte.fincaName}</span><br/>
+            <span style="color: #0284c7;">📐 Superficie: ${suerte.hectareas} Ha</span>
+          </div>
+        `, {
+          sticky: true,
+          className: 'leaflet-custom-tooltip'
+        });
+      }
     });
 
     // 2. Marcadores de Labores / Planificaciones de Campo
     if (showLaborsLayer && planificaciones && planificaciones.length > 0) {
       planificaciones.forEach(p => {
-        const pLat = 3.5285 + (Math.random() - 0.5) * 0.006;
-        const pLng = -76.2980 + (Math.random() - 0.5) * 0.006;
+        const centerLat = boundsPoints.length > 0 ? boundsPoints[0][0] : 3.4530;
+        const centerLng = boundsPoints.length > 0 ? boundsPoints[0][1] : -76.5330;
+        const pLat = centerLat + (Math.random() - 0.5) * 0.005;
+        const pLng = centerLng + (Math.random() - 0.5) * 0.005;
 
         const laborMarker = window.L.circleMarker([pLat, pLng], {
           radius: 8,
@@ -190,7 +240,7 @@ export default function MapaCalor() {
           <div style="font-size: 12px; color: #111827; padding: 4px;">
             <strong style="color: #1d4ed8;">🚜 Labor Agrícola: ${p.ordenCode || p.id}</strong><br/>
             <strong>Actividad:</strong> ${p.actividadNombre || p.actividad || 'Labor General'}<br/>
-            <strong>Ubicación:</strong> ${p.loteNombre || 'Suerte A-01'}<br/>
+            <strong>Ubicación:</strong> ${p.loteNombre || 'Suerte 1A'}<br/>
             <strong>Estado:</strong> ${p.estado || 'Programada'}
           </div>
         `);
@@ -209,21 +259,34 @@ export default function MapaCalor() {
           fillOpacity: 0.95
         }).addTo(markersLayer.current);
 
+        boundsPoints.push([r.lat, r.lng]);
+
         monMarker.bindPopup(`
           <div style="font-size: 12px; color: #111827; padding: 4px;">
             <strong style="color: #7e22ce;">🔬 Muestreo Fitosanitario</strong><br/>
             <strong>Protocolo:</strong> ${r.controlNombre || 'Barrenador / Roya'}<br/>
             <strong>Responsable:</strong> ${r.usuario || 'Agrónomo de Campo'}<br/>
-            <strong>GPS:</strong> ${r.lat.toFixed(4)}, ${r.lng.toFixed(4)}
+            <strong>GPS:</strong> ${Number(r.lat).toFixed(4)}, ${Number(r.lng).toFixed(4)}
           </div>
         `);
       });
     }
 
-  }, [sectores, showNdviSimulation, showLaborsLayer, showMonitoreosLayer, mapType, planificaciones, registrosConGps]);
+    // Auto-ajustar mapa a los polígonos existentes
+    if (boundsPoints.length > 0 && mapInstance.current) {
+      mapInstance.current.fitBounds(window.L.latLngBounds(boundsPoints), { padding: [40, 40], maxZoom: 16 });
+      // Set test GPS default to first point
+      setTestGps({
+        lat: boundsPoints[0][0].toFixed(5),
+        lng: boundsPoints[0][1].toFixed(5)
+      });
+    }
+
+  }, [sectores, showNdviSimulation, showLaborsLayer, showMonitoreosLayer, showLoteBounds, mapType, planificaciones, registrosConGps]);
 
   // Point in Polygon helper for Geofence validation
   const isPointInPoly = (point, vs) => {
+    if (!vs || !Array.isArray(vs) || vs.length < 3) return false;
     const x = point[0], y = point[1];
     let inside = false;
     for (let i = 0, j = vs.length - 1; i < vs.length; j = i++) {
@@ -246,40 +309,23 @@ export default function MapaCalor() {
     }
 
     let foundSuerte = null;
-    let foundLote = null;
-    let foundFinca = null;
 
-    sectores?.forEach(s => {
-      s.fincas?.forEach(f => {
-        f.lotes?.forEach(l => {
-          l.suertes?.forEach(st => {
-            const coords = st.geometria && st.geometria.length > 2
-              ? st.geometria
-              : [
-                  [(st.lat || 3.5285) - 0.003, (st.lng || -76.2980) - 0.003],
-                  [(st.lat || 3.5285) + 0.003, (st.lng || -76.2980) - 0.003],
-                  [(st.lat || 3.5285) + 0.003, (st.lng || -76.2980) + 0.003],
-                  [(st.lat || 3.5285) - 0.003, (st.lng || -76.2980) + 0.003]
-                ];
-            if (isPointInPoly([pLat, pLng], coords)) {
-              foundSuerte = st;
-              foundLote = l;
-              foundFinca = f;
-            }
-          });
-        });
-      });
-    });
+    for (const st of allSuertes) {
+      if (st.geometria && isPointInPoly([pLat, pLng], st.geometria)) {
+        foundSuerte = st;
+        break;
+      }
+    }
 
     if (foundSuerte) {
       setValidationResult({
         valid: true,
         suerte: foundSuerte.name,
-        lote: foundLote.name,
-        finca: foundFinca.name,
+        lote: foundSuerte.loteName,
+        finca: foundSuerte.fincaName,
         lat: pLat,
         lng: pLng,
-        message: `Coordenada verificada dentro de la geocerca de ${foundSuerte.name} (${foundFinca.name}). Labor autorizada en polígono correcto.`
+        message: `Coordenada verificada dentro de la geocerca de ${foundSuerte.name} (${foundSuerte.fincaName}). Labor autorizada en polígono correcto.`
       });
       notifySuccess(`Ubicación GPS válida: ${foundSuerte.name}`);
     } else {
@@ -287,19 +333,19 @@ export default function MapaCalor() {
         valid: false,
         lat: pLat,
         lng: pLng,
-        message: `ALERTA DE DESVIACIÓN: La coordenada GPS (${pLat.toFixed(4)}, ${pLng.toFixed(4)}) se encuentra fuera de los polígonos agrícolas delimitados.`
+        message: `ALERTA DE DESVIACIÓN: La coordenada GPS (${pLat.toFixed(4)}, ${pLng.toFixed(4)}) se encuentra fuera de las geocercas de los lotes delimitados.`
       });
     }
 
     if (mapInstance.current && window.L) {
       mapInstance.current.setView([pLat, pLng], 15);
       window.L.circleMarker([pLat, pLng], {
-        radius: 10,
+        radius: 11,
         fillColor: foundSuerte ? '#10b981' : '#ef4444',
         color: '#ffffff',
         weight: 3,
         fillOpacity: 1
-      }).addTo(markersLayer.current).bindPopup('Punto GPS Validado').openPopup();
+      }).addTo(markersLayer.current).bindPopup(`Punto GPS Validado: ${foundSuerte ? foundSuerte.name : 'Fuera de Geocerca'}`).openPopup();
     }
   };
 
@@ -313,34 +359,34 @@ export default function MapaCalor() {
         <div className="flex flex-wrap items-center gap-2 pointer-events-auto bg-slate-900/90 backdrop-blur-md border border-slate-700/60 p-2 rounded-2xl shadow-2xl">
           <div className="flex items-center gap-2 px-3 py-1 bg-emerald-500/10 border border-emerald-500/20 rounded-xl">
             <MapIcon size={16} className="text-emerald-400" />
-            <span className="text-xs font-bold text-emerald-300">GIS & Teledetección</span>
+            <span className="text-xs font-bold text-emerald-300">GIS & Geocercas</span>
           </div>
 
-          {/* Base Layer Switcher (100% Free - No API Key Needed) */}
+          {/* Base Layer Switcher: 1. Modo Calles, 2. Modo Oscuro (Carto), 3. Satélite */}
           <div className="flex items-center gap-1 bg-white/[0.06] p-1 rounded-xl border border-white/10">
             <button
-              onClick={() => setMapType('dark')}
-              className={`px-3 py-1 rounded-lg text-xs font-bold transition-all ${
-                mapType === 'dark' ? 'bg-indigo-600 text-white shadow-md' : 'text-slate-300 hover:text-white'
-              }`}
-            >
-              🌙 Modo Oscuro (Carto)
-            </button>
-            <button
-              onClick={() => setMapType('satellite')}
-              className={`px-3 py-1 rounded-lg text-xs font-bold transition-all ${
-                mapType === 'satellite' ? 'bg-emerald-600 text-white shadow-md' : 'text-slate-300 hover:text-white'
-              }`}
-            >
-              🛰️ Satélite (Esri)
-            </button>
-            <button
               onClick={() => setMapType('osm')}
-              className={`px-3 py-1 rounded-lg text-xs font-bold transition-all ${
+              className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 ${
                 mapType === 'osm' ? 'bg-blue-600 text-white shadow-md' : 'text-slate-300 hover:text-white'
               }`}
             >
-              🗺️ OpenStreetMap
+              <span>🗺️ Modo Calles</span>
+            </button>
+            <button
+              onClick={() => setMapType('dark')}
+              className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 ${
+                mapType === 'dark' ? 'bg-indigo-600 text-white shadow-md' : 'text-slate-300 hover:text-white'
+              }`}
+            >
+              <span>🌙 Modo Oscuro (Carto)</span>
+            </button>
+            <button
+              onClick={() => setMapType('satellite')}
+              className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 ${
+                mapType === 'satellite' ? 'bg-emerald-600 text-white shadow-md' : 'text-slate-300 hover:text-white'
+              }`}
+            >
+              <span>🛰️ Satélite (Esri)</span>
             </button>
           </div>
 
@@ -356,15 +402,28 @@ export default function MapaCalor() {
             <Sparkles size={14} />
             <span>{showNdviSimulation ? 'NDVI Activo' : 'Capa NDVI'}</span>
           </button>
+
+          {/* Lotes Geofence Outlines Toggle */}
+          <button
+            onClick={() => setShowLoteBounds(!showLoteBounds)}
+            className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 ${
+              showLoteBounds
+                ? 'bg-emerald-600 text-white shadow-md'
+                : 'bg-white/10 text-slate-300 hover:text-white'
+            }`}
+          >
+            <Layers3 size={14} />
+            <span>{showLoteBounds ? 'Geocercas ON' : 'Geocercas OFF'}</span>
+          </button>
         </div>
 
         {/* Right Info Pill */}
         <div className="pointer-events-auto hidden md:flex items-center gap-3 bg-slate-900/90 backdrop-blur-md border border-slate-700/60 px-4 py-2 rounded-2xl text-xs shadow-2xl">
           <span className="text-slate-400">Superficie Delimitada:</span>
-          <strong className="text-emerald-400 font-extrabold">{totalHa.toFixed(1)} Ha</strong>
+          <strong className="text-emerald-400 font-extrabold">{totalHaCount.toFixed(1)} Ha</strong>
           <span className="text-slate-600">|</span>
-          <span className="text-slate-400">Total Suertes:</span>
-          <strong className="text-white font-bold">{totalSuertes}</strong>
+          <span className="text-slate-400">Total Suertes/Lotes:</span>
+          <strong className="text-white font-bold">{totalSuertesCount}</strong>
         </div>
 
       </div>
@@ -447,7 +506,7 @@ export default function MapaCalor() {
                 <div>Finca: <strong className="text-white">{selectedSuerte.finca}</strong></div>
                 <div>Lote: <strong className="text-white">{selectedSuerte.lote}</strong></div>
                 <div>Área: <strong className="text-emerald-400">{selectedSuerte.suerte.hectareas || 0} Ha</strong></div>
-                <div>Estado: <strong className="text-cyan-400">{selectedSuerte.suerte.estadoProductivo || 'Activo'}</strong></div>
+                <div>Sector: <strong className="text-cyan-400">{selectedSuerte.sector}</strong></div>
               </div>
             </div>
           ) : (
@@ -459,7 +518,7 @@ export default function MapaCalor() {
                 <div className="flex items-center gap-1.5"><span className="w-3 h-3 rounded-full bg-purple-500" /> Aguacate (Púrpura)</div>
                 <div className="flex items-center gap-1.5"><span className="w-3 h-3 rounded-full bg-blue-500" /> Labores OT (Azul)</div>
               </div>
-              <p className="text-[10px] text-slate-400">Haz clic en cualquier suerte para ver su ficha y georreferencia.</p>
+              <p className="text-[10px] text-slate-400">Haz clic en cualquier geocerca para inspeccionar su delimitación.</p>
             </div>
           )}
         </div>

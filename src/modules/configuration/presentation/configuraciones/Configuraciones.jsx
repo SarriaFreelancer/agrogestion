@@ -379,23 +379,40 @@ export default function Configuraciones() {
     const demoSectores = [
       {
         id: 'SEC-01',
+        name: 'Valle del Río Cauca (Sector 1)',
         nombre: 'Valle del Río Cauca (Sector 1)',
+        type: 'Sector',
         fincas: [
           {
             id: 'FIN-01',
+            name: 'Hacienda La Manuelita',
             nombre: 'Hacienda La Manuelita',
+            type: 'Finca',
             lotes: [
               {
                 id: 'LOT-01',
+                name: 'Lote Cañaduzal Norte',
                 nombre: 'Lote Cañaduzal Norte',
+                type: 'Lote',
                 suertes: [
                   { 
                     id: 'SUERTE-01', 
+                    name: 'Suerte 1A - Cenicaña CC 01-1940', 
                     nombre: 'Suerte 1A - Cenicaña CC 01-1940', 
+                    type: 'Suerte',
+                    hectareas: 14.5, 
                     area: 14.5, 
                     cultivo: 'Caña de Azúcar',
                     variedad: 'CC 01-1940',
                     bloque: 'Bloque Hidráulico A',
+                    lat: 3.4530,
+                    lng: -76.5330,
+                    geometria: [
+                      [3.4510, -76.5310],
+                      [3.4550, -76.5310],
+                      [3.4550, -76.5350],
+                      [3.4510, -76.5350]
+                    ],
                     coordenadas: [
                       [3.4510, -76.5310],
                       [3.4550, -76.5310],
@@ -405,11 +422,22 @@ export default function Configuraciones() {
                   },
                   { 
                     id: 'SUERTE-02', 
+                    name: 'Suerte 1B - Cenicaña CC 93-4418', 
                     nombre: 'Suerte 1B - Cenicaña CC 93-4418', 
+                    type: 'Suerte',
+                    hectareas: 18.2, 
                     area: 18.2, 
                     cultivo: 'Caña de Azúcar',
                     variedad: 'CC 93-4418',
                     bloque: 'Bloque Hidráulico A',
+                    lat: 3.4570,
+                    lng: -76.5330,
+                    geometria: [
+                      [3.4550, -76.5310],
+                      [3.4590, -76.5310],
+                      [3.4590, -76.5350],
+                      [3.4550, -76.5350]
+                    ],
                     coordenadas: [
                       [3.4550, -76.5310],
                       [3.4590, -76.5310],
@@ -423,19 +451,34 @@ export default function Configuraciones() {
           },
           {
             id: 'FIN-02',
+            name: 'Hacienda El Paraíso',
             nombre: 'Hacienda El Paraíso',
+            type: 'Finca',
             lotes: [
               {
                 id: 'LOT-02',
+                name: 'Lote Frutales de Exportación',
                 nombre: 'Lote Frutales de Exportación',
+                type: 'Lote',
                 suertes: [
                   { 
                     id: 'SUERTE-03', 
+                    name: 'Suerte 2A - Aguacate Hass Export', 
                     nombre: 'Suerte 2A - Aguacate Hass Export', 
+                    type: 'Suerte',
+                    hectareas: 9.8, 
                     area: 9.8, 
                     cultivo: 'Aguacate Hass',
                     variedad: 'Hass Criollo',
                     bloque: 'Bloque Goteo 1',
+                    lat: 3.4530,
+                    lng: -76.5370,
+                    geometria: [
+                      [3.4510, -76.5350],
+                      [3.4550, -76.5350],
+                      [3.4550, -76.5390],
+                      [3.4510, -76.5390]
+                    ],
                     coordenadas: [
                       [3.4510, -76.5350],
                       [3.4550, -76.5350],
@@ -451,23 +494,40 @@ export default function Configuraciones() {
       },
       {
         id: 'SEC-02',
+        name: 'Eje Cafetero y Cordillera (Sector 2)',
         nombre: 'Eje Cafetero y Cordillera (Sector 2)',
+        type: 'Sector',
         fincas: [
           {
             id: 'FIN-03',
+            name: 'Finca La Esperanza',
             nombre: 'Finca La Esperanza',
+            type: 'Finca',
             lotes: [
               {
                 id: 'LOT-03',
+                name: 'Lote Cafetal Castillo',
                 nombre: 'Lote Cafetal Castillo',
+                type: 'Lote',
                 suertes: [
                   { 
                     id: 'SUERTE-04', 
+                    name: 'Suerte 3A - Café Castillo Naranjal', 
                     nombre: 'Suerte 3A - Café Castillo Naranjal', 
+                    type: 'Suerte',
+                    hectareas: 7.2, 
                     area: 7.2, 
                     cultivo: 'Café',
                     variedad: 'Castillo 2.0',
                     bloque: 'Bloque Ladera',
+                    lat: 3.4570,
+                    lng: -76.5370,
+                    geometria: [
+                      [3.4550, -76.5350],
+                      [3.4590, -76.5350],
+                      [3.4590, -76.5390],
+                      [3.4550, -76.5390]
+                    ],
                     coordenadas: [
                       [3.4550, -76.5350],
                       [3.4590, -76.5350],
