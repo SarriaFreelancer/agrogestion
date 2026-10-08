@@ -94,7 +94,7 @@ button {
 }
 
 .btn-primary {
-  color: #000000 !important;
+  color: #ffffff !important;
   font-weight: 700 !important;
 }
 
@@ -295,26 +295,32 @@ button {
 }
 
 .btn-primary {
-  background: var(--primary-color);
-  color: white;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+  background: var(--primary-color) !important;
+  color: #ffffff !important;
+  font-weight: 700 !important;
+  box-shadow: 0 4px 10px rgba(var(--primary-rgb), 0.35);
+  border: 1px solid rgba(255, 255, 255, 0.2);
 }
 
 .btn-primary:hover:not(:disabled) {
-  background: var(--primary-light);
-  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2);
+  background: var(--primary-light) !important;
+  color: #ffffff !important;
+  box-shadow: 0 6px 16px rgba(var(--primary-rgb), 0.45);
   transform: translateY(-2px);
 }
 
 .btn-secondary {
   background: var(--input-bg);
-  color: var(--text-main);
+  color: var(--text-contrast);
   border: 1px solid var(--glass-border);
 }
 
 .btn-secondary:hover:not(:disabled) {
-  background: #f1f1f1;
-  border-color: #bbb;
+  background: rgba(var(--primary-rgb), 0.22) !important;
+  border-color: rgba(var(--primary-rgb), 0.5) !important;
+  color: var(--text-contrast) !important;
+  box-shadow: 0 4px 12px rgba(var(--primary-rgb), 0.25);
+  transform: translateY(-1px);
 }
 
 button:disabled {

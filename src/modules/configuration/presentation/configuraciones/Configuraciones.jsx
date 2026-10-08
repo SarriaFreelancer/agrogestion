@@ -1522,13 +1522,27 @@ export default function Configuraciones() {
                       className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold transition-all duration-150 text-left ${
                         isActive 
                           ? 'text-white shadow-md font-bold' 
-                          : 'text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white'
+                          : 'text-slate-700 dark:text-slate-300'
                       }`}
                       style={isActive ? {
                         backgroundColor: 'var(--primary-color)',
                         boxShadow: '0 4px 14px 0 rgba(var(--primary-rgb), 0.35)',
                         border: '1px solid rgba(255, 255, 255, 0.2)'
-                      } : {}}
+                      } : { border: '1px solid transparent' }}
+                      onMouseEnter={(e) => {
+                        if (!isActive) {
+                          e.currentTarget.style.backgroundColor = 'rgba(var(--primary-rgb), 0.18)';
+                          e.currentTarget.style.color = 'var(--primary-light)';
+                          e.currentTarget.style.borderColor = 'rgba(var(--primary-rgb), 0.35)';
+                        }
+                      }}
+                      onMouseLeave={(e) => {
+                        if (!isActive) {
+                          e.currentTarget.style.backgroundColor = 'transparent';
+                          e.currentTarget.style.color = '';
+                          e.currentTarget.style.borderColor = 'transparent';
+                        }
+                      }}
                     >
                       <Icon size={16} className={isActive ? 'text-white' : 'text-slate-500 dark:text-slate-400'} />
                       <span className="truncate">{item.label}</span>

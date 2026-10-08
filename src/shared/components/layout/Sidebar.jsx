@@ -86,7 +86,7 @@ const Sidebar = ({ currentView, onNavClick, isMobileMenuOpen, setIsMobileMenuOpe
         className={`group relative px-3.5 py-2.5 rounded-xl cursor-pointer transition-all duration-200 flex items-center justify-between text-[13.5px] font-semibold
           ${isActive 
             ? 'text-white font-bold shadow-lg shadow-black/25 translate-x-1' 
-            : 'text-slate-300 hover:text-white hover:bg-white/[0.1] hover:translate-x-0.5'
+            : 'text-slate-300 hover:text-white hover:translate-x-0.5'
           }
           ${item.highlight && !isActive ? 'text-amber-300 font-bold' : ''}
         `}
@@ -94,7 +94,19 @@ const Sidebar = ({ currentView, onNavClick, isMobileMenuOpen, setIsMobileMenuOpe
           backgroundColor: 'var(--primary-color)',
           boxShadow: '0 4px 15px rgba(var(--primary-rgb), 0.45)',
           border: '1px solid rgba(255, 255, 255, 0.25)'
-        } : {}}
+        } : { border: '1px solid transparent' }}
+        onMouseEnter={(e) => {
+          if (!isActive) {
+            e.currentTarget.style.backgroundColor = 'rgba(var(--primary-rgb), 0.22)';
+            e.currentTarget.style.borderColor = 'rgba(var(--primary-rgb), 0.45)';
+          }
+        }}
+        onMouseLeave={(e) => {
+          if (!isActive) {
+            e.currentTarget.style.backgroundColor = 'transparent';
+            e.currentTarget.style.borderColor = 'transparent';
+          }
+        }}
       >
         <div className="flex items-center gap-3 truncate">
           <Icon 
