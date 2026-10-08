@@ -257,7 +257,6 @@ export default function Configuraciones() {
 
   // ── GENERADOR DE DATOS DE PRUEBA REALES ──────────────────────────────
   const handleLoadFullDemoData = () => {
-    // 1. Estructura Agrícola Completa de 6 niveles
     const demoSectores = [
       {
         id: 'SEC-01',
@@ -365,7 +364,6 @@ export default function Configuraciones() {
       }
     ];
 
-    // 2. Insumos y Productos
     const demoProductos = [
       { id: 'INS-01', codigo: 'INS-01', nombre: 'Urea Granulada 46% N', ingrediente: 'Nitrógeno 46%', categoria: 'Fertilizantes', unidad: 'Kg', stock: 1250, costoUnitario: 85000 },
       { id: 'INS-02', codigo: 'INS-02', nombre: 'DAP Fosfato Diamónico 18-46-0', ingrediente: 'N-P', categoria: 'Fertilizantes', unidad: 'Kg', stock: 800, costoUnitario: 110000 },
@@ -375,7 +373,6 @@ export default function Configuraciones() {
       { id: 'INS-06', codigo: 'INS-06', nombre: 'Bio-Trichoderma Harzianum', ingrediente: 'Trichoderma', categoria: 'Bioinsumos', unidad: 'Kg', stock: 180, costoUnitario: 35000 }
     ];
 
-    // 3. Maquinaria
     const demoMaquinaria = [
       { id: 'MAQ-01', codigo: 'MAQ-01', nombre: 'Tractor John Deere 6125M', tipo: 'Tractor Agrícola', marca: 'John Deere', tarifa: 135000, estado: 'Operativo', horometro: 1420.5 },
       { id: 'MAQ-02', codigo: 'MAQ-02', nombre: 'Tractor New Holland TT4.75', tipo: 'Tractor Agrícola', marca: 'New Holland', tarifa: 98000, estado: 'Operativo', horometro: 980.0 },
@@ -383,7 +380,6 @@ export default function Configuraciones() {
       { id: 'MAQ-04', codigo: 'MAQ-04', nombre: 'Pulverizadora Autopropulsada Jacto', tipo: 'Fumigadora', marca: 'Jacto', tarifa: 180000, estado: 'Operativo', horometro: 650.0 }
     ];
 
-    // 4. Trabajadores
     const demoTrabajadores = [
       { id: 'TRA-01', codigo: 'TRA-01', nombre: 'Carlos Andrés Restrepo', cedula: '1144123456', cargo: 'Operador de Maquinaria Pesada', cuadrilla: 'Cuadrilla Mecanizada', estado: 'Activo' },
       { id: 'TRA-02', codigo: 'TRA-02', nombre: 'Jorge Iván Caicedo', cedula: '1130987654', cargo: 'Supervisor Agronómico de Campo', cuadrilla: 'Cuadrilla Técnica', estado: 'Activo' },
@@ -391,7 +387,6 @@ export default function Configuraciones() {
       { id: 'TRA-04', codigo: 'TRA-04', nombre: 'Luis Fernando Mosquera', cedula: '94567890', cargo: 'Operario de Riego y Drenaje', cuadrilla: 'Cuadrilla de Riego', estado: 'Activo' }
     ];
 
-    // 5. Planificaciones / Órdenes de Trabajo con Geofence
     const demoPlanificaciones = [
       {
         id: 'PLAN-2026-001',
@@ -424,7 +419,6 @@ export default function Configuraciones() {
       }
     ];
 
-    // 6. Monitoreo Fitosanitario
     const demoMonitoreos = [
       {
         id: 'MON-2026-001',
@@ -537,24 +531,15 @@ export default function Configuraciones() {
     // ── MONITOREO ───────────────────────────────────────────────────────
     if (activeTab === 'monitoreo') {
       return (
-        <div className="space-y-6 w-full max-w-4xl fade-in">
-          <div className="flex items-center justify-between mb-8">
+        <div className="space-y-6 w-full max-w-4xl">
+          <div className="flex items-center justify-between mb-6">
             <div className="flex items-center gap-4">
-              <div className="w-12 h-12 rounded-xl bg-emerald-500/10 flex items-center justify-center text-emerald-500 text-2xl border border-emerald-500/20 shadow-md">
+              <div className="w-12 h-12 rounded-xl bg-emerald-500/10 flex items-center justify-center text-emerald-500 text-2xl border border-emerald-500/20 shadow-sm">
                 <Microscope size={24} />
               </div>
               <div>
                 <h2 className="text-2xl font-bold text-slate-900 dark:text-white tracking-tight">Monitoreo Fitosanitario & Suelos</h2>
-                <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">Configure las validaciones y parámetros de inspección agronómica en campo</p>
-              </div>
-            </div>
-            <div className="bg-emerald-500/10 border border-emerald-500/20 px-4 py-3 rounded-xl flex items-center gap-3">
-              <div className="w-6 h-6 rounded-full bg-emerald-500/20 flex items-center justify-center text-emerald-600 dark:text-emerald-400 text-xs font-bold">
-                ✓
-              </div>
-              <div>
-                <h4 className="text-sm font-semibold text-emerald-600 dark:text-emerald-400">Monitoreo Activo</h4>
-                <p className="text-[11px] text-slate-500 dark:text-slate-400">Validación GPS y muestreo dinámico</p>
+                <p className="text-sm text-slate-500 dark:text-slate-400 mt-0.5">Configure las validaciones y parámetros de inspección agronómica en campo</p>
               </div>
             </div>
           </div>
@@ -566,31 +551,25 @@ export default function Configuraciones() {
               { id: 'monitoreo_adicionales', label: 'Permitir sub-muestras por punto de control', desc: 'Activa el registro de múltiples sub-muestras por coordenada.', icon: '🧪' },
               { id: 'monitoreo_obs', label: 'Permitir notas y fotos de evidencia', desc: 'Agrega campo de fotografía y observaciones técnicas al formulario.', icon: '📝' },
               { id: 'monitoreo_req', label: 'Variables agronómicas requeridas', desc: 'Impide guardar monitoreo si faltan variables críticas del cultivo.', icon: '⚙️' }
-            ].map(opt => {
-              const active = isEnabled(configuraciones[opt.id] ?? 1);
-              return (
-                <div key={opt.id} className="flex items-center justify-between p-4 rounded-xl bg-white dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800 hover:border-emerald-500/40 shadow-sm transition-all group">
-                  <div className="flex items-center gap-4">
-                    <div className="w-10 h-10 rounded-xl bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 flex items-center justify-center text-xl">
-                      {opt.icon}
-                    </div>
-                    <div>
-                      <h4 className="text-[15px] font-bold text-slate-800 dark:text-slate-100">{opt.label}</h4>
-                      <p className="text-[13px] text-slate-500 dark:text-slate-400 mt-0.5">{opt.desc}</p>
-                    </div>
+            ].map(opt => (
+              <div key={opt.id} className="flex items-center justify-between p-4 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700 shadow-sm transition-all">
+                <div className="flex items-center gap-4">
+                  <div className="w-10 h-10 rounded-xl bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 flex items-center justify-center text-xl shrink-0">
+                    {opt.icon}
                   </div>
-                  <div className="flex items-center gap-3">
-                    <span className={`text-[11px] font-bold px-2.5 py-1 rounded-md uppercase tracking-wider ${active ? 'bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30' : 'bg-slate-200 dark:bg-slate-800 text-slate-500 dark:text-slate-400 border border-slate-300 dark:border-slate-700'}`}>
-                      {active ? 'ACTIVADO' : 'DESACTIVADO'}
-                    </span>
-                    <Switch 
-                      checked={active} 
-                      onCheckedChange={() => handleToggle(opt.id)} 
-                    />
+                  <div>
+                    <h4 className="text-[15px] font-bold text-slate-800 dark:text-slate-100">{opt.label}</h4>
+                    <p className="text-[13px] text-slate-500 dark:text-slate-400 mt-0.5">{opt.desc}</p>
                   </div>
                 </div>
-              );
-            })}
+                <div className="shrink-0 pl-4">
+                  <Switch 
+                    checked={isEnabled(configuraciones[opt.id] ?? 1)} 
+                    onCheckedChange={() => handleToggle(opt.id)} 
+                  />
+                </div>
+              </div>
+            ))}
           </div>
         </div>
       );
@@ -599,14 +578,14 @@ export default function Configuraciones() {
     // ── INSUMOS ─────────────────────────────────────────────────────────
     if (activeTab === 'insumos') {
       return (
-        <div className="space-y-6 w-full max-w-4xl fade-in">
-          <div className="flex items-center gap-4 mb-8">
-            <div className="w-12 h-12 rounded-xl bg-amber-500/10 flex items-center justify-center text-amber-500 text-2xl border border-amber-500/20 shadow-md">
+        <div className="space-y-6 w-full max-w-4xl">
+          <div className="flex items-center gap-4 mb-6">
+            <div className="w-12 h-12 rounded-xl bg-amber-500/10 flex items-center justify-center text-amber-500 text-2xl border border-amber-500/20 shadow-sm">
               <Package size={24} />
             </div>
             <div>
               <h2 className="text-2xl font-bold text-slate-900 dark:text-white tracking-tight">Insumos & Inventario</h2>
-              <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">Reglas de salida de bodega, stock mínimo y control de costos</p>
+              <p className="text-sm text-slate-500 dark:text-slate-400 mt-0.5">Reglas de salida de bodega, stock mínimo y control de costos</p>
             </div>
           </div>
 
@@ -616,31 +595,25 @@ export default function Configuraciones() {
               { id: 'validarInsumos', label: 'Obligar Insumos en Aplicaciones', desc: 'Requiere registrar producto y dosis exacta en fertilizaciones y fumigaciones.', icon: '⚠️' },
               { id: 'bloquearStockNegativo', label: 'Bloquear Salidas sin Stock (Stock Negativo)', desc: 'Impide despachos de bodega si no hay inventario físico registrado.', icon: '🛑' },
               { id: 'registrarGpsInsumos', label: 'Registrar Geocerca en Despacho', desc: 'Captura coordenadas del punto de aplicación de insumos en el lote.', icon: '📍' }
-            ].map(opt => {
-              const active = isEnabled(configuraciones[opt.id] ?? (opt.id === 'config_insumos' ? 1 : 0));
-              return (
-                <div key={opt.id} className="flex items-center justify-between p-4 rounded-xl bg-white dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800 hover:border-emerald-500/40 shadow-sm transition-all">
-                  <div className="flex items-center gap-4">
-                    <div className="w-10 h-10 rounded-xl bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 flex items-center justify-center text-xl">
-                      {opt.icon}
-                    </div>
-                    <div>
-                      <h4 className="text-[15px] font-bold text-slate-800 dark:text-slate-100">{opt.label}</h4>
-                      <p className="text-[13px] text-slate-500 dark:text-slate-400 mt-0.5">{opt.desc}</p>
-                    </div>
+            ].map(opt => (
+              <div key={opt.id} className="flex items-center justify-between p-4 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700 shadow-sm transition-all">
+                <div className="flex items-center gap-4">
+                  <div className="w-10 h-10 rounded-xl bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 flex items-center justify-center text-xl shrink-0">
+                    {opt.icon}
                   </div>
-                  <div className="flex items-center gap-3">
-                    <span className={`text-[11px] font-bold px-2.5 py-1 rounded-md uppercase tracking-wider ${active ? 'bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30' : 'bg-slate-200 dark:bg-slate-800 text-slate-500 dark:text-slate-400 border border-slate-300 dark:border-slate-700'}`}>
-                      {active ? 'ACTIVADO' : 'DESACTIVADO'}
-                    </span>
-                    <Switch 
-                      checked={active} 
-                      onCheckedChange={() => handleToggle(opt.id)} 
-                    />
+                  <div>
+                    <h4 className="text-[15px] font-bold text-slate-800 dark:text-slate-100">{opt.label}</h4>
+                    <p className="text-[13px] text-slate-500 dark:text-slate-400 mt-0.5">{opt.desc}</p>
                   </div>
                 </div>
-              );
-            })}
+                <div className="shrink-0 pl-4">
+                  <Switch 
+                    checked={isEnabled(configuraciones[opt.id] ?? (opt.id === 'config_insumos' ? 1 : 0))} 
+                    onCheckedChange={() => handleToggle(opt.id)} 
+                  />
+                </div>
+              </div>
+            ))}
           </div>
         </div>
       );
@@ -649,14 +622,14 @@ export default function Configuraciones() {
     // ── MAQUINARIA ──────────────────────────────────────────────────────
     if (activeTab === 'maquinaria') {
       return (
-        <div className="space-y-6 w-full max-w-4xl fade-in">
-          <div className="flex items-center gap-4 mb-8">
-            <div className="w-12 h-12 rounded-xl bg-blue-500/10 flex items-center justify-center text-blue-500 text-2xl border border-blue-500/20 shadow-md">
+        <div className="space-y-6 w-full max-w-4xl">
+          <div className="flex items-center gap-4 mb-6">
+            <div className="w-12 h-12 rounded-xl bg-blue-500/10 flex items-center justify-center text-blue-500 text-2xl border border-blue-500/20 shadow-sm">
               <Tractor size={24} />
             </div>
             <div>
               <h2 className="text-2xl font-bold text-slate-900 dark:text-white tracking-tight">Maquinaria & Equipos</h2>
-              <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">Horómetros, combustibles, telemetría y costos mecánicos</p>
+              <p className="text-sm text-slate-500 dark:text-slate-400 mt-0.5">Horómetros, combustibles, telemetría y costos mecánicos</p>
             </div>
           </div>
 
@@ -665,31 +638,25 @@ export default function Configuraciones() {
               { id: 'config_maq', label: 'Bloque de Maquinaria y Talleres', desc: 'Activa o desactiva la gestión de parque de maquinaria y aperos.', icon: '🚜' },
               { id: 'validarMaquinaria', label: 'Obligar Asignación de Equipo en Labores Mecánicas', desc: 'Exige seleccionar tractor o apero en aradas, rastrilladas y siembra.', icon: '⚠️' },
               { id: 'registrarGpsMaquinaria', label: 'Telemetría GPS por Jornada', desc: 'Registra coordenadas de inicio y fin de la labor mecanizada.', icon: '📍' }
-            ].map(opt => {
-              const active = isEnabled(configuraciones[opt.id] ?? (opt.id === 'config_maq' ? 1 : 0));
-              return (
-                <div key={opt.id} className="flex items-center justify-between p-4 rounded-xl bg-white dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800 hover:border-blue-500/40 shadow-sm transition-all">
-                  <div className="flex items-center gap-4">
-                    <div className="w-10 h-10 rounded-xl bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 flex items-center justify-center text-xl">
-                      {opt.icon}
-                    </div>
-                    <div>
-                      <h4 className="text-[15px] font-bold text-slate-800 dark:text-slate-100">{opt.label}</h4>
-                      <p className="text-[13px] text-slate-500 dark:text-slate-400 mt-0.5">{opt.desc}</p>
-                    </div>
+            ].map(opt => (
+              <div key={opt.id} className="flex items-center justify-between p-4 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700 shadow-sm transition-all">
+                <div className="flex items-center gap-4">
+                  <div className="w-10 h-10 rounded-xl bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 flex items-center justify-center text-xl shrink-0">
+                    {opt.icon}
                   </div>
-                  <div className="flex items-center gap-3">
-                    <span className={`text-[11px] font-bold px-2.5 py-1 rounded-md uppercase tracking-wider ${active ? 'bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30' : 'bg-slate-200 dark:bg-slate-800 text-slate-500 dark:text-slate-400 border border-slate-300 dark:border-slate-700'}`}>
-                      {active ? 'ACTIVADO' : 'DESACTIVADO'}
-                    </span>
-                    <Switch 
-                      checked={active} 
-                      onCheckedChange={() => handleToggle(opt.id)} 
-                    />
+                  <div>
+                    <h4 className="text-[15px] font-bold text-slate-800 dark:text-slate-100">{opt.label}</h4>
+                    <p className="text-[13px] text-slate-500 dark:text-slate-400 mt-0.5">{opt.desc}</p>
                   </div>
                 </div>
-              );
-            })}
+                <div className="shrink-0 pl-4">
+                  <Switch 
+                    checked={isEnabled(configuraciones[opt.id] ?? (opt.id === 'config_maq' ? 1 : 0))} 
+                    onCheckedChange={() => handleToggle(opt.id)} 
+                  />
+                </div>
+              </div>
+            ))}
           </div>
         </div>
       );
@@ -698,14 +665,14 @@ export default function Configuraciones() {
     // ── MANO DE OBRA ────────────────────────────────────────────────────
     if (activeTab === 'mano_obra') {
       return (
-        <div className="space-y-6 w-full max-w-4xl fade-in">
-          <div className="flex items-center gap-4 mb-8">
-            <div className="w-12 h-12 rounded-xl bg-indigo-500/10 flex items-center justify-center text-indigo-500 text-2xl border border-indigo-500/20 shadow-md">
+        <div className="space-y-6 w-full max-w-4xl">
+          <div className="flex items-center gap-4 mb-6">
+            <div className="w-12 h-12 rounded-xl bg-indigo-500/10 flex items-center justify-center text-indigo-500 text-2xl border border-indigo-500/20 shadow-sm">
               <Users size={24} />
             </div>
             <div>
               <h2 className="text-2xl font-bold text-slate-900 dark:text-white tracking-tight">Mano de Obra & Cuadrillas</h2>
-              <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">Control de nómina, jornales, tareas al destajo y asistencia</p>
+              <p className="text-sm text-slate-500 dark:text-slate-400 mt-0.5">Control de nómina, jornales, tareas al destajo y asistencia</p>
             </div>
           </div>
 
@@ -714,52 +681,46 @@ export default function Configuraciones() {
               { id: 'config_mao', label: 'Bloque de Mano de Obra', desc: 'Activa la liquidación de cuadrillas y trabajadores por labor.', icon: '👥' },
               { id: 'validarNomina', label: 'Obligar Trabajador Responsable', desc: 'Exige asignar el personal que ejecutó la labor en campo.', icon: '📋' },
               { id: 'registrarGpsManoObra', label: 'Marcación Biométrica / GPS de Asistencia', desc: 'Valida que el personal se encuentre dentro de la finca asignada.', icon: '📍' }
-            ].map(opt => {
-              const active = isEnabled(configuraciones[opt.id] ?? (opt.id === 'config_mao' ? 1 : 0));
-              return (
-                <div key={opt.id} className="flex items-center justify-between p-4 rounded-xl bg-white dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800 hover:border-indigo-500/40 shadow-sm transition-all">
-                  <div className="flex items-center gap-4">
-                    <div className="w-10 h-10 rounded-xl bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 flex items-center justify-center text-xl">
-                      {opt.icon}
-                    </div>
-                    <div>
-                      <h4 className="text-[15px] font-bold text-slate-800 dark:text-slate-100">{opt.label}</h4>
-                      <p className="text-[13px] text-slate-500 dark:text-slate-400 mt-0.5">{opt.desc}</p>
-                    </div>
+            ].map(opt => (
+              <div key={opt.id} className="flex items-center justify-between p-4 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700 shadow-sm transition-all">
+                <div className="flex items-center gap-4">
+                  <div className="w-10 h-10 rounded-xl bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 flex items-center justify-center text-xl shrink-0">
+                    {opt.icon}
                   </div>
-                  <div className="flex items-center gap-3">
-                    <span className={`text-[11px] font-bold px-2.5 py-1 rounded-md uppercase tracking-wider ${active ? 'bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30' : 'bg-slate-200 dark:bg-slate-800 text-slate-500 dark:text-slate-400 border border-slate-300 dark:border-slate-700'}`}>
-                      {active ? 'ACTIVADO' : 'DESACTIVADO'}
-                    </span>
-                    <Switch 
-                      checked={active} 
-                      onCheckedChange={() => handleToggle(opt.id)} 
-                    />
+                  <div>
+                    <h4 className="text-[15px] font-bold text-slate-800 dark:text-slate-100">{opt.label}</h4>
+                    <p className="text-[13px] text-slate-500 dark:text-slate-400 mt-0.5">{opt.desc}</p>
                   </div>
                 </div>
-              );
-            })}
+                <div className="shrink-0 pl-4">
+                  <Switch 
+                    checked={isEnabled(configuraciones[opt.id] ?? (opt.id === 'config_mao' ? 1 : 0))} 
+                    onCheckedChange={() => handleToggle(opt.id)} 
+                  />
+                </div>
+              </div>
+            ))}
           </div>
         </div>
       );
     }
 
-    // ── ESTRUCTURA AGRÍCOLA (HASTA 6 NIVELES) ───────────────────────────
+    // ── ESTRUCTURA AGRÍCOLA ─────────────────────────────────────────────
     if (activeTab === 'estructura') {
       const nivelesCount = configuraciones.estructuraNiveles || 6;
       return (
-        <div className="space-y-6 w-full max-w-4xl fade-in">
-          <div className="flex items-center gap-4 mb-8">
-            <div className="w-12 h-12 rounded-xl bg-emerald-500/10 flex items-center justify-center text-emerald-500 text-2xl border border-emerald-500/20 shadow-md">
+        <div className="space-y-6 w-full max-w-4xl">
+          <div className="flex items-center gap-4 mb-6">
+            <div className="w-12 h-12 rounded-xl bg-emerald-500/10 flex items-center justify-center text-emerald-500 text-2xl border border-emerald-500/20 shadow-sm">
               <Layers size={24} />
             </div>
             <div>
               <h2 className="text-2xl font-bold text-slate-900 dark:text-white tracking-tight">Estructura Jerárquica Agrícola</h2>
-              <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">Configuración de niveles de segregación territorial y unidades productivas</p>
+              <p className="text-sm text-slate-500 dark:text-slate-400 mt-0.5">Configuración de niveles de segregación territorial y unidades productivas</p>
             </div>
           </div>
 
-          <div className="bg-white dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800 rounded-xl p-6 shadow-sm mb-6">
+          <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-6 shadow-sm mb-6">
             <label className="block text-sm font-bold text-slate-700 dark:text-slate-200 mb-2">
               Profundidad de la Jerarquía Territorial
             </label>
@@ -779,7 +740,7 @@ export default function Configuraciones() {
               const defaultNames = ['Sector Geográfico', 'Finca / Predio', 'Lote de Cultivo', 'Suerte / Tablar', 'Variedad / Híbrido', 'Bloque de Riego / Válvula'];
               const key = `nivel${index + 1}`;
               return (
-                <div key={key} className="bg-white dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800 rounded-xl p-5 shadow-sm">
+                <div key={key} className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-5 shadow-sm">
                   <div className="flex items-center justify-between mb-2">
                     <label className="text-xs font-bold uppercase tracking-wider text-emerald-600 dark:text-emerald-400">
                       Nivel {index + 1}
@@ -806,14 +767,14 @@ export default function Configuraciones() {
     // ── MAESTROS ────────────────────────────────────────────────────────
     if (activeTab === 'maestros') {
       return (
-        <div className="space-y-6 w-full max-w-4xl fade-in">
-          <div className="flex items-center gap-4 mb-8">
-            <div className="w-12 h-12 rounded-xl bg-purple-500/10 flex items-center justify-center text-purple-500 text-2xl border border-purple-500/20 shadow-md">
+        <div className="space-y-6 w-full max-w-4xl">
+          <div className="flex items-center gap-4 mb-6">
+            <div className="w-12 h-12 rounded-xl bg-purple-500/10 flex items-center justify-center text-purple-500 text-2xl border border-purple-500/20 shadow-sm">
               <BookOpen size={24} />
             </div>
             <div>
               <h2 className="text-2xl font-bold text-slate-900 dark:text-white tracking-tight">Catálogos Maestros</h2>
-              <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">Active o desactive módulos maestros según la operación de su agroindustria</p>
+              <p className="text-sm text-slate-500 dark:text-slate-400 mt-0.5">Active o desactive módulos maestros según la operación de su agroindustria</p>
             </div>
           </div>
 
@@ -831,43 +792,37 @@ export default function Configuraciones() {
               { id: 'maestro_cuadrillas', label: 'Cuadrillas de Campo', icon: '🧑‍🤝‍🧑' },
               { id: 'maestro_unidades', label: 'Unidades de Medida', icon: '📏' },
               { id: 'maestro_tipos_productos', label: 'Tipos de Productos', icon: '🔖' }
-            ].map(maestro => {
-              const active = isEnabled(configuraciones[maestro.id] ?? 1);
-              return (
-                <div key={maestro.id} className="flex items-center justify-between p-4 rounded-xl bg-white dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800 hover:border-purple-500/40 shadow-sm transition-all">
-                  <div className="flex items-center gap-3">
-                    <span className="text-2xl">{maestro.icon}</span>
-                    <span className="text-sm font-bold text-slate-800 dark:text-slate-100">{maestro.label}</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <span className={`text-[10px] font-bold px-2 py-0.5 rounded ${active ? 'bg-emerald-500/15 text-emerald-600 dark:text-emerald-400' : 'bg-slate-200 dark:bg-slate-800 text-slate-500'}`}>
-                      {active ? 'ON' : 'OFF'}
-                    </span>
-                    <Switch 
-                      checked={active} 
-                      onCheckedChange={() => handleToggle(maestro.id)} 
-                    />
-                  </div>
+            ].map(maestro => (
+              <div key={maestro.id} className="flex items-center justify-between p-4 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700 shadow-sm transition-all">
+                <div className="flex items-center gap-3">
+                  <span className="text-2xl">{maestro.icon}</span>
+                  <span className="text-sm font-bold text-slate-800 dark:text-slate-100">{maestro.label}</span>
                 </div>
-              );
-            })}
+                <div className="shrink-0 pl-4">
+                  <Switch 
+                    checked={isEnabled(configuraciones[maestro.id] ?? 1)} 
+                    onCheckedChange={() => handleToggle(maestro.id)} 
+                  />
+                </div>
+              </div>
+            ))}
           </div>
         </div>
       );
     }
 
-    // ── IMPORTACIÓN MASIVA (CSV) ────────────────────────────────────────
+    // ── IMPORTACIÓN MASIVA ──────────────────────────────────────────────
     if (activeTab === 'importacion') {
       return (
-        <div className="space-y-6 w-full max-w-4xl fade-in">
-          <div className="flex items-center justify-between mb-8">
+        <div className="space-y-6 w-full max-w-4xl">
+          <div className="flex items-center justify-between mb-6">
             <div className="flex items-center gap-4">
-              <div className="w-12 h-12 rounded-xl bg-emerald-500/10 flex items-center justify-center text-emerald-500 text-2xl border border-emerald-500/20 shadow-md">
+              <div className="w-12 h-12 rounded-xl bg-emerald-500/10 flex items-center justify-center text-emerald-500 text-2xl border border-emerald-500/20 shadow-sm">
                 <UploadCloud size={24} />
               </div>
               <div>
                 <h2 className="text-2xl font-bold text-slate-900 dark:text-white tracking-tight">Importación Masiva de Datos</h2>
-                <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">Cargue fácilmente planillas CSV o Excel a cualquier catálogo del sistema</p>
+                <p className="text-sm text-slate-500 dark:text-slate-400 mt-0.5">Cargue fácilmente planillas CSV o Excel a cualquier catálogo del sistema</p>
               </div>
             </div>
           </div>
@@ -887,7 +842,7 @@ export default function Configuraciones() {
                 { id: 'actividades', label: 'Catálogo de Labores', icon: '📝', desc: 'Jornales, grupos, cultivos' },
                 { id: 'monitoreo', label: 'Monitoreo Fitosanitario', icon: '🔬', desc: 'Plagas, coordenadas GPS' }
               ].map(tpl => (
-                <div key={tpl.id} className="p-4 rounded-xl bg-white dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800 hover:border-emerald-500/40 shadow-sm flex flex-col justify-between gap-3 transition-all">
+                <div key={tpl.id} className="p-4 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700 shadow-sm flex flex-col justify-between gap-3 transition-all">
                   <div className="flex items-start gap-3">
                     <span className="text-2xl">{tpl.icon}</span>
                     <div>
@@ -897,7 +852,7 @@ export default function Configuraciones() {
                   </div>
                   <button 
                     onClick={() => downloadTemplate(tpl.id)}
-                    className="w-full py-1.5 px-3 rounded-lg text-xs font-bold bg-slate-100 dark:bg-slate-800 hover:bg-emerald-500 hover:text-white dark:hover:bg-emerald-600 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-700 flex items-center justify-center gap-1.5 transition-colors"
+                    className="w-full py-1.5 px-3 rounded-lg text-xs font-bold bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-700 flex items-center justify-center gap-1.5 transition-colors"
                   >
                     <Download size={13} />
                     <span>Descargar Plantilla</span>
@@ -908,7 +863,7 @@ export default function Configuraciones() {
           </div>
 
           {/* Zona de Carga de Archivo */}
-          <div className="bg-white dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800 rounded-xl p-6 shadow-sm space-y-4">
+          <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-6 shadow-sm space-y-4">
             <h3 className="text-sm font-bold text-slate-900 dark:text-white flex items-center gap-2">
               <FileSpreadsheet size={16} className="text-emerald-500" />
               2. Subir Archivo CSV con Datos
@@ -941,7 +896,7 @@ export default function Configuraciones() {
                   type="file"
                   accept=".csv"
                   onChange={handleFileUpload}
-                  className="w-full text-xs text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-emerald-500 file:text-white hover:file:bg-emerald-600 cursor-pointer"
+                  className="w-full text-xs text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-emerald-600 file:text-white hover:file:bg-emerald-700 cursor-pointer"
                 />
               </div>
             </div>
@@ -1001,23 +956,22 @@ export default function Configuraciones() {
       );
     }
 
-    // ── DATOS DE PRUEBA & DEMO ──────────────────────────────────────────
+    // ── DATOS DE PRUEBA ─────────────────────────────────────────────────
     if (activeTab === 'datos_prueba') {
       return (
-        <div className="space-y-6 w-full max-w-4xl fade-in">
-          <div className="flex items-center gap-4 mb-8">
-            <div className="w-12 h-12 rounded-xl bg-purple-500/10 flex items-center justify-center text-purple-500 text-2xl border border-purple-500/20 shadow-md">
+        <div className="space-y-6 w-full max-w-4xl">
+          <div className="flex items-center gap-4 mb-6">
+            <div className="w-12 h-12 rounded-xl bg-purple-500/10 flex items-center justify-center text-purple-500 text-2xl border border-purple-500/20 shadow-sm">
               <FlaskConical size={24} />
             </div>
             <div>
               <h2 className="text-2xl font-bold text-slate-900 dark:text-white tracking-tight">Generador de Datos de Prueba</h2>
-              <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">Inyecte datasets agrícolas reales o limpie la base de datos para pruebas</p>
+              <p className="text-sm text-slate-500 dark:text-slate-400 mt-0.5">Inyecte datasets agrícolas reales o limpie la base de datos para pruebas</p>
             </div>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {/* Cargar Demo Completo */}
-            <div className="bg-white dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800 rounded-xl p-5 shadow-sm space-y-4 flex flex-col justify-between">
+            <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-5 shadow-sm space-y-4 flex flex-col justify-between">
               <div className="space-y-2">
                 <div className="w-10 h-10 rounded-xl bg-emerald-500/15 text-emerald-500 flex items-center justify-center text-xl">
                   🚀
@@ -1029,15 +983,14 @@ export default function Configuraciones() {
               </div>
               <button
                 onClick={handleLoadFullDemoData}
-                className="w-full py-2.5 px-4 rounded-xl text-xs font-bold bg-emerald-500 hover:bg-emerald-600 text-white shadow-md flex items-center justify-center gap-2 transition-colors"
+                className="w-full py-2.5 px-4 rounded-xl text-xs font-bold bg-emerald-600 hover:bg-emerald-700 text-white shadow-md flex items-center justify-center gap-2 transition-colors"
               >
                 <Play size={14} />
                 <span>Inyectar Dataset Agrícola</span>
               </button>
             </div>
 
-            {/* Limpiar Datos Operativos */}
-            <div className="bg-white dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800 rounded-xl p-5 shadow-sm space-y-4 flex flex-col justify-between">
+            <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-5 shadow-sm space-y-4 flex flex-col justify-between">
               <div className="space-y-2">
                 <div className="w-10 h-10 rounded-xl bg-amber-500/15 text-amber-500 flex items-center justify-center text-xl">
                   🧹
@@ -1056,8 +1009,7 @@ export default function Configuraciones() {
               </button>
             </div>
 
-            {/* Restaurar Fábrica */}
-            <div className="bg-white dark:bg-slate-900/60 border border-red-500/20 rounded-xl p-5 shadow-sm space-y-4 flex flex-col justify-between md:col-span-2">
+            <div className="bg-white dark:bg-slate-900 border border-red-500/20 rounded-xl p-5 shadow-sm space-y-4 flex flex-col justify-between md:col-span-2">
               <div className="space-y-2">
                 <div className="flex items-center gap-3">
                   <div className="w-10 h-10 rounded-xl bg-red-500/15 text-red-500 flex items-center justify-center text-xl">
@@ -1073,7 +1025,7 @@ export default function Configuraciones() {
               </div>
               <button
                 onClick={handleResetFactory}
-                className="w-full py-2.5 px-4 rounded-xl text-xs font-bold bg-red-500 hover:bg-red-600 text-white shadow-md flex items-center justify-center gap-2 transition-colors"
+                className="w-full py-2.5 px-4 rounded-xl text-xs font-bold bg-red-600 hover:bg-red-700 text-white shadow-md flex items-center justify-center gap-2 transition-colors"
               >
                 <RefreshCw size={14} />
                 <span>Restaurar Valores de Fábrica</span>
@@ -1100,29 +1052,20 @@ export default function Configuraciones() {
       };
 
       return (
-        <div className="space-y-6 w-full max-w-4xl fade-in">
-          <div className="flex items-center justify-between mb-8">
+        <div className="space-y-6 w-full max-w-4xl">
+          <div className="flex items-center justify-between mb-6">
             <div className="flex items-center gap-4">
-              <div className="w-12 h-12 rounded-xl bg-emerald-500/10 flex items-center justify-center text-emerald-500 text-2xl border border-emerald-500/20 shadow-md">
+              <div className="w-12 h-12 rounded-xl bg-emerald-500/10 flex items-center justify-center text-emerald-500 text-2xl border border-emerald-500/20 shadow-sm">
                 <Sparkles size={24} />
               </div>
               <div>
                 <h2 className="text-2xl font-bold text-slate-900 dark:text-white tracking-tight">Inteligencia Artificial & Satélite Python</h2>
-                <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">Microservicio Python para telemetría multiespectral, NDVI e IA agronómica</p>
-              </div>
-            </div>
-            <div className="bg-emerald-500/10 border border-emerald-500/20 px-4 py-3 rounded-xl flex items-center gap-3">
-              <div className="w-6 h-6 rounded-full bg-emerald-500/20 flex items-center justify-center text-emerald-600 dark:text-emerald-400 text-xs font-bold">
-                ✓
-              </div>
-              <div>
-                <h4 className="text-sm font-semibold text-emerald-600 dark:text-emerald-400">Microservicio Python Activo</h4>
-                <p className="text-[11px] text-slate-500 dark:text-slate-400">Puerto 8000 · Conectado vía Node Gateway</p>
+                <p className="text-sm text-slate-500 dark:text-slate-400 mt-0.5">Microservicio Python para telemetría multiespectral, NDVI e IA agronómica</p>
               </div>
             </div>
           </div>
 
-          <div className="bg-white dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800 rounded-xl p-6 shadow-sm space-y-4">
+          <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-6 shadow-sm space-y-4">
             <div className="flex items-center justify-between">
               <div>
                 <h3 className="text-sm font-bold text-slate-900 dark:text-white">Estado de Conexión del Motor IA</h3>
@@ -1168,31 +1111,29 @@ export default function Configuraciones() {
       ];
 
       return (
-        <div className="space-y-6 w-full max-w-5xl fade-in">
-          <div className="flex items-center justify-between mb-8">
+        <div className="space-y-6 w-full max-w-5xl">
+          <div className="flex items-center justify-between mb-6">
             <div className="flex items-center gap-4">
-              <div className="w-12 h-12 rounded-xl bg-emerald-500/10 flex items-center justify-center text-emerald-500 text-2xl border border-emerald-500/20 shadow-md">
+              <div className="w-12 h-12 rounded-xl bg-emerald-500/10 flex items-center justify-center text-emerald-500 text-2xl border border-emerald-500/20 shadow-sm">
                 <Palette size={24} />
               </div>
               <div>
                 <h2 className="text-2xl font-bold text-slate-900 dark:text-white tracking-tight">Apariencia & Personalización</h2>
-                <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">Seleccione el esquema de color y la base visual de la plataforma</p>
+                <p className="text-sm text-slate-500 dark:text-slate-400 mt-0.5">Seleccione el esquema de color y la base visual de la plataforma</p>
               </div>
             </div>
           </div>
           
-          <div className="bg-white dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800 rounded-xl p-5 mb-6 flex items-center justify-between shadow-sm">
+          <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-5 mb-6 flex items-center justify-between shadow-sm">
             <div>
-              <h4 className="text-[15px] font-bold text-slate-900 dark:text-white">Modo Claro / Oscuro</h4>
-              <p className="text-[13px] text-slate-500 dark:text-slate-400 mt-0.5">Alterna la paleta general manteniendo la visibilidad y alto contraste.</p>
+              <h4 className="text-[15px] font-bold text-slate-900 dark:text-white">Modo Oscuro</h4>
+              <p className="text-[13px] text-slate-500 dark:text-slate-400 mt-0.5">Alterna la base visual entre modo claro y modo oscuro.</p>
             </div>
-            <div className="flex items-center gap-3">
-              <span className={`text-xs font-bold ${configuraciones.modoOscuro === 0 ? 'text-emerald-600' : 'text-slate-400'}`}>Claro</span>
+            <div className="shrink-0 pl-4">
               <Switch 
                 checked={configuraciones.modoOscuro !== 0} 
                 onCheckedChange={() => handleToggle('modoOscuro')} 
               />
-              <span className={`text-xs font-bold ${configuraciones.modoOscuro !== 0 ? 'text-emerald-500' : 'text-slate-400'}`}>Oscuro</span>
             </div>
           </div>
 
@@ -1203,18 +1144,18 @@ export default function Configuraciones() {
                 <button
                   key={theme.id}
                   onClick={() => handleThemeChange(theme.id)}
-                  className={`relative text-left rounded-xl overflow-hidden border transition-all duration-300 group
+                  className={`relative text-left rounded-xl overflow-hidden border transition-all duration-200 group
                     ${isActive 
-                      ? 'border-emerald-500 ring-2 ring-emerald-500 shadow-lg bg-white dark:bg-slate-900' 
-                      : 'border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/60 hover:border-slate-400 dark:hover:border-slate-700'
+                      ? 'border-emerald-500 ring-2 ring-emerald-500 shadow-md bg-white dark:bg-slate-900' 
+                      : 'border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 hover:border-slate-400 dark:hover:border-slate-600'
                     }
                   `}
                 >
                   <div className="h-32 w-full overflow-hidden relative">
                     <div className="absolute inset-0 bg-gradient-to-t from-slate-900 via-transparent to-transparent z-10"></div>
-                    <img src={theme.img} alt={theme.label} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
+                    <img src={theme.img} alt={theme.label} className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105" />
                     {isActive && (
-                      <div className="absolute top-3 right-3 z-20 w-6 h-6 rounded-full bg-emerald-500 text-white flex items-center justify-center text-xs font-bold shadow-lg">
+                      <div className="absolute top-3 right-3 z-20 w-6 h-6 rounded-full bg-emerald-500 text-white flex items-center justify-center text-xs font-bold shadow-md">
                         ✓
                       </div>
                     )}
@@ -1240,8 +1181,8 @@ export default function Configuraciones() {
     // ── DATOS DE EMPRESA ────────────────────────────────────────────────
     if (activeTab === 'datos_empresa') {
       return (
-        <div className="space-y-6 w-full max-w-4xl fade-in">
-          <div className="flex items-center gap-4 mb-8">
+        <div className="space-y-6 w-full max-w-4xl">
+          <div className="flex items-center gap-4 mb-6">
             <div className="w-12 h-12 rounded-xl bg-emerald-500/10 flex items-center justify-center text-emerald-500 text-2xl border border-emerald-500/20">
               <Building2 size={24} />
             </div>
@@ -1250,7 +1191,7 @@ export default function Configuraciones() {
               <p className="text-sm text-slate-500 dark:text-slate-400">Información corporativa y parámetros regionales</p>
             </div>
           </div>
-          <div className="bg-white dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800 rounded-xl p-6 shadow-sm space-y-4">
+          <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-6 shadow-sm space-y-4">
             {[
               { key: 'empresa', label: 'Razón Social / Organización', placeholder: 'Ej: Ingenio Agrícola de Occidente' },
               { key: 'pais', label: 'País', placeholder: 'Ej: Colombia' },
@@ -1292,17 +1233,17 @@ export default function Configuraciones() {
   };
 
   return (
-    <div className="flex h-full w-full fade-in gap-5 p-0 bg-transparent">
+    <div className="flex h-full w-full gap-5 p-0 bg-transparent">
       {/* Toast Notification */}
       {toastMessage && (
-        <div className="fixed bottom-6 right-6 z-50 bg-emerald-600 text-white font-bold text-xs px-4 py-3 rounded-xl shadow-2xl flex items-center gap-2 animate-bounce">
+        <div className="fixed bottom-6 right-6 z-50 bg-emerald-600 text-white font-bold text-xs px-4 py-3 rounded-xl shadow-2xl flex items-center gap-2">
           <CheckCircle2 size={16} />
           <span>{toastMessage}</span>
         </div>
       )}
 
       {/* Submenu Lateral de Configuración */}
-      <div className="w-[280px] border-r border-slate-200 dark:border-slate-800 flex-shrink-0 z-10 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md flex flex-col h-full overflow-hidden shadow-sm">
+      <div className="w-[280px] border-r border-slate-200 dark:border-slate-800 flex-shrink-0 z-10 bg-white dark:bg-slate-900 flex flex-col h-full overflow-hidden shadow-sm">
         <div className="px-6 py-6 shrink-0 border-b border-slate-200 dark:border-slate-800">
           <h1 className="text-xl font-bold tracking-tight text-slate-900 dark:text-white leading-tight">Configuración</h1>
           <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Parámetros del Sistema</p>
