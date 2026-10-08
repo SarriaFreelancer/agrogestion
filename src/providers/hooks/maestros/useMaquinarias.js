@@ -1,9 +1,41 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { confirmDialog } from '@/utils/swal';
+import { initialMaquinaria, emptyTiposMaquinaria } from '../../mocks';
 
 export function useMaquinarias(syncToDatabase) {
-  const [maquinarias, setMaquinarias] = useState([]);
-  const [tiposMaquinaria, setTiposMaquinaria] = useState([]);
+  const [maquinarias, setMaquinarias] = useState(() => {
+    try {
+      const s = localStorage.getItem('agro_maquinarias');
+      if (s) {
+        const p = JSON.parse(s);
+        if (Array.isArray(p) && p.length > 0) return p;
+      }
+    } catch (e) {}
+    return initialMaquinaria;
+  });
+
+  const [tiposMaquinaria, setTiposMaquinaria] = useState(() => {
+    try {
+      const s = localStorage.getItem('agro_tipos_maquinaria');
+      if (s) {
+        const p = JSON.parse(s);
+        if (Array.isArray(p) && p.length > 0) return p;
+      }
+    } catch (e) {}
+    return emptyTiposMaquinaria;
+  });
+
+  useEffect(() => {
+    try {
+      if (maquinarias?.length) localStorage.setItem('agro_maquinarias', JSON.stringify(maquinarias));
+    } catch (e) {}
+  }, [maquinarias]);
+
+  useEffect(() => {
+    try {
+      if (tiposMaquinaria?.length) localStorage.setItem('agro_tipos_maquinaria', JSON.stringify(tiposMaquinaria));
+    } catch (e) {}
+  }, [tiposMaquinaria]);
 
   // Maquinarias
   const addMaquinaria = (m) => { 

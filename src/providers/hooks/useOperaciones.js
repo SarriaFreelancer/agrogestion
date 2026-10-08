@@ -1,9 +1,40 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { confirmDialog } from '@/utils/swal';
 
 export function useOperaciones(syncToDatabase, productos, setProductos) {
-  const [planificaciones, setPlanificaciones] = useState([]);
-  const [movimientosInventario, setMovimientosInventario] = useState([]);
+  const [planificaciones, setPlanificaciones] = useState(() => {
+    try {
+      const s = localStorage.getItem('agro_planificaciones');
+      if (s) {
+        const p = JSON.parse(s);
+        if (Array.isArray(p)) return p;
+      }
+    } catch (e) {}
+    return [];
+  });
+
+  const [movimientosInventario, setMovimientosInventario] = useState(() => {
+    try {
+      const s = localStorage.getItem('agro_movimientos_inventario');
+      if (s) {
+        const p = JSON.parse(s);
+        if (Array.isArray(p)) return p;
+      }
+    } catch (e) {}
+    return [];
+  });
+
+  useEffect(() => {
+    try {
+      localStorage.setItem('agro_planificaciones', JSON.stringify(planificaciones));
+    } catch (e) {}
+  }, [planificaciones]);
+
+  useEffect(() => {
+    try {
+      localStorage.setItem('agro_movimientos_inventario', JSON.stringify(movimientosInventario));
+    } catch (e) {}
+  }, [movimientosInventario]);
 
   // Planificación
   const addPlanificacion = (plan) => { 
@@ -38,12 +69,14 @@ export function useOperaciones(syncToDatabase, productos, setProductos) {
     let cantNum = parseFloat(cantidad) || 0;
     if (tipo === 'Salida') cantNum = -cantNum;
 
-    setProductos(prev => prev.map(p => {
-      if (p.id === prodId || p.nombre === prodId) {
-        return { ...p, stockActual: Math.max(0, (p.stockActual || 0) + cantNum) };
-      }
-      return p;
-    }));
+    if (setProductos) {
+      setProductos(prev => prev.map(p => {
+        if (p.id === prodId || p.nombre === prodId) {
+          return { ...p, stockActual: Math.max(0, (p.stockActual || 0) + cantNum) };
+        }
+        return p;
+      }));
+    }
 
     const mov = {
       id: Date.now().toString(),
@@ -54,7 +87,6 @@ export function useOperaciones(syncToDatabase, productos, setProductos) {
       referencia: ref
     };
     setMovimientosInventario(prev => [mov, ...prev]);
-    // Optionally sync inventory movement here
   };
 
   const ejecutarPlanificacion = (planId, extraData = {}) => {

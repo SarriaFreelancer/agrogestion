@@ -1,10 +1,58 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { confirmDialog } from '@/utils/swal';
+import { emptyControlesAgro } from '../mocks';
 
 export function useMonitoreo(syncToDatabase) {
-  const [controlesAgro, setControlesAgro] = useState([]);
-  const [registrosControles, setRegistrosControles] = useState([]);
-  const [mantenimientos, setMantenimientos] = useState([]);
+  const [controlesAgro, setControlesAgro] = useState(() => {
+    try {
+      const s = localStorage.getItem('agro_controles');
+      if (s) {
+        const p = JSON.parse(s);
+        if (Array.isArray(p) && p.length > 0) return p;
+      }
+    } catch (e) {}
+    return emptyControlesAgro;
+  });
+
+  const [registrosControles, setRegistrosControles] = useState(() => {
+    try {
+      const s = localStorage.getItem('agro_registros_controles');
+      if (s) {
+        const p = JSON.parse(s);
+        if (Array.isArray(p)) return p;
+      }
+    } catch (e) {}
+    return [];
+  });
+
+  const [mantenimientos, setMantenimientos] = useState(() => {
+    try {
+      const s = localStorage.getItem('agro_mantenimientos');
+      if (s) {
+        const p = JSON.parse(s);
+        if (Array.isArray(p)) return p;
+      }
+    } catch (e) {}
+    return [];
+  });
+
+  useEffect(() => {
+    try {
+      if (controlesAgro?.length) localStorage.setItem('agro_controles', JSON.stringify(controlesAgro));
+    } catch (e) {}
+  }, [controlesAgro]);
+
+  useEffect(() => {
+    try {
+      localStorage.setItem('agro_registros_controles', JSON.stringify(registrosControles));
+    } catch (e) {}
+  }, [registrosControles]);
+
+  useEffect(() => {
+    try {
+      localStorage.setItem('agro_mantenimientos', JSON.stringify(mantenimientos));
+    } catch (e) {}
+  }, [mantenimientos]);
 
   // Controles
   const addControl = (c) => {
@@ -44,7 +92,6 @@ export function useMonitoreo(syncToDatabase) {
   const addMantenimiento = (m) => {
     const n = { ...m, id: m.id || Date.now().toString() };
     setMantenimientos([...mantenimientos, n]);
-    // syncToDatabase('Mantenimiento', 'add', n); // If schema exists
   };
   const editMantenimiento = (id, newProps) => {
     setMantenimientos(mantenimientos.map(m => m.id === id ? { ...m, ...newProps } : m));

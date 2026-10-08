@@ -1,8 +1,24 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { confirmDialog } from '@/utils/swal';
+import { initialUnidades } from '../../mocks';
 
 export function useUnidades(syncToDatabase) {
-  const [unidades, setUnidades] = useState([]);
+  const [unidades, setUnidades] = useState(() => {
+    try {
+      const s = localStorage.getItem('agro_unidades');
+      if (s) {
+        const p = JSON.parse(s);
+        if (Array.isArray(p) && p.length > 0) return p;
+      }
+    } catch (e) {}
+    return initialUnidades;
+  });
+
+  useEffect(() => {
+    try {
+      if (unidades?.length) localStorage.setItem('agro_unidades', JSON.stringify(unidades));
+    } catch (e) {}
+  }, [unidades]);
 
   const addUnidad = (u) => { 
     const n = { ...u, id: u.id || Date.now().toString() }; 

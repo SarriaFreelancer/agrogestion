@@ -1,8 +1,30 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { confirmDialog } from '@/utils/swal';
+import { initialData } from '../mocks';
 
 export function useEstructura(syncToDatabase) {
-  const [sectores, setSectores] = useState([]);
+  const [sectores, setSectores] = useState(() => {
+    try {
+      const saved = localStorage.getItem('agro_sectores');
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+      }
+    } catch (e) {
+      console.warn('Error reading agro_sectores from localStorage', e);
+    }
+    return initialData;
+  });
+
+  useEffect(() => {
+    try {
+      if (sectores && Array.isArray(sectores) && sectores.length > 0) {
+        localStorage.setItem('agro_sectores', JSON.stringify(sectores));
+      }
+    } catch (e) {
+      console.warn('Error saving agro_sectores to localStorage', e);
+    }
+  }, [sectores]);
 
   // Recursive Area Helpers across 6 Levels
   const calcSurcoHa = (surco) => Number(surco.hectareas || 0);
@@ -100,40 +122,34 @@ export function useEstructura(syncToDatabase) {
     } else if (newNode.type === 'Lote') {
       syncToDatabase('Lote', 'add', { id: newNode.id, fincaCodigo: parentId, nombre: newNode.name });
     } else if (newNode.type === 'Suerte') {
-      syncToDatabase('Suerte', 'add', { id: newNode.id, loteCodigo: parentId, nombre: newNode.name, hectareas: newNode.hectareas || 0, plantas: newNode.plantas || 0, cultivo: newNode.cultivo || '', estado: newNode.estado || 'Activo' });
-    } else if (newNode.type === 'Surco' || newNode.type === 'Seccion') {
-      syncToDatabase('Surco', 'add', { id: newNode.id, suerteCodigo: parentId, nombre: newNode.name, hectareas: newNode.hectareas || 0 });
+      syncToDatabase('Suerte', 'add', { id: newNode.id, loteCodigo: parentId, nombre: newNode.name, hectareas: newNode.hectareas, cultivo: newNode.cultivo, geometria: newNode.geometria });
     }
   };
 
-  const addSector = (sector) => {
-    const s = { ...sector, id: sector.id || Date.now().toString(), type: 'Sector', plantaCliente: sector.plantaCliente || 'N/A', fincas: [], suertes: [], sectores: [] };
-    setSectores([...sectores, s]);
-    syncToDatabase('Sector', 'add', s);
-  };
-
-  const removeNode = (nodes, id, type = null) => {
+  const removeNode = (nodes, id) => {
     return nodes
-      .filter(node => !(node.id === id && (!type || node.type === type)))
+      .filter(node => node.id !== id)
       .map(node => ({
         ...node,
-        zonas: node.zonas ? removeNode(node.zonas, id, type) : undefined,
-        sectores: node.sectores ? removeNode(node.sectores, id, type) : undefined,
-        fincas: node.fincas ? removeNode(node.fincas, id, type) : undefined,
-        lotes: node.lotes ? removeNode(node.lotes, id, type) : undefined,
-        suertes: node.suertes ? removeNode(node.suertes, id, type) : undefined,
-        surcos: node.surcos ? removeNode(node.surcos, id, type) : undefined
+        zonas: node.zonas ? removeNode(node.zonas, id) : undefined,
+        sectores: node.sectores ? removeNode(node.sectores, id) : undefined,
+        fincas: node.fincas ? removeNode(node.fincas, id) : undefined,
+        lotes: node.lotes ? removeNode(node.lotes, id) : undefined,
+        suertes: node.suertes ? removeNode(node.suertes, id) : undefined,
+        surcos: node.surcos ? removeNode(node.surcos, id) : undefined
       }));
   };
 
-  const deleteEstructura = async (id, type = null) => { 
-    if (await confirmDialog('¿Eliminar este nivel y todos sus sub-elementos?', { title: 'Eliminar estructura' })) {
-      setSectores(removeNode(sectores, id, type)); 
+  const deleteElementoEstructura = async (id, type) => {
+    if (await confirmDialog(`¿Está seguro de eliminar este elemento (${type}) y todos sus descendientes?`, { title: 'Eliminar elemento' })) {
+      setSectores(removeNode(sectores, id));
+      if (type) syncToDatabase(type, 'delete', { id });
     }
   };
 
   return {
-    sectores, setSectores, updateEstructura, addSector, addElementoEstructura, deleteEstructura,
-    calcTotalHa, calcLotesActivos, calcLoteHa, calcFincaHa, calcSectorHa, calcZonaHa, calcSuerteHa
+    sectores, setSectores,
+    calcTotalHa, calcLotesActivos,
+    updateEstructura, addElementoEstructura, deleteElementoEstructura
   };
 }

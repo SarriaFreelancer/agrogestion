@@ -1,9 +1,41 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { confirmDialog } from '@/utils/swal';
+import { initialProductos, initialTiposProductos } from '../../mocks';
 
 export function useProductos(syncToDatabase) {
-  const [productos, setProductos] = useState([]);
-  const [tiposProductos, setTiposProductos] = useState([]);
+  const [productos, setProductos] = useState(() => {
+    try {
+      const s = localStorage.getItem('agro_productos');
+      if (s) {
+        const p = JSON.parse(s);
+        if (Array.isArray(p) && p.length > 0) return p;
+      }
+    } catch (e) {}
+    return initialProductos;
+  });
+
+  const [tiposProductos, setTiposProductos] = useState(() => {
+    try {
+      const s = localStorage.getItem('agro_tipos_productos');
+      if (s) {
+        const p = JSON.parse(s);
+        if (Array.isArray(p) && p.length > 0) return p;
+      }
+    } catch (e) {}
+    return initialTiposProductos;
+  });
+
+  useEffect(() => {
+    try {
+      if (productos?.length) localStorage.setItem('agro_productos', JSON.stringify(productos));
+    } catch (e) {}
+  }, [productos]);
+
+  useEffect(() => {
+    try {
+      if (tiposProductos?.length) localStorage.setItem('agro_tipos_productos', JSON.stringify(tiposProductos));
+    } catch (e) {}
+  }, [tiposProductos]);
 
   // Productos
   const addProducto = (p) => { 

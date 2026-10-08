@@ -1,8 +1,24 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { confirmDialog } from '@/utils/swal';
+import { initialCuadrillas } from '../../mocks';
 
 export function useCuadrillas(syncToDatabase) {
-  const [cuadrillas, setCuadrillas] = useState([]);
+  const [cuadrillas, setCuadrillas] = useState(() => {
+    try {
+      const s = localStorage.getItem('agro_cuadrillas');
+      if (s) {
+        const p = JSON.parse(s);
+        if (Array.isArray(p) && p.length > 0) return p;
+      }
+    } catch (e) {}
+    return initialCuadrillas;
+  });
+
+  useEffect(() => {
+    try {
+      if (cuadrillas?.length) localStorage.setItem('agro_cuadrillas', JSON.stringify(cuadrillas));
+    } catch (e) {}
+  }, [cuadrillas]);
 
   const addCuadrilla = (c) => { 
     const n = { ...c, id: c.id || Date.now().toString() }; 

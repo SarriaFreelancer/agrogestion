@@ -1,8 +1,24 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { confirmDialog } from '@/utils/swal';
+import { initialProveedores } from '../../mocks';
 
 export function useProveedores(syncToDatabase) {
-  const [proveedores, setProveedores] = useState([]);
+  const [proveedores, setProveedores] = useState(() => {
+    try {
+      const s = localStorage.getItem('agro_proveedores');
+      if (s) {
+        const p = JSON.parse(s);
+        if (Array.isArray(p) && p.length > 0) return p;
+      }
+    } catch (e) {}
+    return initialProveedores;
+  });
+
+  useEffect(() => {
+    try {
+      if (proveedores?.length) localStorage.setItem('agro_proveedores', JSON.stringify(proveedores));
+    } catch (e) {}
+  }, [proveedores]);
 
   const addProveedor = (p) => { 
     const n = { ...p, id: p.id || Date.now().toString() }; 

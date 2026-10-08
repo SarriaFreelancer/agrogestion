@@ -1,8 +1,24 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { confirmDialog } from '@/utils/swal';
+import { initialCultivos } from '../../mocks';
 
 export function useCultivos(syncToDatabase) {
-  const [cultivos, setCultivos] = useState([]);
+  const [cultivos, setCultivos] = useState(() => {
+    try {
+      const s = localStorage.getItem('agro_cultivos');
+      if (s) {
+        const p = JSON.parse(s);
+        if (Array.isArray(p) && p.length > 0) return p;
+      }
+    } catch (e) {}
+    return initialCultivos;
+  });
+
+  useEffect(() => {
+    try {
+      if (cultivos?.length) localStorage.setItem('agro_cultivos', JSON.stringify(cultivos));
+    } catch (e) {}
+  }, [cultivos]);
 
   const addCultivo = (c) => { 
     const n = { ...c, id: c.id || Date.now().toString() }; 

@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState, useMemo } from 'react';
 import { useAgro } from '@/providers/AgroContext';
+import { initialData } from '@/providers/mocks';
 import { 
   Map as MapIcon, 
   Satellite, 
@@ -67,10 +68,26 @@ export default function MapaCalor() {
   // 'personal': Tracking de Cuadrillas & Personal en Campo
   // 'maquinaria': Tracking de Maquinaria & Telemetría IoT
   // 'palmas': Censo Individual Planta a Planta (Palmas/Árboles)
-  const [gisMode, setGisMode] = useState('catastro');
+  const [gisMode, setGisMode] = useState(() => {
+    return localStorage.getItem('agro_gis_mode') || 'catastro';
+  });
 
   // Base map type: 'satellite' | 'osm' | 'dark'
-  const [mapType, setMapType] = useState('satellite');
+  const [mapType, setMapType] = useState(() => {
+    return localStorage.getItem('agro_gis_map_type') || 'satellite';
+  });
+
+  useEffect(() => {
+    try {
+      localStorage.setItem('agro_gis_mode', gisMode);
+    } catch (e) {}
+  }, [gisMode]);
+
+  useEffect(() => {
+    try {
+      localStorage.setItem('agro_gis_map_type', mapType);
+    } catch (e) {}
+  }, [mapType]);
 
   // Selections and toggles
   const [selectedSuerte, setSelectedSuerte] = useState(null);
@@ -86,16 +103,28 @@ export default function MapaCalor() {
   const [palmFilterStatus, setPalmFilterStatus] = useState('all'); // 'all' | 'Sana' | 'Alerta' | 'Enferma' | 'Vacio'
 
   // Geofence GPS Simulator & Validator state
-  const [testGps, setTestGps] = useState({ lat: '3.4530', lng: '-76.5330' });
+  const [testGps, setTestGps] = useState({ lat: '3.5285', lng: '-76.2980' });
   const [validationResult, setValidationResult] = useState(null);
 
   // Configuration settings for Plant Census
-  const [palmSettings, setPalmSettings] = useState({
-    distanciaSiembra: 9, // 9m marco triangular tresbolillo
-    variedad: 'Tenera Guineensis x Oleifera',
-    anodeSiembra: 2021,
-    densidadHa: 143
+  const [palmSettings, setPalmSettings] = useState(() => {
+    try {
+      const s = localStorage.getItem('agro_gis_palm_settings');
+      if (s) return JSON.parse(s);
+    } catch (e) {}
+    return {
+      distanciaSiembra: 9, // 9m marco triangular tresbolillo
+      variedad: 'Tenera Guineensis x Oleifera',
+      anodeSiembra: 2021,
+      densidadHa: 143
+    };
   });
+
+  useEffect(() => {
+    try {
+      localStorage.setItem('agro_gis_palm_settings', JSON.stringify(palmSettings));
+    } catch (e) {}
+  }, [palmSettings]);
 
   // ── Helper recursivo para extraer todas las suertes y lotes ─────────────
   const extractAllSuertesAndLotes = (nodes) => {
@@ -156,7 +185,20 @@ export default function MapaCalor() {
     return { suertes, lotes };
   };
 
-  const { suertes: allSuertes, lotes: allLotes } = useMemo(() => extractAllSuertesAndLotes(sectores), [sectores]);
+  // Safe fallback to initialData if sectores is ever empty
+  const rawSectores = useMemo(() => {
+    if (sectores && Array.isArray(sectores) && sectores.length > 0) return sectores;
+    try {
+      const saved = localStorage.getItem('agro_sectores');
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+      }
+    } catch (e) {}
+    return initialData;
+  }, [sectores]);
+
+  const { suertes: allSuertes, lotes: allLotes } = useMemo(() => extractAllSuertesAndLotes(rawSectores), [rawSectores]);
 
   // Superficie y estadísticas
   const totalSuertesCount = allSuertes.length;
@@ -167,7 +209,7 @@ export default function MapaCalor() {
     if (allSuertes.length > 0 && allSuertes[0].geometria && allSuertes[0].geometria[0]) {
       return allSuertes[0].geometria[0];
     }
-    return [3.4530, -76.5330];
+    return [3.5285, -76.2980];
   }, [allSuertes]);
 
   // ── Generador / Modelado de Tracking de Personal en Campo ────────────────
@@ -185,8 +227,8 @@ export default function MapaCalor() {
       const wInfo = baseNames[idx % baseNames.length];
       if (st.geometria && st.geometria.length > 0) {
         const pt = st.geometria[0];
-        const offsetLat = (Math.sin(idx * 2) * 0.0008);
-        const offsetLng = (Math.cos(idx * 2) * 0.0008);
+        const offsetLat = (Math.sin(idx * 2) * 0.0006);
+        const offsetLng = (Math.cos(idx * 2) * 0.0006);
         list.push({
           id: `WRK-${idx + 101}`,
           nombre: wInfo.name,
@@ -226,8 +268,8 @@ export default function MapaCalor() {
           ...mInfo,
           suerteName: st.name,
           fincaName: st.fincaName,
-          lat: pt[0] + (Math.cos(idx * 3) * 0.0006),
-          lng: pt[1] + (Math.sin(idx * 3) * 0.0006),
+          lat: pt[0] + (Math.cos(idx * 3) * 0.0005),
+          lng: pt[1] + (Math.sin(idx * 3) * 0.0005),
           horometro: `${(1420 + idx * 85).toFixed(1)} h`,
           ultimaConexion: 'En línea (GPS Activo)'
         });
@@ -238,29 +280,39 @@ export default function MapaCalor() {
   }, [allSuertes]);
 
   // ── Generador / Modelado de Censo Individual Palma a Palma ──────────────
-  const [palmsList, setPalmsList] = useState([]);
+  const [palmsList, setPalmsList] = useState(() => {
+    try {
+      const s = localStorage.getItem('agro_gis_palms');
+      if (s) {
+        const p = JSON.parse(s);
+        if (Array.isArray(p) && p.length > 0) return p;
+      }
+    } catch (e) {}
+    return [];
+  });
 
   useEffect(() => {
     if (allSuertes.length === 0) return;
     const targetSuerte = selectedSuerte ? selectedSuerte.suerte : allSuertes[0];
     if (!targetSuerte || !targetSuerte.geometria || targetSuerte.geometria.length < 3) return;
 
+    // If already generated and has matching target, keep
+    if (palmsList.length > 0 && palmsList[0].suerteName === targetSuerte.name) return;
+
     const baseLat = targetSuerte.geometria[0][0];
     const baseLng = targetSuerte.geometria[0][1];
     const generated = [];
 
-    // Generar grilla georreferenciada de palmas (ej. 6 filas x 8 columnas = 48 palmas individuales)
     const rows = 6;
     const cols = 8;
-    const stepLat = 0.00022; // ~24 metros
-    const stepLng = 0.00024;
-
+    const stepLat = 0.00018;
+    const stepLng = 0.00020;
     const statuses = ['Sana', 'Sana', 'Sana', 'Sana', 'Alerta', 'Enferma', 'Vacio'];
 
     let count = 1;
     for (let r = 0; r < rows; r++) {
       for (let c = 0; c < cols; c++) {
-        const offsetC = (r % 2 === 1) ? stepLng * 0.5 : 0; // Tresbolillo
+        const offsetC = (r % 2 === 1) ? stepLng * 0.5 : 0;
         const pLat = baseLat + (r - rows / 2) * stepLat;
         const pLng = baseLng + (c - cols / 2) * stepLng + offsetC;
         const status = statuses[(r * cols + c) % statuses.length];
@@ -292,36 +344,50 @@ export default function MapaCalor() {
     }
 
     setPalmsList(generated);
+    try {
+      localStorage.setItem('agro_gis_palms', JSON.stringify(generated));
+    } catch (e) {}
   }, [allSuertes, selectedSuerte, palmSettings]);
-
-  // ── Inicializar mapa Leaflet ────────────────────────────────────────────
-  useEffect(() => {
-    if (!mapInstance.current && window.L && mapRef.current) {
-      mapInstance.current = window.L.map(mapRef.current, {
-        zoomControl: false
-      }).setView(defaultCenter, 14);
-
-      window.L.control.zoom({ position: 'bottomright' }).addTo(mapInstance.current);
-
-      baseTileLayer.current = window.L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
-        attribution: '© Esri, Maxar, Earthstar Geographics'
-      }).addTo(mapInstance.current);
-
-      markersLayer.current = window.L.layerGroup().addTo(mapInstance.current);
-      heatLayerGroup.current = window.L.layerGroup().addTo(mapInstance.current);
-
-      // On map click -> set GPS validator coords
-      mapInstance.current.on('click', (e) => {
-        setTestGps({
-          lat: e.latlng.lat.toFixed(5),
-          lng: e.latlng.lng.toFixed(5)
-        });
-      });
-    }
-  }, []);
 
   // CARTO Basemaps API Key oficial
   const CARTO_API_KEY = 'cb1_4dz5_1_6e0c0b2aaa6bc37eadf27bcd';
+
+  // ── Inicializar mapa Leaflet Seguro ─────────────────────────────────────
+  useEffect(() => {
+    const initMap = () => {
+      if (!mapInstance.current && window.L && mapRef.current) {
+        mapInstance.current = window.L.map(mapRef.current, {
+          zoomControl: false
+        }).setView(defaultCenter, 14);
+
+        window.L.control.zoom({ position: 'bottomright' }).addTo(mapInstance.current);
+
+        const tileUrl = mapType === 'satellite'
+          ? 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}'
+          : mapType === 'osm'
+            ? 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png'
+            : `https://basemaps.cartocdn.com/rastertiles/dark_all/{z}/{x}/{y}.png?key=${CARTO_API_KEY}`;
+
+        baseTileLayer.current = window.L.tileLayer(tileUrl, {
+          attribution: '© AgroGestión GIS / Esri / CARTO / OSM'
+        }).addTo(mapInstance.current);
+
+        markersLayer.current = window.L.layerGroup().addTo(mapInstance.current);
+        heatLayerGroup.current = window.L.layerGroup().addTo(mapInstance.current);
+
+        mapInstance.current.on('click', (e) => {
+          setTestGps({
+            lat: e.latlng.lat.toFixed(5),
+            lng: e.latlng.lng.toFixed(5)
+          });
+        });
+      }
+    };
+
+    initMap();
+    const timer = setTimeout(initMap, 250);
+    return () => clearTimeout(timer);
+  }, []);
 
   // Cambiar tipo de mapa base
   useEffect(() => {
@@ -471,20 +537,22 @@ export default function MapaCalor() {
 
     // ── 2. MODO CALOR: MAPA DE CALOR & MUESTREOS AGRONÓMICOS ──────────────
     if (gisMode === 'calor') {
+      const baseLat = boundsPoints.length > 0 ? boundsPoints[0][0] : 3.5285;
+      const baseLng = boundsPoints.length > 0 ? boundsPoints[0][1] : -76.2980;
+
       const heatPoints = [
-        { lat: 3.4540, lng: -76.5340, severidad: 38, plaga: 'Diatraea saccharalis (Barrenador)', nivel: 'Crítico', color: '#ef4444' },
-        { lat: 3.4532, lng: -76.5325, severidad: 24, plaga: 'Spodoptera frugiperda (Gusano Cogollero)', nivel: 'Alto', color: '#f97316' },
-        { lat: 3.4520, lng: -76.5335, severidad: 12, plaga: 'Rhynchophorus palmarum (Picudo)', nivel: 'Medio', color: '#eab308' },
-        { lat: 3.4550, lng: -76.5315, severidad: 4, plaga: 'Puccinia melanocephala (Roya)', nivel: 'Bajo', color: '#10b981' },
-        { lat: 3.4515, lng: -76.5350, severidad: 28, plaga: 'Mahanarva andigena (Salivazo)', nivel: 'Alto', color: '#f97316' },
-        { lat: 3.4528, lng: -76.5310, severidad: 42, plaga: 'Pudrición del Cogollo (PC)', nivel: 'Crítico', color: '#dc2626' }
+        { lat: baseLat + 0.0015, lng: baseLng - 0.0010, severidad: 38, plaga: 'Diatraea saccharalis (Barrenador)', nivel: 'Crítico', color: '#ef4444' },
+        { lat: baseLat + 0.0005, lng: baseLng + 0.0012, severidad: 24, plaga: 'Spodoptera frugiperda (Gusano Cogollero)', nivel: 'Alto', color: '#f97316' },
+        { lat: baseLat - 0.0010, lng: baseLng + 0.0005, severidad: 12, plaga: 'Rhynchophorus palmarum (Picudo)', nivel: 'Medio', color: '#eab308' },
+        { lat: baseLat + 0.0020, lng: baseLng + 0.0018, severidad: 4, plaga: 'Puccinia melanocephala (Roya)', nivel: 'Bajo', color: '#10b981' },
+        { lat: baseLat - 0.0015, lng: baseLng - 0.0015, severidad: 28, plaga: 'Mahanarva andigena (Salivazo)', nivel: 'Alto', color: '#f97316' },
+        { lat: baseLat - 0.0005, lng: baseLng - 0.0020, severidad: 42, plaga: 'Pudrición del Cogollo (PC)', nivel: 'Crítico', color: '#dc2626' }
       ];
 
       heatPoints.forEach((hp, idx) => {
         if (filterPestSeverity === 'critical' && hp.nivel !== 'Crítico') return;
         if (filterPestSeverity === 'high' && hp.nivel !== 'Crítico' && hp.nivel !== 'Alto') return;
 
-        // Círculo de calor graduado (Buffer de infestación)
         window.L.circle([hp.lat, hp.lng], {
           radius: 80 + hp.severidad * 2.5,
           color: hp.color,
@@ -494,7 +562,6 @@ export default function MapaCalor() {
           dashArray: '3, 3'
         }).addTo(markersLayer.current);
 
-        // Marcador central del muestreo
         const heatPin = window.L.circleMarker([hp.lat, hp.lng], {
           radius: 9,
           fillColor: hp.color,
@@ -624,7 +691,18 @@ export default function MapaCalor() {
       });
     }
 
-  }, [sectores, gisMode, showNdviSimulation, showLoteBounds, showVertexPoints, mapType, filterPestSeverity, palmFilterStatus, palmsList, workersTelemetry, machineryTelemetry]);
+    // Auto-fit on initial render or view update
+    if (boundsPoints.length > 0 && mapInstance.current) {
+      try {
+        mapInstance.current.invalidateSize();
+        if (!mapInstance.current._hasInitialFit) {
+          mapInstance.current.fitBounds(window.L.latLngBounds(boundsPoints), { padding: [40, 40], maxZoom: 16 });
+          mapInstance.current._hasInitialFit = true;
+        }
+      } catch (e) {}
+    }
+
+  }, [allSuertes, gisMode, showNdviSimulation, showLoteBounds, showVertexPoints, mapType, filterPestSeverity, palmFilterStatus, palmsList, workersTelemetry, machineryTelemetry]);
 
   // Point in Polygon helper for Geofence validation
   const isPointInPoly = (point, vs) => {

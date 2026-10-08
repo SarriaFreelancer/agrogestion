@@ -1,9 +1,41 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { confirmDialog } from '@/utils/swal';
+import { initialActividades, initialGrupos } from '../../mocks';
 
 export function useActividades(syncToDatabase) {
-  const [actividades, setActividades] = useState([]);
-  const [gruposActividades, setGruposActividades] = useState([]);
+  const [actividades, setActividades] = useState(() => {
+    try {
+      const s = localStorage.getItem('agro_actividades');
+      if (s) {
+        const p = JSON.parse(s);
+        if (Array.isArray(p) && p.length > 0) return p;
+      }
+    } catch (e) {}
+    return initialActividades;
+  });
+
+  const [gruposActividades, setGruposActividades] = useState(() => {
+    try {
+      const s = localStorage.getItem('agro_grupos');
+      if (s) {
+        const p = JSON.parse(s);
+        if (Array.isArray(p) && p.length > 0) return p;
+      }
+    } catch (e) {}
+    return initialGrupos;
+  });
+
+  useEffect(() => {
+    try {
+      if (actividades?.length) localStorage.setItem('agro_actividades', JSON.stringify(actividades));
+    } catch (e) {}
+  }, [actividades]);
+
+  useEffect(() => {
+    try {
+      if (gruposActividades?.length) localStorage.setItem('agro_grupos', JSON.stringify(gruposActividades));
+    } catch (e) {}
+  }, [gruposActividades]);
 
   // Actividades
   const addActividad = (act) => { 
