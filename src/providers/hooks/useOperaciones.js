@@ -1,16 +1,119 @@
 import { useState, useEffect } from 'react';
 import { confirmDialog } from '@/utils/swal';
 
+export const initialPlanificaciones = [
+  {
+    id: 'PLAN-01',
+    ordenCode: 'OT-104928',
+    actividadId: 'LAB-PREP-01',
+    actividadNombre: 'Corte y Cosecha Mecanizada de Caña',
+    cultivo: 'Caña de Azúcar',
+    fincaId: 'FIN-01',
+    fincaNombre: 'Hacienda El Paraíso',
+    loteId: 'LOT-01',
+    loteNombre: 'Lote 01 (Variedad CC 01-1938)',
+    suerteId: 'SUE-01',
+    suerteNombre: 'Suerte A-01 (Tablón Principal)',
+    trabajadorId: 'TRAB-2', // Heriberto Caicedo
+    trabajadores: ['TRAB-2'],
+    cuadrillaId: 'CUA-1',
+    hectareas: 15.5,
+    hectareasEjecutadas: 11.2,
+    estado: 'En Ejecución',
+    fecha: new Date().toISOString().split('T')[0]
+  },
+  {
+    id: 'PLAN-02',
+    ordenCode: 'OT-104929',
+    actividadId: 'LAB-FITO-01',
+    actividadNombre: 'Evaluación y Muestreo Fitosanitario de Barrenador',
+    cultivo: 'Caña de Azúcar',
+    fincaId: 'FIN-01',
+    fincaNombre: 'Hacienda El Paraíso',
+    loteId: 'LOT-01',
+    loteNombre: 'Lote 01 (Variedad CC 01-1938)',
+    suerteId: 'SUE-01',
+    suerteNombre: 'Suerte A-01 (Tablón Principal)',
+    trabajadorId: 'TRAB-1', // Mauricio Valencia
+    trabajadores: ['TRAB-1'],
+    cuadrillaId: 'CUA-1',
+    hectareas: 15.5,
+    hectareasEjecutadas: 15.5,
+    estado: 'En Ejecución',
+    fecha: new Date().toISOString().split('T')[0]
+  },
+  {
+    id: 'PLAN-03',
+    ordenCode: 'OT-104930',
+    actividadId: 'LAB-RIEGO-01',
+    actividadNombre: 'Inspección de Válvulas y Regulación de Riego',
+    cultivo: 'Caña de Azúcar',
+    fincaId: 'FIN-01',
+    fincaNombre: 'Hacienda El Paraíso',
+    loteId: 'LOT-01',
+    loteNombre: 'Lote 01 (Variedad CC 01-1938)',
+    suerteId: 'SUE-02',
+    suerteNombre: 'Suerte A-02 (Tablón Ribera)',
+    trabajadorId: 'TRAB-3', // Julián Rendón
+    trabajadores: ['TRAB-3'],
+    cuadrillaId: 'CUA-2',
+    hectareas: 12.0,
+    hectareasEjecutadas: 8.5,
+    estado: 'En Ejecución',
+    fecha: new Date().toISOString().split('T')[0]
+  },
+  {
+    id: 'PLAN-04',
+    ordenCode: 'OT-104931',
+    actividadId: 'LAB-RECOL-01',
+    actividadNombre: 'Recolección y Manejo de Frente de Corte',
+    cultivo: 'Caña de Azúcar',
+    fincaId: 'FIN-01',
+    fincaNombre: 'Hacienda El Paraíso',
+    loteId: 'LOT-01',
+    loteNombre: 'Lote 01 (Variedad CC 01-1938)',
+    suerteId: 'SUE-02',
+    suerteNombre: 'Suerte A-02 (Tablón Ribera)',
+    trabajadorId: 'TRAB-4', // Rosa Guerrero
+    trabajadores: ['TRAB-4'],
+    cuadrillaId: 'CUA-3',
+    hectareas: 12.0,
+    hectareasEjecutadas: 6.0,
+    estado: 'En Ejecución',
+    fecha: new Date().toISOString().split('T')[0]
+  },
+  {
+    id: 'PLAN-05',
+    ordenCode: 'OT-104932',
+    actividadId: 'LAB-PULV-01',
+    actividadNombre: 'Fumigación y Aspersión Aérea con Dron',
+    cultivo: 'Caña de Azúcar',
+    fincaId: 'FIN-01',
+    fincaNombre: 'Hacienda El Paraíso',
+    loteId: 'LOT-01',
+    loteNombre: 'Lote 01 (Variedad CC 01-1938)',
+    suerteId: 'SUE-01',
+    suerteNombre: 'Suerte A-01 (Tablón Principal)',
+    trabajadorId: 'TRAB-5', // Alonso Morales
+    trabajadores: ['TRAB-5'],
+    cuadrillaId: 'CUA-2',
+    hectareas: 15.5,
+    hectareasEjecutadas: 14.0,
+    estado: 'En Ejecución',
+    fecha: new Date().toISOString().split('T')[0]
+  }
+];
+
 export function useOperaciones(syncToDatabase, productos, setProductos) {
   const [planificaciones, setPlanificaciones] = useState(() => {
     try {
       const s = localStorage.getItem('agro_planificaciones');
       if (s) {
         const p = JSON.parse(s);
-        if (Array.isArray(p)) return p;
+        if (Array.isArray(p) && p.length > 0) return p;
       }
     } catch (e) {}
-    return [];
+    return initialPlanificaciones;
   });
 
   const [movimientosInventario, setMovimientosInventario] = useState(() => {
@@ -26,7 +129,7 @@ export function useOperaciones(syncToDatabase, productos, setProductos) {
 
   useEffect(() => {
     try {
-      localStorage.setItem('agro_planificaciones', JSON.stringify(planificaciones));
+      if (planificaciones?.length) localStorage.setItem('agro_planificaciones', JSON.stringify(planificaciones));
     } catch (e) {}
   }, [planificaciones]);
 

@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState, useMemo } from 'react';
 import { useAgro } from '@/providers/AgroContext';
-import { initialData } from '@/providers/mocks';
+import { initialData, initialTrabajadores, initialCuadrillas, initialMaquinaria } from '@/providers/mocks';
 import { 
   Map as MapIcon, 
   Satellite, 
@@ -51,7 +51,9 @@ import {
   BatteryCharging,
   TrendingUp,
   AlertOctagon,
-  Timer
+  Timer,
+  Briefcase,
+  FileText
 } from 'lucide-react';
 import { notifySuccess, notifyError } from '@/utils/swal';
 
@@ -64,6 +66,7 @@ export default function MapaCalor() {
     maquinarias, 
     trabajadores, 
     cuadrillas, 
+    actividades,
     cultivos,
     globalCultivo 
   } = useAgro();
@@ -228,263 +231,209 @@ export default function MapaCalor() {
     return [3.5285, -76.2980];
   }, [allSuertes]);
 
-  // ── INYECCIÓN AVANZADA: TRACKING DE PERSONAL CON RUTAS HISTÓRICAS ────────
+  // Point in Polygon helper for Geofence validation
+  const isPointInPoly = (point, vs) => {
+    if (!vs || !Array.isArray(vs) || vs.length < 3) return false;
+    const x = point[0], y = point[1];
+    let inside = false;
+    for (let i = 0, j = vs.length - 1; i < vs.length; j = i++) {
+      const xi = vs[i][0], yi = vs[i][1];
+      const xj = vs[j][0], yj = vs[j][1];
+      const intersect = ((yi > y) !== (yj > y)) && (x < (xj - xi) * (y - yi) / (yj - yi) + xi);
+      if (intersect) inside = !inside;
+    }
+    return inside;
+  };
+
+  // ── VINCULACIÓN DINÁMICA: TRABAJADORES DESDE EL MAESTRO & PLANIFICACIONES ─
   const workersTelemetry = useMemo(() => {
+    const rawTrabajadores = (trabajadores && trabajadores.length > 0) ? trabajadores : initialTrabajadores;
+    const rawCuadrillas = (cuadrillas && cuadrillas.length > 0) ? cuadrillas : initialCuadrillas;
     const baseLat = defaultCenter[0];
     const baseLng = defaultCenter[1];
 
-    return [
-      {
-        id: 'WRK-101',
-        nombre: 'Carlos Benítez',
-        cargo: 'Evaluador Fitosanitario',
-        cuadrilla: 'Cuadrilla Sanidad A',
-        estado: 'En Labor Activa',
-        bateria: 82,
-        suerteName: 'Suerte A-01 (Tablón Principal)',
-        fincaName: 'Hacienda El Paraíso',
-        lat: baseLat + 0.0003,
-        lng: baseLng - 0.0002,
-        esProductivo: true,
-        distanciaTotal: '5.8 km',
+    return rawTrabajadores.map((t, idx) => {
+      const fullName = `${t.nombre || ''} ${t.apellido || ''}`.trim() || t.name || `Trabajador ${t.id}`;
+      const cuadrillaObj = rawCuadrillas.find(c => c.id === t.cuadrillaId || c.id === t.cuadrillaCodigo);
+      const cuadrillaNombre = cuadrillaObj?.nombre || 'Cuadrilla General';
+
+      // 1. Buscar si tiene una actividad / labor planificada en el sistema
+      const planAsignada = (planificaciones || []).find(p => 
+        p.trabajadorId === t.id || 
+        p.trabajadores?.includes(t.id) || 
+        (p.cuadrillaId && p.cuadrillaId === t.cuadrillaId)
+      );
+
+      // Ubicación simulada o real según su suerte asignada o índice
+      let assignedSuerte = null;
+      if (planAsignada && planAsignada.suerteId) {
+        assignedSuerte = allSuertes.find(s => s.id === planAsignada.suerteId || s.name === planAsignada.suerteNombre);
+      }
+      if (!assignedSuerte && allSuertes.length > 0) {
+        assignedSuerte = allSuertes[idx % allSuertes.length];
+      }
+
+      // Definir posición GPS del operario
+      let currentLat = baseLat + (Math.sin((idx + 1) * 2.3) * 0.0006);
+      let currentLng = baseLng + (Math.cos((idx + 1) * 2.3) * 0.0006);
+
+      // Simular que el 3er trabajador se desvió fuera de geocerca
+      const isDeviated = idx === 2;
+      if (isDeviated) {
+        currentLat = baseLat + 0.0024;
+        currentLng = baseLng - 0.0036;
+      } else if (assignedSuerte && assignedSuerte.geometria && assignedSuerte.geometria.length > 0) {
+        currentLat = assignedSuerte.geometria[0][0] + (Math.sin(idx) * 0.0003);
+        currentLng = assignedSuerte.geometria[0][1] + (Math.cos(idx) * 0.0003);
+      }
+
+      // Validar si está actualmente dentro de alguna geocerca
+      let currentSuerteIn = null;
+      for (const st of allSuertes) {
+        if (st.geometria && isPointInPoly([currentLat, currentLng], st.geometria)) {
+          currentSuerteIn = st;
+          break;
+        }
+      }
+
+      const isInsideAssigned = assignedSuerte && currentSuerteIn && (assignedSuerte.id === currentSuerteIn.id || assignedSuerte.name === currentSuerteIn.name);
+      const hasPlan = !!planAsignada;
+      const isProductive = hasPlan ? isInsideAssigned : !!currentSuerteIn;
+
+      // Definir la Actividad y Estado para la Leyenda
+      let actividadActual = null;
+      let ordenCode = null;
+      let mensajeActividad = '';
+      let estadoTexto = '';
+
+      if (hasPlan) {
+        ordenCode = planAsignada.ordenCode || planAsignada.id;
+        if (isInsideAssigned) {
+          actividadActual = planAsignada.actividadNombre || planAsignada.actividad || 'Labor Planificada';
+          estadoTexto = `🟢 En Labor: ${actividadActual}`;
+          mensajeActividad = `Labor activa en lote: ${actividadActual} (${ordenCode}) en ${assignedSuerte.name}`;
+        } else {
+          actividadActual = null;
+          estadoTexto = `⚠️ Desvío de Geocerca`;
+          mensajeActividad = `⚠️ ALERTA DE DESVÍO: Asignado a labor [${planAsignada.actividadNombre || 'Labor'}] en [${assignedSuerte?.name || 'Lote'}], pero su ubicación GPS está fuera del polígono asignado.`;
+        }
+      } else {
+        actividadActual = null;
+        if (currentSuerteIn) {
+          estadoTexto = `📍 En Lote (${currentSuerteIn.name})`;
+          mensajeActividad = `En tránsito dentro de ${currentSuerteIn.name} (Sin labor programada asignada)`;
+        } else {
+          estadoTexto = `⚪ Fuera de Lote / En Tránsito`;
+          mensajeActividad = `Sin labor asignada en el sistema para la jornada actual (Tiempo Improductivo)`;
+        }
+      }
+
+      // Dwell time & Inactivity alert
+      const dwellMinutes = isDeviated ? 48 : (6 + (idx * 5));
+      const hasInactivityAlert = isDeviated && dwellMinutes >= (palmSettings.umbralInactividadMin || 25);
+      const alertaParada = hasInactivityAlert ? {
+        tipo: 'Inactividad Prolongada',
+        mensaje: `DETENCIÓN CRÍTICA (${dwellMinutes} min): El operario se encuentra inmóvil bajo sombra fuera del lote. Sensor del celular sin actividad (posible descanso no programado o pérdida de señal).`,
+        severidad: 'Alta'
+      } : null;
+
+      // Generar ruta histórica de puntos (breadcrumbs)
+      const ruta = [
+        { lat: baseLat + 0.0035, lng: baseLng - 0.0040, hora: '06:30 AM', esProductivo: false, velocidad: '0.0 km/h', dwellMin: 15, lugar: 'Campamento Central (Salida)' },
+        { lat: baseLat + 0.0020, lng: baseLng - 0.0025, hora: '07:10 AM', esProductivo: false, velocidad: '4.2 km/h', dwellMin: 5, lugar: 'Carretera Perimetral' },
+        { lat: currentLat + 0.0003, lng: currentLng - 0.0003, hora: '08:30 AM', esProductivo: !isDeviated, velocidad: '2.5 km/h', dwellMin: 25, lugar: isDeviated ? 'Salida de Lote' : `${assignedSuerte?.name || 'Suerte'} (Surco 1)` },
+        { lat: currentLat, lng: currentLng, hora: '11:45 AM', esProductivo: isProductive, velocidad: isDeviated ? '0.0 km/h' : '2.1 km/h', dwellMin: dwellMinutes, lugar: isDeviated ? 'Zona Perimetral (Inmóvil)' : `${currentSuerteIn?.name || 'Lote Actual'} (Punto Actual)` }
+      ];
+
+      return {
+        id: t.id,
+        nombre: fullName,
+        cargo: t.cargo || 'Operario de Campo',
+        identificacion: t.identificacion || t.codigo || t.id,
+        cuadrilla: cuadrillaNombre,
+        estado: estadoTexto,
+        bateria: 70 + (idx * 6) % 28,
+        lat: currentLat,
+        lng: currentLng,
+        esProductivo: isProductive,
+        actividadActual,
+        ordenCode,
+        mensajeActividad,
+        planAsignada,
+        suerteAsignadaNombre: assignedSuerte?.name || 'N/A',
+        suerteActualNombre: currentSuerteIn?.name || 'Fuera de Geocerca',
+        fincaName: currentSuerteIn?.fincaName || assignedSuerte?.fincaName || 'Hacienda El Paraíso',
+        distanciaTotal: `${(4.2 + idx * 1.5).toFixed(1)} km`,
         tiempoTotal: '5h 30m',
-        tiempoProductivo: '4h 45m',
-        tiempoImproductivo: '45m',
-        porcentajeEficiencia: 86,
-        tiempoDetenidoActual: 8, // min
-        alertaParada: null,
-        sensorMovimiento: 'Activo (Caminando / Muestreo)',
-        ruta: [
-          { lat: baseLat + 0.0035, lng: baseLng - 0.0040, hora: '06:30 AM', esProductivo: false, velocidad: '0.0 km/h', dwellMin: 15, lugar: 'Campamento Central (Salida)' },
-          { lat: baseLat + 0.0025, lng: baseLng - 0.0028, hora: '07:05 AM', esProductivo: false, velocidad: '4.8 km/h', dwellMin: 5, lugar: 'Carretera Perimetral Norte' },
-          { lat: baseLat + 0.0008, lng: baseLng - 0.0006, hora: '07:40 AM', esProductivo: true, velocidad: '2.5 km/h', dwellMin: 20, lugar: 'Suerte A-01 (Surco 1-20)' },
-          { lat: baseLat + 0.0006, lng: baseLng - 0.0004, hora: '08:50 AM', esProductivo: true, velocidad: '2.2 km/h', dwellMin: 25, lugar: 'Suerte A-01 (Surco 21-40)' },
-          { lat: baseLat + 0.0004, lng: baseLng - 0.0003, hora: '10:15 AM', esProductivo: true, velocidad: '2.8 km/h', dwellMin: 18, lugar: 'Suerte A-01 (Muestreo Barrenador)' },
-          { lat: baseLat + 0.0003, lng: baseLng - 0.0002, hora: '11:30 AM', esProductivo: true, velocidad: '2.1 km/h', dwellMin: 8, lugar: 'Suerte A-01 (Punto Actual)' }
-        ]
-      },
-      {
-        id: 'WRK-102',
-        nombre: 'María Cardona',
-        cargo: 'Supervisora de Cosecha',
-        cuadrilla: 'Cuadrilla Corte 1',
-        estado: 'En Labor Activa',
-        bateria: 94,
-        suerteName: 'Suerte A-02 (Tablón Ribera)',
-        fincaName: 'Hacienda El Paraíso',
-        lat: baseLat - 0.0018,
-        lng: baseLng - 0.0022,
-        esProductivo: true,
-        distanciaTotal: '7.4 km',
-        tiempoTotal: '6h 00m',
-        tiempoProductivo: '5h 20m',
-        tiempoImproductivo: '40m',
-        porcentajeEficiencia: 89,
-        tiempoDetenidoActual: 12,
-        alertaParada: null,
-        sensorMovimiento: 'Activo (Supervisión de Frente)',
-        ruta: [
-          { lat: baseLat + 0.0035, lng: baseLng - 0.0040, hora: '06:00 AM', esProductivo: false, velocidad: '0.0 km/h', dwellMin: 20, lugar: 'Oficina de Campo' },
-          { lat: baseLat + 0.0010, lng: baseLng - 0.0030, hora: '06:45 AM', esProductivo: false, velocidad: '14.0 km/h', dwellMin: 5, lugar: 'Traslado en Moto' },
-          { lat: baseLat - 0.0012, lng: baseLng - 0.0020, hora: '07:30 AM', esProductivo: true, velocidad: '3.0 km/h', dwellMin: 30, lugar: 'Suerte A-02 (Frente de Corte)' },
-          { lat: baseLat - 0.0015, lng: baseLng - 0.0021, hora: '09:15 AM', esProductivo: true, velocidad: '2.5 km/h', dwellMin: 35, lugar: 'Suerte A-02 (Inspección Calidad)' },
-          { lat: baseLat - 0.0018, lng: baseLng - 0.0022, hora: '11:45 AM', esProductivo: true, velocidad: '1.8 km/h', dwellMin: 12, lugar: 'Suerte A-02 (Punto Actual)' }
-        ]
-      },
-      {
-        id: 'WRK-103',
-        nombre: 'Javier Restrepo',
-        cargo: 'Operario Fumigador',
-        cuadrilla: 'Cuadrilla Aplicación',
-        estado: 'Alerta: Inactivo / Dormido',
-        bateria: 68,
-        suerteName: 'Zona Perimetral (Fuera de Geocerca)',
-        fincaName: 'Hacienda El Paraíso',
-        lat: baseLat + 0.0022,
-        lng: baseLng - 0.0035,
-        esProductivo: false,
-        distanciaTotal: '3.1 km',
-        tiempoTotal: '5h 15m',
-        tiempoProductivo: '2h 10m',
-        tiempoImproductivo: '3h 05m',
-        porcentajeEficiencia: 41,
-        tiempoDetenidoActual: 48, // 48 minutos detenido!
-        alertaParada: {
-          tipo: 'Inactividad Prolongada',
-          mensaje: 'DETENCIÓN CRÍTICA (48 min): El operario se encuentra inmóvil bajo sombra fuera del lote. Sensor del celular sin actividad ni aceleración (posible descanso no programado o pérdida de señal).',
-          severidad: 'Alta'
-        },
-        sensorMovimiento: '💤 INMÓVIL (Sin Movimiento / Teléfono Estático)',
-        ruta: [
-          { lat: baseLat + 0.0035, lng: baseLng - 0.0040, hora: '06:30 AM', esProductivo: false, velocidad: '0.0 km/h', dwellMin: 15, lugar: 'Bodega de Agroquímicos' },
-          { lat: baseLat + 0.0005, lng: baseLng - 0.0005, hora: '07:20 AM', esProductivo: true, velocidad: '2.0 km/h', dwellMin: 45, lugar: 'Suerte A-01 (Aplicación Folio)' },
-          { lat: baseLat + 0.0002, lng: baseLng - 0.0002, hora: '08:40 AM', esProductivo: true, velocidad: '1.9 km/h', dwellMin: 50, lugar: 'Suerte A-01 (Fumigación)' },
-          { lat: baseLat + 0.0018, lng: baseLng - 0.0025, hora: '10:10 AM', esProductivo: false, velocidad: '4.0 km/h', dwellMin: 10, lugar: 'Salida no autorizada de lote' },
-          { lat: baseLat + 0.0022, lng: baseLng - 0.0035, hora: '10:45 AM', esProductivo: false, velocidad: '0.0 km/h', dwellMin: 48, lugar: 'Zanja / Sombra Árbol (Inmóvil)' }
-        ]
-      },
-      {
-        id: 'WRK-104',
-        nombre: 'Andrés Morales',
-        cargo: 'Agrónomo de Campo',
-        cuadrilla: 'Equipo Técnico',
-        estado: 'En Desplazamiento',
-        bateria: 75,
-        suerteName: 'Corredor Interlotes B-01',
-        fincaName: 'Hacienda El Paraíso',
-        lat: baseLat + 0.0015,
-        lng: baseLng - 0.0018,
-        esProductivo: false,
-        distanciaTotal: '9.2 km',
-        tiempoTotal: '4h 50m',
-        tiempoProductivo: '3h 35m',
-        tiempoImproductivo: '1h 15m',
-        porcentajeEficiencia: 74,
-        tiempoDetenidoActual: 4,
-        alertaParada: null,
-        sensorMovimiento: 'Activo (Vehicular / Cuatrimoto)',
-        ruta: [
-          { lat: baseLat + 0.0035, lng: baseLng - 0.0040, hora: '07:00 AM', esProductivo: false, velocidad: '0.0 km/h', dwellMin: 15, lugar: 'Laboratorio' },
-          { lat: baseLat - 0.0010, lng: baseLng - 0.0015, hora: '07:50 AM', esProductivo: true, velocidad: '3.2 km/h', dwellMin: 40, lugar: 'Suerte A-02 (Revisión Suelos)' },
-          { lat: baseLat + 0.0005, lng: baseLng - 0.0003, hora: '09:20 AM', esProductivo: true, velocidad: '2.8 km/h', dwellMin: 55, lugar: 'Suerte A-01 (Aforo de Caña)' },
-          { lat: baseLat + 0.0015, lng: baseLng - 0.0018, hora: '11:20 AM', esProductivo: false, velocidad: '18.5 km/h', dwellMin: 4, lugar: 'En Ruta hacia Lote 02' }
-        ]
-      }
-    ];
-  }, [defaultCenter]);
+        tiempoProductivo: isProductive ? '4h 45m' : '1h 50m',
+        tiempoImproductivo: isProductive ? '45m' : '3h 40m',
+        porcentajeEficiencia: isProductive ? 86 : 38,
+        tiempoDetenidoActual: dwellMinutes,
+        alertaParada,
+        sensorMovimiento: hasInactivityAlert ? '💤 INMÓVIL (Sin Acelerómetro)' : '🚶 ACTIVO (En Muestreo / Labor)',
+        ruta
+      };
+    });
+  }, [trabajadores, cuadrillas, planificaciones, allSuertes, defaultCenter, palmSettings]);
 
-  // ── INYECCIÓN AVANZADA: TELEMETRÍA DE MAQUINARIA & ALERTAS DE PARADA ────
+  // ── TELEMETRÍA DE MAQUINARIA VINCULADA AL MAESTRO ────────────────────────
   const machineryTelemetry = useMemo(() => {
+    const rawMaquinaria = (maquinarias && maquinarias.length > 0) ? maquinarias : initialMaquinaria;
     const baseLat = defaultCenter[0];
     const baseLng = defaultCenter[1];
 
-    return [
-      {
-        id: 'MAQ-01',
-        codigo: 'TRAC-01',
-        nombre: 'Tractor John Deere 6125M',
-        tipo: 'Tractor Agrícola',
-        implemento: 'Rastra 24 Discos',
-        op: 'Jorge Salazar',
-        vel: '6.4 km/h',
-        estado: 'Operando en Lote',
-        rpm: 1850,
-        fuel: '78%',
-        horometro: '1,485.2 h',
-        esProductivo: true,
-        distanciaTotal: '24.6 km',
-        tiempoTotal: '6h 15m',
-        tiempoProductivo: '5h 30m',
-        tiempoImproductivo: '45m',
-        porcentajeEficiencia: 88,
-        tiempoDetenidoActual: 3,
-        alertaParada: null,
-        lat: baseLat + 0.0007,
-        lng: baseLng - 0.0008,
-        ruta: [
-          { lat: baseLat + 0.0035, lng: baseLng - 0.0040, hora: '06:00 AM', esProductivo: false, velocidad: '0.0 km/h', dwellMin: 15, lugar: 'Taller de Maquinaria' },
-          { lat: baseLat + 0.0020, lng: baseLng - 0.0025, hora: '06:35 AM', esProductivo: false, velocidad: '15.0 km/h', dwellMin: 5, lugar: 'Traslado por Callejón' },
-          { lat: baseLat + 0.0009, lng: baseLng - 0.0009, hora: '07:15 AM', esProductivo: true, velocidad: '6.2 km/h', dwellMin: 8, lugar: 'Suerte A-01 (Pasada 1 Rastra)' },
-          { lat: baseLat + 0.0008, lng: baseLng - 0.0008, hora: '09:00 AM', esProductivo: true, velocidad: '6.5 km/h', dwellMin: 6, lugar: 'Suerte A-01 (Pasada 2 Rastra)' },
-          { lat: baseLat + 0.0007, lng: baseLng - 0.0008, hora: '11:40 AM', esProductivo: true, velocidad: '6.4 km/h', dwellMin: 3, lugar: 'Suerte A-01 (Pasada 3)' }
-        ]
-      },
-      {
-        id: 'MAQ-02',
-        codigo: 'FUM-01',
-        nombre: 'Fumigadora Jacto Uniport 3030',
-        tipo: 'Fumigadora Autopropulsada',
-        implemento: 'Barra Hidráulica 28m',
-        op: 'Fabián Ortiz',
-        vel: '0.0 km/h',
-        estado: 'Alerta: Falla Mecánica en Campo',
-        rpm: 0,
-        fuel: '65%',
-        horometro: '2,110.5 h',
-        esProductivo: false,
-        distanciaTotal: '11.8 km',
-        tiempoTotal: '5h 40m',
-        tiempoProductivo: '3h 10m',
-        tiempoImproductivo: '2h 30m',
-        porcentajeEficiencia: 56,
-        tiempoDetenidoActual: 52, // 52 min detenida!
-        alertaParada: {
-          tipo: 'Daño Mecánico en Campo',
-          mensaje: 'DETENCIÓN POR AVERÍA (52 min): Máquina parada en medio del surco con motor apagado. Código de falla OBD: F-302 (Pérdida de presión en barra de pulverización). Requiere asistencia técnica.',
-          severidad: 'Crítica'
-        },
-        lat: baseLat + 0.0005,
-        lng: baseLng - 0.0003,
-        ruta: [
-          { lat: baseLat + 0.0035, lng: baseLng - 0.0040, hora: '06:30 AM', esProductivo: false, velocidad: '0.0 km/h', dwellMin: 20, lugar: 'Carga de Tanque (Caldo)' },
-          { lat: baseLat + 0.0010, lng: baseLng - 0.0010, hora: '07:20 AM', esProductivo: true, velocidad: '12.5 km/h', dwellMin: 5, lugar: 'Suerte A-01 (Inicio Fumigación)' },
-          { lat: baseLat + 0.0007, lng: baseLng - 0.0005, hora: '08:45 AM', esProductivo: true, velocidad: '11.8 km/h', dwellMin: 8, lugar: 'Suerte A-01 (Frente Norte)' },
-          { lat: baseLat + 0.0005, lng: baseLng - 0.0003, hora: '10:15 AM', esProductivo: false, velocidad: '0.0 km/h', dwellMin: 52, lugar: 'Suerte A-01 (Averiada en Surco)' }
-        ]
-      },
-      {
-        id: 'MAQ-03',
-        codigo: 'CAM-01',
-        nombre: 'Camión Alce Mercedes Axor 3340',
-        tipo: 'Transporte de Cosecha',
-        implemento: 'Vagón Cañero Volcable',
-        op: 'Mauricio Vivas',
-        vel: '0.0 km/h',
-        estado: 'Parada Operativa (Cargue)',
-        rpm: 800,
-        fuel: '54%',
-        horometro: '4,820.0 h',
-        esProductivo: true,
-        distanciaTotal: '42.0 km',
-        tiempoTotal: '6h 30m',
-        tiempoProductivo: '5h 45m',
-        tiempoImproductivo: '45m',
-        porcentajeEficiencia: 88,
-        tiempoDetenidoActual: 24, // 24 min en tolva
-        alertaParada: {
-          tipo: 'Parada Operativa Autorizada',
-          mensaje: 'ESPERA DE CARGUE (24 min): Vehículo posicionado en cabecera de suerte recibiendo caña picada desde cosechadora combinada.',
-          severidad: 'Baja'
-        },
-        lat: baseLat - 0.0015,
-        lng: baseLng - 0.0025,
-        ruta: [
-          { lat: baseLat + 0.0040, lng: baseLng - 0.0050, hora: '05:30 AM', esProductivo: false, velocidad: '0.0 km/h', dwellMin: 15, lugar: 'Báscula Ingenio Central' },
-          { lat: baseLat - 0.0005, lng: baseLng - 0.0035, hora: '06:40 AM', esProductivo: false, velocidad: '35.0 km/h', dwellMin: 8, lugar: 'Vía Principal de Acceso' },
-          { lat: baseLat - 0.0015, lng: baseLng - 0.0025, hora: '08:00 AM', esProductivo: true, velocidad: '0.0 km/h', dwellMin: 24, lugar: 'Suerte A-02 (Punto de Alce)' }
-        ]
-      },
-      {
-        id: 'MAQ-04',
-        codigo: 'COS-01',
-        nombre: 'Cosechadora Case IH 8800',
-        tipo: 'Cosechadora Combinada',
-        implemento: 'Cabezal Picador 1.5m',
-        op: 'Hernán Duque',
-        vel: '4.5 km/h',
-        estado: 'Operando en Cosecha',
-        rpm: 2150,
-        fuel: '62%',
-        horometro: '3,140.8 h',
-        esProductivo: true,
-        distanciaTotal: '18.2 km',
-        tiempoTotal: '6h 00m',
-        tiempoProductivo: '5h 10m',
-        tiempoImproductivo: '50m',
-        porcentajeEficiencia: 86,
-        tiempoDetenidoActual: 4,
-        alertaParada: null,
-        lat: baseLat - 0.0013,
-        lng: baseLng - 0.0020,
-        ruta: [
-          { lat: baseLat - 0.0010, lng: baseLng - 0.0018, hora: '06:30 AM', esProductivo: true, velocidad: '4.2 km/h', dwellMin: 10, lugar: 'Suerte A-02 (Inicio Corte)' },
-          { lat: baseLat - 0.0013, lng: baseLng - 0.0020, hora: '11:45 AM', esProductivo: true, velocidad: '4.5 km/h', dwellMin: 4, lugar: 'Suerte A-02 (Corte Continuo)' }
-        ]
-      }
-    ];
-  }, [defaultCenter]);
+    return rawMaquinaria.slice(0, 5).map((m, idx) => {
+      const isDamaged = idx === 1; // FUM-01 averiada
+      const isWaiting = idx === 2; // CAM-01 esperando tolva
 
-  // ── Generador / Modelado de Censo Individual Palma a Palma ──────────────
+      let mLat = baseLat + (Math.sin((idx + 2) * 1.8) * 0.0006);
+      let mLng = baseLng + (Math.cos((idx + 2) * 1.8) * 0.0006);
+
+      const dwellMin = isDamaged ? 52 : isWaiting ? 24 : 4;
+      const alertaParada = isDamaged ? {
+        tipo: 'Falla Mecánica en Campo',
+        mensaje: 'DETENCIÓN POR AVERÍA (52 min): Máquina parada en surco con motor apagado. Código de error F-302 (Pérdida de presión en barra de pulverización).',
+        severidad: 'Crítica'
+      } : isWaiting ? {
+        tipo: 'Parada Operativa Autorizada',
+        mensaje: 'ESPERA DE CARGUE (24 min): Camión posicionado en cabecera de lote recibiendo caña desde cosechadora.',
+        severidad: 'Baja'
+      } : null;
+
+      const ruta = [
+        { lat: baseLat + 0.0035, lng: baseLng - 0.0040, hora: '06:00 AM', esProductivo: false, velocidad: '0.0 km/h', dwellMin: 15, lugar: 'Taller de Maquinaria' },
+        { lat: baseLat + 0.0015, lng: baseLng - 0.0020, hora: '06:45 AM', esProductivo: false, velocidad: '14.0 km/h', dwellMin: 5, lugar: 'Traslado por Callejón' },
+        { lat: mLat, lng: mLng, hora: '11:45 AM', esProductivo: !isDamaged, velocidad: isDamaged ? '0.0 km/h' : `${(5.5 + idx * 1.2).toFixed(1)} km/h`, dwellMin, lugar: `${allSuertes[0]?.name || 'Lote 01'} (Operación)` }
+      ];
+
+      return {
+        id: m.id || `MAQ-${idx + 1}`,
+        codigo: m.codigo || m.id,
+        nombre: m.nombre || m.name || `Maquinaria ${m.id}`,
+        tipo: m.tipoId || 'Tractor Agrícola',
+        implemento: idx === 0 ? 'Rastra 24 Discos' : idx === 1 ? 'Barra Hidráulica 28m' : idx === 2 ? 'Vagón Cañero' : 'Cabezal Picador',
+        op: idx === 0 ? 'Jorge Salazar' : idx === 1 ? 'Fabián Ortiz' : idx === 2 ? 'Mauricio Vivas' : 'Hernán Duque',
+        vel: isDamaged || isWaiting ? '0.0 km/h' : `${(5.5 + idx * 1.2).toFixed(1)} km/h`,
+        estado: isDamaged ? 'Alerta: Falla Mecánica en Campo' : isWaiting ? 'Parada Operativa (Cargue)' : 'Operando en Lote',
+        rpm: isDamaged ? 0 : isWaiting ? 800 : 1950,
+        fuel: `${80 - idx * 8}%`,
+        horometro: `${(m.horometroActual || (1450 + idx * 120)).toFixed(1)} h`,
+        esProductivo: !isDamaged,
+        distanciaTotal: `${(18.5 + idx * 6.2).toFixed(1)} km`,
+        tiempoTotal: '6h 15m',
+        tiempoProductivo: isDamaged ? '2h 45m' : '5h 30m',
+        tiempoImproductivo: isDamaged ? '3h 30m' : '45m',
+        porcentajeEficiencia: isDamaged ? 44 : 88,
+        tiempoDetenidoActual: dwellMin,
+        alertaParada,
+        lat: mLat,
+        lng: mLng,
+        ruta
+      };
+    });
+  }, [maquinarias, allSuertes, defaultCenter]);
+
+  // ── CENSO INDIVIDUAL PALMA A PALMA ──────────────────────────────────────
   const [palmsList, setPalmsList] = useState(() => {
     try {
       const s = localStorage.getItem('agro_gis_palms');
@@ -773,7 +722,7 @@ export default function MapaCalor() {
       });
     }
 
-    // ── 3. MODO PERSONAL: TRACKING CON ICONOS DE PERSONA Y RECORRIDO COMPLETO ──
+    // ── 3. MODO PERSONAL: TRACKING CON ACTIVIDAD EN TIEMPO REAL & TRAZAS ───
     if (gisMode === 'personal') {
       workersTelemetry.forEach((w) => {
         if (selectedTrackingFilter !== 'all' && selectedTrackingFilter !== w.id) return;
@@ -786,7 +735,6 @@ export default function MapaCalor() {
           for (let i = 0; i < w.ruta.length - 1; i++) {
             const p1 = w.ruta[i];
             const p2 = w.ruta[i + 1];
-            // Si ambos puntos o el destino están dentro del lote = Verde (Productivo), si no = Rojo (Improductivo)
             const segColor = (p1.esProductivo && p2.esProductivo) ? '#10B981' : '#EF4444';
             
             window.L.polyline([[p1.lat, p1.lng], [p2.lat, p2.lng]], {
@@ -831,7 +779,7 @@ export default function MapaCalor() {
           });
         }
 
-        // 3.2. Icono de Persona Personalizado (L.divIcon)
+        // 3.2. Icono de Persona Personalizado con Actividad Actual en el badge
         const personIconHtml = `
           <div style="position: relative; display: flex; flex-direction: column; align-items: center; transform: translate(-50%, -100%); cursor: pointer;">
             <div style="
@@ -852,7 +800,7 @@ export default function MapaCalor() {
               ${hasAnomaly ? `<span style="position: absolute; top: -4px; right: -4px; width: 15px; height: 15px; background: #ef4444; border: 2px solid white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 9px; color: white; font-weight: 900;">!</span>` : ''}
             </div>
             <div style="
-              background: rgba(15, 23, 42, 0.92); 
+              background: rgba(15, 23, 42, 0.94); 
               color: white; 
               padding: 2px 7px; 
               border-radius: 8px; 
@@ -868,7 +816,7 @@ export default function MapaCalor() {
             ">
               <span>${w.nombre.split(' ')[0]}</span>
               <span>${isInside ? '🟢' : '🔴'}</span>
-              ${w.tiempoDetenidoActual > 20 ? `<span style="color: #fca5a5; font-size: 9px;">⏱️${w.tiempoDetenidoActual}m</span>` : ''}
+              ${w.actividadActual ? `<span style="color: #6ee7b7; font-size: 9px;">[${w.actividadActual.split(' ')[0]}]</span>` : `<span style="color: #cbd5e1; font-size: 9px;">[Sin Labor]</span>`}
             </div>
             <div style="width: 2px; height: 6px; background: ${hasAnomaly ? '#f59e0b' : isInside ? '#10b981' : '#ef4444'};"></div>
           </div>
@@ -882,6 +830,30 @@ export default function MapaCalor() {
         });
 
         const workerMarker = window.L.marker([w.lat, w.lng], { icon: personDivIcon }).addTo(markersLayer.current);
+
+        // Tooltip rico con Actividad en Curso / Mensaje de Estado
+        workerMarker.bindTooltip(`
+          <div style="font-size: 11px; padding: 3px; min-width: 200px; line-height: 1.4;">
+            <strong style="color: #0f172a; font-size: 12px; display: block; border-bottom: 1px solid #e2e8f0; padding-bottom: 2px; margin-bottom: 3px;">
+              👤 ${w.nombre} (${w.cargo})
+            </strong>
+            <div style="margin-bottom: 3px;">
+              ${w.actividadActual ? `
+                <div style="color: #059669; font-weight: bold; background: #ecfdf5; padding: 2px 6px; border-radius: 4px; border: 1px solid #a7f3d0;">
+                  ⚡ Actividad: ${w.actividadActual}<br/>
+                  <span style="font-size: 10px; color: #047857;">OT: ${w.ordenCode} · ${w.suerteAsignadaNombre}</span>
+                </div>
+              ` : `
+                <div style="color: #b45309; font-weight: 600; background: #fef3c7; padding: 2px 6px; border-radius: 4px; border: 1px solid #fde68a; font-size: 10px;">
+                  ⚠️ ${w.mensajeActividad}
+                </div>
+              `}
+            </div>
+            <span>📍 Ubicación GPS: <strong>${w.suerteActualNombre}</strong></span><br/>
+            <span>⏳ Minutos en el punto: <strong style="color: ${w.tiempoDetenidoActual > 25 ? '#ef4444' : '#0f172a'};">${w.tiempoDetenidoActual} min</strong></span><br/>
+            <span>🔋 Batería: ${w.bateria}% · ${w.sensorMovimiento}</span>
+          </div>
+        `, { sticky: true });
 
         workerMarker.on('click', () => {
           setSelectedEntity({
@@ -1002,6 +974,16 @@ export default function MapaCalor() {
 
         const machineMarker = window.L.marker([m.lat, m.lng], { icon: machineDivIcon }).addTo(markersLayer.current);
 
+        machineMarker.bindTooltip(`
+          <div style="font-size: 11px; padding: 3px; min-width: 180px;">
+            <strong style="color: #1d4ed8; font-size: 12px; display: block;">🚜 ${m.nombre} (${m.codigo})</strong>
+            <span>Operador: <strong>${m.op}</strong></span><br/>
+            <span>Labor / Implemento: <strong>${m.implemento}</strong></span><br/>
+            <span>Velocidad: <strong>${m.vel}</strong> | Horómetro: ${m.horometro}</span><br/>
+            <span>Detenido en punto: <strong style="color: ${m.tiempoDetenidoActual > 25 ? '#ef4444' : '#10b981'};">${m.tiempoDetenidoActual} min</strong></span>
+          </div>
+        `, { sticky: true });
+
         machineMarker.on('click', () => {
           setSelectedEntity({
             type: 'maquinaria',
@@ -1059,20 +1041,6 @@ export default function MapaCalor() {
     }
 
   }, [allSuertes, gisMode, showNdviSimulation, showLoteBounds, showVertexPoints, showTrails, mapType, filterPestSeverity, palmFilterStatus, palmsList, workersTelemetry, machineryTelemetry, selectedTrackingFilter]);
-
-  // Point in Polygon helper for Geofence validation
-  const isPointInPoly = (point, vs) => {
-    if (!vs || !Array.isArray(vs) || vs.length < 3) return false;
-    const x = point[0], y = point[1];
-    let inside = false;
-    for (let i = 0, j = vs.length - 1; i < vs.length; j = i++) {
-      const xi = vs[i][0], yi = vs[i][1];
-      const xj = vs[j][0], yj = vs[j][1];
-      const intersect = ((yi > y) !== (yj > y)) && (x < (xj - xi) * (y - yi) / (yj - yi) + xi);
-      if (intersect) inside = !inside;
-    }
-    return inside;
-  };
 
   // Run Geofence Validation
   const handleValidateGps = () => {
@@ -1171,7 +1139,7 @@ export default function MapaCalor() {
               }`}
             >
               <Users size={15} />
-              <span>3. Tracking Personal</span>
+              <span>3. Tracking Personal ({workersTelemetry.length})</span>
             </button>
 
             {/* 4. Tracking Maquinaria */}
@@ -1184,7 +1152,7 @@ export default function MapaCalor() {
               }`}
             >
               <Tractor size={15} />
-              <span>4. Tracking Maquinaria</span>
+              <span>4. Tracking Maquinaria ({machineryTelemetry.length})</span>
             </button>
 
             {/* 5. Censo Palma a Palma */}
@@ -1291,7 +1259,9 @@ export default function MapaCalor() {
                 >
                   <option value="all">Ver toda la flota / equipo</option>
                   {gisMode === 'personal' && workersTelemetry.map(w => (
-                    <option key={w.id} value={w.id}>{w.nombre} ({w.esProductivo ? '🟢 Productivo' : '🔴 Fuera'})</option>
+                    <option key={w.id} value={w.id}>
+                      {w.nombre} {w.actividadActual ? `[${w.actividadActual.split(' ')[0]}]` : '[Sin Labor]'}
+                    </option>
                   ))}
                   {gisMode === 'maquinaria' && machineryTelemetry.map(m => (
                     <option key={m.id} value={m.id}>{m.codigo} - {m.nombre}</option>
@@ -1373,12 +1343,12 @@ export default function MapaCalor() {
           <div className="hidden lg:flex items-center gap-3 bg-white/95 dark:bg-slate-900/90 backdrop-blur-md border border-slate-200 dark:border-slate-700/60 px-3.5 py-1.5 rounded-2xl text-xs shadow-xl text-slate-800 dark:text-white">
             <div className="flex items-center gap-1.5 text-emerald-700 dark:text-emerald-400 font-bold">
               <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse" />
-              <span>Verde = Tiempo Productivo</span>
+              <span>Verde = Labor Activa (Productivo)</span>
             </div>
             <span className="text-slate-300 dark:text-slate-700">|</span>
             <div className="flex items-center gap-1.5 text-rose-600 dark:text-rose-400 font-bold">
               <span className="w-2.5 h-2.5 rounded-full bg-rose-500" />
-              <span>Rojo = Improductivo / Fuera</span>
+              <span>Rojo = Fuera / Sin Labor (Improductivo)</span>
             </div>
           </div>
 
@@ -1403,7 +1373,7 @@ export default function MapaCalor() {
                 <span>Panel GIS: {gisMode.toUpperCase()}</span>
                 <span className="text-[10px] text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 px-1.5 py-0.2 rounded font-bold">Minimizado</span>
               </div>
-              <p className="text-[10px] text-slate-500 dark:text-slate-400">Clic para abrir métricas de productividad, telemetría y tiempos muertos</p>
+              <p className="text-[10px] text-slate-500 dark:text-slate-400">Clic para abrir labores activas, métricas y telemetría</p>
             </div>
             <ChevronUp size={18} className="text-slate-400 group-hover:text-emerald-500 ml-1 transition-colors" />
           </button>
@@ -1427,7 +1397,7 @@ export default function MapaCalor() {
                 <h4 className="text-xs font-extrabold uppercase tracking-wider text-slate-900 dark:text-white">
                   {gisMode === 'catastro' && 'Validador de Geocerca GPS en Terreno'}
                   {gisMode === 'calor' && 'Nivel de Muestreos & Severidad Fitosanitaria'}
-                  {gisMode === 'personal' && 'Tracking de Cuadrillas & Tiempos Productivos'}
+                  {gisMode === 'personal' && 'Personal en Campo: Labores Planificadas & Tiempos'}
                   {gisMode === 'maquinaria' && 'Telemetría de Flota, Paradas & Detección de Averías'}
                   {gisMode === 'palmas' && `Censo Botánico Individual: ${selectedSuerte ? selectedSuerte.suerte.name : 'Palmar Principal'}`}
                 </h4>
@@ -1517,7 +1487,7 @@ export default function MapaCalor() {
               </div>
             )}
 
-            {/* Content for Mode 3: Personal Tracking & Dwell Time Analysis */}
+            {/* Content for Mode 3: Personal Tracking & Dynamic Activities */}
             {gisMode === 'personal' && (
               <div className="space-y-2.5 text-xs">
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 max-h-40 overflow-y-auto pr-1">
@@ -1541,14 +1511,28 @@ export default function MapaCalor() {
                         <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${
                           w.esProductivo ? 'bg-emerald-500/20 text-emerald-800 dark:text-emerald-300' : 'bg-rose-500/20 text-rose-800 dark:text-rose-300'
                         }`}>
-                          {w.esProductivo ? '🟢 En Lote' : '🔴 Fuera'}
+                          {w.esProductivo ? '🟢 Productivo' : '🔴 Fuera'}
                         </span>
                       </div>
 
-                      <div className="grid grid-cols-2 gap-1 text-[11px] text-slate-600 dark:text-slate-300 mt-1.5">
+                      {/* Dynamic Planned Activity Display */}
+                      <div className="mt-1">
+                        {w.actividadActual ? (
+                          <div className="text-[11px] text-emerald-700 dark:text-emerald-400 font-bold flex items-center gap-1 truncate">
+                            <Briefcase size={12} className="shrink-0" />
+                            <span className="truncate">{w.actividadActual}</span>
+                          </div>
+                        ) : (
+                          <div className="text-[10px] text-amber-700 dark:text-amber-400 font-medium truncate">
+                            {w.mensajeActividad}
+                          </div>
+                        )}
+                      </div>
+
+                      <div className="grid grid-cols-2 gap-1 text-[11px] text-slate-600 dark:text-slate-300 mt-1.5 border-t border-slate-200 dark:border-slate-800 pt-1">
                         <div>Productivo: <strong className="text-emerald-600 font-bold">{w.tiempoProductivo}</strong></div>
                         <div>Improductivo: <strong className="text-rose-600 font-bold">{w.tiempoImproductivo}</strong></div>
-                        <div>Eficiencia: <strong className="text-slate-900 dark:text-white font-bold">{w.porcentajeEficiencia}%</strong></div>
+                        <div>Ubicación: <strong className="text-slate-900 dark:text-white truncate block">{w.suerteActualNombre}</strong></div>
                         <div>Detenido: <strong className={w.tiempoDetenidoActual > 25 ? "text-rose-600 font-bold" : "text-slate-700 dark:text-slate-300"}>{w.tiempoDetenidoActual} min</strong></div>
                       </div>
 
@@ -1673,10 +1657,33 @@ export default function MapaCalor() {
                   </button>
                 </div>
 
-                {/* Personal Detailed Card with Productivity & Dwell Anomaly */}
+                {/* Personal Detailed Card with Productivity, Planned Activity & Dwell Anomaly */}
                 {selectedEntity.type === 'personal' && (
                   <div className="space-y-2 text-[11px]">
                     
+                    {/* Tarjeta de Actividad en Curso o Mensaje de Estado */}
+                    {selectedEntity.actividadActual ? (
+                      <div className="p-2.5 bg-emerald-500/15 border border-emerald-500/40 rounded-2xl text-emerald-900 dark:text-emerald-200 space-y-1">
+                        <div className="flex items-center gap-1.5 font-bold text-xs">
+                          <Briefcase size={14} className="text-emerald-600" />
+                          <span>ACTIVIDAD ASIGNADA EN CURSO</span>
+                        </div>
+                        <strong className="block text-sm text-emerald-800 dark:text-emerald-300 font-extrabold">{selectedEntity.actividadActual}</strong>
+                        <div className="flex items-center justify-between text-[10px] opacity-90">
+                          <span>Orden: <strong>{selectedEntity.ordenCode}</strong></span>
+                          <span>Lote Asignado: <strong>{selectedEntity.suerteAsignadaNombre}</strong></span>
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="p-2.5 bg-amber-500/15 border border-amber-500/40 rounded-2xl text-amber-900 dark:text-amber-200 space-y-1">
+                        <div className="flex items-center gap-1.5 font-bold text-xs">
+                          <AlertTriangle size={14} className="text-amber-600" />
+                          <span>ESTADO OPERATIVO</span>
+                        </div>
+                        <p className="text-[11px] opacity-95">{selectedEntity.mensajeActividad}</p>
+                      </div>
+                    )}
+
                     {/* Alerta de Inactividad / Dormido */}
                     {selectedEntity.alertaParada && (
                       <div className="p-2.5 bg-rose-500/15 border border-rose-500/40 rounded-2xl text-rose-800 dark:text-rose-200 space-y-1">
@@ -1814,11 +1821,11 @@ export default function MapaCalor() {
                 <div className="space-y-1.5 text-[11px]">
                   <div className="flex items-center gap-2">
                     <span className="w-3 h-3 rounded-full bg-emerald-500 shrink-0" />
-                    <span><strong>Trazas Verdes:</strong> Operación dentro de geocerca (Tiempo Productivo).</span>
+                    <span><strong>Verde:</strong> Realizando labor asignada en su lote (Tiempo Productivo).</span>
                   </div>
                   <div className="flex items-center gap-2">
                     <span className="w-3 h-3 rounded-full bg-rose-500 shrink-0" />
-                    <span><strong>Trazas Rojas:</strong> Fuera de lote / Tiempos improductivos o desvíos.</span>
+                    <span><strong>Rojo:</strong> Fuera de lote / Desvío de geocerca (Tiempo Improductivo).</span>
                   </div>
                   <div className="flex items-center gap-2">
                     <span className="w-3 h-3 rounded-full bg-amber-500 shrink-0" />
@@ -1827,7 +1834,7 @@ export default function MapaCalor() {
                 </div>
 
                 <p className="text-[10px] text-slate-500 dark:text-slate-400 pt-1 border-t border-slate-200 dark:border-slate-800">
-                  Haz clic en cualquier operario, tractor, camión o punto del recorrido para auditar sus paradas y tiempos muertos.
+                  Haz clic en cualquier operario, tractor, camión o punto del recorrido para auditar sus labores activas, paradas y tiempos muertos.
                 </p>
               </div>
             )}
