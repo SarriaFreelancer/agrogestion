@@ -1,5 +1,6 @@
 import React, { useState, useRef } from 'react';
 import { useAgro } from '@/providers/AgroContext';
+import { useTheme } from '@/providers/ThemeProvider';
 import { Switch } from '@/components/ui/Switch';
 import { 
   Building2, 
@@ -53,6 +54,8 @@ export default function Configuraciones() {
     addAuditLog
   } = useAgro();
 
+  const { applyTheme } = useTheme();
+
   const isAdminUser = currentUser?.rol === 'Super Admin' || currentUser?.rol === 'Administrador' || currentUser?.modulos?.includes('ALL');
 
   const [activeTab, setActiveTab] = useState('monitoreo');
@@ -80,6 +83,9 @@ export default function Configuraciones() {
     const currentValue = configuraciones[key];
     const nextValue = Number(currentValue) === 1 ? 0 : 1;
     updateConfiguracion(key, nextValue);
+    if (key === 'modoOscuro' && typeof applyTheme === 'function') {
+      applyTheme(currentClient?.theme || 'Tema Principal', nextValue === 1);
+    }
     if (addAuditLog) {
       addAuditLog({
         usuario: currentUser?.nombre || 'Administrador',
@@ -111,6 +117,10 @@ export default function Configuraciones() {
     if (typeof updateConfiguracion === 'function') {
       updateConfiguracion('tema', newTheme);
     }
+    if (typeof applyTheme === 'function') {
+      applyTheme(newTheme, configuraciones.modoOscuro === 1);
+    }
+    showToast(`Tema "${newTheme}" aplicado exitosamente.`);
   };
 
   // ── CSV TEMPLATE DOWNLOADER ─────────────────────────────────────────────
@@ -1314,11 +1324,16 @@ export default function Configuraciones() {
                       key={item.id}
                       type="button"
                       onClick={() => setActiveTab(item.id)}
-                      className={`w-full flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-semibold transition-all duration-150 text-left ${
+                      className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold transition-all duration-150 text-left ${
                         isActive 
-                          ? 'bg-emerald-600 text-white shadow-md font-bold' 
-                          : 'text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-emerald-600 dark:hover:text-emerald-400'
+                          ? 'text-white shadow-md font-bold' 
+                          : 'text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white'
                       }`}
+                      style={isActive ? {
+                        backgroundColor: 'var(--primary-color)',
+                        boxShadow: '0 4px 14px 0 rgba(var(--primary-rgb), 0.35)',
+                        border: '1px solid rgba(255, 255, 255, 0.2)'
+                      } : {}}
                     >
                       <Icon size={16} className={isActive ? 'text-white' : 'text-slate-500 dark:text-slate-400'} />
                       <span className="truncate">{item.label}</span>

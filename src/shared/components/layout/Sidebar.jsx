@@ -83,38 +83,43 @@ const Sidebar = ({ currentView, onNavClick, isMobileMenuOpen, setIsMobileMenuOpe
     return (
       <li 
         onClick={() => onNavClick(item.view)}
-        className={`group relative px-3 py-2.5 rounded-xl cursor-pointer transition-all duration-200 flex items-center justify-between text-[13.5px] font-semibold
+        className={`group relative px-3.5 py-2.5 rounded-xl cursor-pointer transition-all duration-200 flex items-center justify-between text-[13.5px] font-semibold
           ${isActive 
-            ? 'bg-emerald-500/25 border border-emerald-400/50 text-white font-bold shadow-lg shadow-emerald-950/40' 
-            : 'text-slate-300 hover:text-white hover:bg-white/[0.08] hover:translate-x-0.5'
+            ? 'text-white font-bold shadow-lg shadow-black/25 translate-x-1' 
+            : 'text-slate-300 hover:text-white hover:bg-white/[0.1] hover:translate-x-0.5'
           }
           ${item.highlight && !isActive ? 'text-amber-300 font-bold' : ''}
         `}
+        style={isActive ? {
+          backgroundColor: 'var(--primary-color)',
+          boxShadow: '0 4px 15px rgba(var(--primary-rgb), 0.45)',
+          border: '1px solid rgba(255, 255, 255, 0.25)'
+        } : {}}
       >
         <div className="flex items-center gap-3 truncate">
           <Icon 
             size={18} 
             className={`shrink-0 transition-colors ${
               isActive 
-                ? 'text-emerald-300' 
+                ? 'text-white' 
                 : item.highlight 
                   ? 'text-amber-400' 
-                  : 'text-slate-400 group-hover:text-emerald-400'
+                  : 'text-slate-400 group-hover:text-white'
             }`} 
           />
-          <span className={`truncate text-[13px] ${isActive ? 'text-white font-extrabold' : 'text-slate-200 group-hover:text-white'}`}>
+          <span className={`truncate text-[13px] ${isActive ? 'text-white font-extrabold tracking-wide' : 'text-slate-200 group-hover:text-white'}`}>
             {item.label}
           </span>
         </div>
 
         {item.badge && (
-          <span className={`text-[10px] font-extrabold px-2 py-0.5 rounded-full ${isActive ? 'bg-emerald-400 text-black font-black' : 'bg-amber-500/25 text-amber-300 border border-amber-500/40'}`}>
+          <span className={`text-[10px] font-extrabold px-2 py-0.5 rounded-full ${isActive ? 'bg-white/20 text-white font-black border border-white/30' : 'bg-amber-500/25 text-amber-300 border border-amber-500/40'}`}>
             {item.badge}
           </span>
         )}
 
         {isActive && (
-          <ChevronRight size={14} className="text-emerald-300 shrink-0 ml-1" />
+          <ChevronRight size={14} className="text-white shrink-0 ml-1" />
         )}
       </li>
     );
