@@ -39,7 +39,19 @@ import {
   Plus,
   Zap,
   Check,
-  RefreshCw
+  RefreshCw,
+  User,
+  Truck,
+  Clock,
+  Smartphone,
+  Moon,
+  Route,
+  Footprints,
+  ShieldAlert,
+  BatteryCharging,
+  TrendingUp,
+  AlertOctagon,
+  Timer
 } from 'lucide-react';
 import { notifySuccess, notifyError } from '@/utils/swal';
 
@@ -59,6 +71,7 @@ export default function MapaCalor() {
   const mapRef = useRef(null);
   const mapInstance = useRef(null);
   const markersLayer = useRef(null);
+  const trailsLayer = useRef(null);
   const heatLayerGroup = useRef(null);
   const baseTileLayer = useRef(null);
 
@@ -95,8 +108,10 @@ export default function MapaCalor() {
   const [showNdviSimulation, setShowNdviSimulation] = useState(false);
   const [showVertexPoints, setShowVertexPoints] = useState(true);
   const [showLoteBounds, setShowLoteBounds] = useState(true);
+  const [showTrails, setShowTrails] = useState(true); // Mostrar trazas de ruta punto a punto
   const [isPanelMinimized, setIsPanelMinimized] = useState(false);
   const [showConfigModal, setShowConfigModal] = useState(false);
+  const [selectedTrackingFilter, setSelectedTrackingFilter] = useState('all'); // 'all' or specific entity ID
 
   // Filter states
   const [filterPestSeverity, setFilterPestSeverity] = useState('all'); // 'all' | 'high' | 'critical'
@@ -106,7 +121,7 @@ export default function MapaCalor() {
   const [testGps, setTestGps] = useState({ lat: '3.5285', lng: '-76.2980' });
   const [validationResult, setValidationResult] = useState(null);
 
-  // Configuration settings for Plant Census
+  // Configuration settings for Plant Census & Telemetry
   const [palmSettings, setPalmSettings] = useState(() => {
     try {
       const s = localStorage.getItem('agro_gis_palm_settings');
@@ -116,7 +131,8 @@ export default function MapaCalor() {
       distanciaSiembra: 9, // 9m marco triangular tresbolillo
       variedad: 'Tenera Guineensis x Oleifera',
       anodeSiembra: 2021,
-      densidadHa: 143
+      densidadHa: 143,
+      umbralInactividadMin: 25 // minutos para alertar inactividad
     };
   });
 
@@ -212,72 +228,261 @@ export default function MapaCalor() {
     return [3.5285, -76.2980];
   }, [allSuertes]);
 
-  // ── Generador / Modelado de Tracking de Personal en Campo ────────────────
+  // ── INYECCIÓN AVANZADA: TRACKING DE PERSONAL CON RUTAS HISTÓRICAS ────────
   const workersTelemetry = useMemo(() => {
-    const list = [];
-    const baseNames = [
-      { name: 'Carlos Benítez', rol: 'Evaluador Fitosanitario', cuadrilla: 'Cuadrilla Sanidad A', estado: 'En Labor' },
-      { name: 'María Cardona', rol: 'Supervisora de Cosecha', cuadrilla: 'Cuadrilla Corte 1', estado: 'En Labor' },
-      { name: 'Javier Restrepo', rol: 'Operario Fumigador', cuadrilla: 'Cuadrilla Aplicación', estado: 'En Desplazamiento' },
-      { name: 'Andrés Morales', rol: 'Agrónomo de Campo', cuadrilla: 'Equipo Técnico', estado: 'En Labor' },
-      { name: 'Laura Gómez', rol: 'Técnica de Riego', cuadrilla: 'Cuadrilla Riego y Drenaje', estado: 'Pausa / Descanso' }
-    ];
+    const baseLat = defaultCenter[0];
+    const baseLng = defaultCenter[1];
 
-    allSuertes.forEach((st, idx) => {
-      const wInfo = baseNames[idx % baseNames.length];
-      if (st.geometria && st.geometria.length > 0) {
-        const pt = st.geometria[0];
-        const offsetLat = (Math.sin(idx * 2) * 0.0006);
-        const offsetLng = (Math.cos(idx * 2) * 0.0006);
-        list.push({
-          id: `WRK-${idx + 101}`,
-          nombre: wInfo.name,
-          cargo: wInfo.rol,
-          cuadrilla: wInfo.cuadrilla,
-          estado: wInfo.estado,
-          bateria: Math.floor(65 + Math.random() * 30),
-          suerteName: st.name,
-          fincaName: st.fincaName,
-          lat: pt[0] + offsetLat,
-          lng: pt[1] + offsetLng,
-          ultimaActualizacion: 'Hace 2 min',
-          cumplimientoGeocerca: true
-        });
+    return [
+      {
+        id: 'WRK-101',
+        nombre: 'Carlos Benítez',
+        cargo: 'Evaluador Fitosanitario',
+        cuadrilla: 'Cuadrilla Sanidad A',
+        estado: 'En Labor Activa',
+        bateria: 82,
+        suerteName: 'Suerte A-01 (Tablón Principal)',
+        fincaName: 'Hacienda El Paraíso',
+        lat: baseLat + 0.0003,
+        lng: baseLng - 0.0002,
+        esProductivo: true,
+        distanciaTotal: '5.8 km',
+        tiempoTotal: '5h 30m',
+        tiempoProductivo: '4h 45m',
+        tiempoImproductivo: '45m',
+        porcentajeEficiencia: 86,
+        tiempoDetenidoActual: 8, // min
+        alertaParada: null,
+        sensorMovimiento: 'Activo (Caminando / Muestreo)',
+        ruta: [
+          { lat: baseLat + 0.0035, lng: baseLng - 0.0040, hora: '06:30 AM', esProductivo: false, velocidad: '0.0 km/h', dwellMin: 15, lugar: 'Campamento Central (Salida)' },
+          { lat: baseLat + 0.0025, lng: baseLng - 0.0028, hora: '07:05 AM', esProductivo: false, velocidad: '4.8 km/h', dwellMin: 5, lugar: 'Carretera Perimetral Norte' },
+          { lat: baseLat + 0.0008, lng: baseLng - 0.0006, hora: '07:40 AM', esProductivo: true, velocidad: '2.5 km/h', dwellMin: 20, lugar: 'Suerte A-01 (Surco 1-20)' },
+          { lat: baseLat + 0.0006, lng: baseLng - 0.0004, hora: '08:50 AM', esProductivo: true, velocidad: '2.2 km/h', dwellMin: 25, lugar: 'Suerte A-01 (Surco 21-40)' },
+          { lat: baseLat + 0.0004, lng: baseLng - 0.0003, hora: '10:15 AM', esProductivo: true, velocidad: '2.8 km/h', dwellMin: 18, lugar: 'Suerte A-01 (Muestreo Barrenador)' },
+          { lat: baseLat + 0.0003, lng: baseLng - 0.0002, hora: '11:30 AM', esProductivo: true, velocidad: '2.1 km/h', dwellMin: 8, lugar: 'Suerte A-01 (Punto Actual)' }
+        ]
+      },
+      {
+        id: 'WRK-102',
+        nombre: 'María Cardona',
+        cargo: 'Supervisora de Cosecha',
+        cuadrilla: 'Cuadrilla Corte 1',
+        estado: 'En Labor Activa',
+        bateria: 94,
+        suerteName: 'Suerte A-02 (Tablón Ribera)',
+        fincaName: 'Hacienda El Paraíso',
+        lat: baseLat - 0.0018,
+        lng: baseLng - 0.0022,
+        esProductivo: true,
+        distanciaTotal: '7.4 km',
+        tiempoTotal: '6h 00m',
+        tiempoProductivo: '5h 20m',
+        tiempoImproductivo: '40m',
+        porcentajeEficiencia: 89,
+        tiempoDetenidoActual: 12,
+        alertaParada: null,
+        sensorMovimiento: 'Activo (Supervisión de Frente)',
+        ruta: [
+          { lat: baseLat + 0.0035, lng: baseLng - 0.0040, hora: '06:00 AM', esProductivo: false, velocidad: '0.0 km/h', dwellMin: 20, lugar: 'Oficina de Campo' },
+          { lat: baseLat + 0.0010, lng: baseLng - 0.0030, hora: '06:45 AM', esProductivo: false, velocidad: '14.0 km/h', dwellMin: 5, lugar: 'Traslado en Moto' },
+          { lat: baseLat - 0.0012, lng: baseLng - 0.0020, hora: '07:30 AM', esProductivo: true, velocidad: '3.0 km/h', dwellMin: 30, lugar: 'Suerte A-02 (Frente de Corte)' },
+          { lat: baseLat - 0.0015, lng: baseLng - 0.0021, hora: '09:15 AM', esProductivo: true, velocidad: '2.5 km/h', dwellMin: 35, lugar: 'Suerte A-02 (Inspección Calidad)' },
+          { lat: baseLat - 0.0018, lng: baseLng - 0.0022, hora: '11:45 AM', esProductivo: true, velocidad: '1.8 km/h', dwellMin: 12, lugar: 'Suerte A-02 (Punto Actual)' }
+        ]
+      },
+      {
+        id: 'WRK-103',
+        nombre: 'Javier Restrepo',
+        cargo: 'Operario Fumigador',
+        cuadrilla: 'Cuadrilla Aplicación',
+        estado: 'Alerta: Inactivo / Dormido',
+        bateria: 68,
+        suerteName: 'Zona Perimetral (Fuera de Geocerca)',
+        fincaName: 'Hacienda El Paraíso',
+        lat: baseLat + 0.0022,
+        lng: baseLng - 0.0035,
+        esProductivo: false,
+        distanciaTotal: '3.1 km',
+        tiempoTotal: '5h 15m',
+        tiempoProductivo: '2h 10m',
+        tiempoImproductivo: '3h 05m',
+        porcentajeEficiencia: 41,
+        tiempoDetenidoActual: 48, // 48 minutos detenido!
+        alertaParada: {
+          tipo: 'Inactividad Prolongada',
+          mensaje: 'DETENCIÓN CRÍTICA (48 min): El operario se encuentra inmóvil bajo sombra fuera del lote. Sensor del celular sin actividad ni aceleración (posible descanso no programado o pérdida de señal).',
+          severidad: 'Alta'
+        },
+        sensorMovimiento: '💤 INMÓVIL (Sin Movimiento / Teléfono Estático)',
+        ruta: [
+          { lat: baseLat + 0.0035, lng: baseLng - 0.0040, hora: '06:30 AM', esProductivo: false, velocidad: '0.0 km/h', dwellMin: 15, lugar: 'Bodega de Agroquímicos' },
+          { lat: baseLat + 0.0005, lng: baseLng - 0.0005, hora: '07:20 AM', esProductivo: true, velocidad: '2.0 km/h', dwellMin: 45, lugar: 'Suerte A-01 (Aplicación Folio)' },
+          { lat: baseLat + 0.0002, lng: baseLng - 0.0002, hora: '08:40 AM', esProductivo: true, velocidad: '1.9 km/h', dwellMin: 50, lugar: 'Suerte A-01 (Fumigación)' },
+          { lat: baseLat + 0.0018, lng: baseLng - 0.0025, hora: '10:10 AM', esProductivo: false, velocidad: '4.0 km/h', dwellMin: 10, lugar: 'Salida no autorizada de lote' },
+          { lat: baseLat + 0.0022, lng: baseLng - 0.0035, hora: '10:45 AM', esProductivo: false, velocidad: '0.0 km/h', dwellMin: 48, lugar: 'Zanja / Sombra Árbol (Inmóvil)' }
+        ]
+      },
+      {
+        id: 'WRK-104',
+        nombre: 'Andrés Morales',
+        cargo: 'Agrónomo de Campo',
+        cuadrilla: 'Equipo Técnico',
+        estado: 'En Desplazamiento',
+        bateria: 75,
+        suerteName: 'Corredor Interlotes B-01',
+        fincaName: 'Hacienda El Paraíso',
+        lat: baseLat + 0.0015,
+        lng: baseLng - 0.0018,
+        esProductivo: false,
+        distanciaTotal: '9.2 km',
+        tiempoTotal: '4h 50m',
+        tiempoProductivo: '3h 35m',
+        tiempoImproductivo: '1h 15m',
+        porcentajeEficiencia: 74,
+        tiempoDetenidoActual: 4,
+        alertaParada: null,
+        sensorMovimiento: 'Activo (Vehicular / Cuatrimoto)',
+        ruta: [
+          { lat: baseLat + 0.0035, lng: baseLng - 0.0040, hora: '07:00 AM', esProductivo: false, velocidad: '0.0 km/h', dwellMin: 15, lugar: 'Laboratorio' },
+          { lat: baseLat - 0.0010, lng: baseLng - 0.0015, hora: '07:50 AM', esProductivo: true, velocidad: '3.2 km/h', dwellMin: 40, lugar: 'Suerte A-02 (Revisión Suelos)' },
+          { lat: baseLat + 0.0005, lng: baseLng - 0.0003, hora: '09:20 AM', esProductivo: true, velocidad: '2.8 km/h', dwellMin: 55, lugar: 'Suerte A-01 (Aforo de Caña)' },
+          { lat: baseLat + 0.0015, lng: baseLng - 0.0018, hora: '11:20 AM', esProductivo: false, velocidad: '18.5 km/h', dwellMin: 4, lugar: 'En Ruta hacia Lote 02' }
+        ]
       }
-    });
+    ];
+  }, [defaultCenter]);
 
-    return list;
-  }, [allSuertes]);
-
-  // ── Generador / Modelado de Telemetría de Maquinaria IoT ────────────────
+  // ── INYECCIÓN AVANZADA: TELEMETRÍA DE MAQUINARIA & ALERTAS DE PARADA ────
   const machineryTelemetry = useMemo(() => {
-    const list = [];
-    const machinesRef = [
-      { id: 'MAQ-01', codigo: 'TRAC-01', nombre: 'Tractor John Deere 6125M', tipo: 'Tractor Agrícola', implemento: 'Rastra 24 Discos', op: 'Jorge Salazar', vel: '6.4 km/h', estado: 'Operando', rpm: 1850, fuel: '78%' },
-      { id: 'MAQ-02', codigo: 'COS-01', nombre: 'Cosechadora Case IH 8800', tipo: 'Cosechadora Combinada', implemento: 'Cabezal Picador', op: 'Hernán Duque', vel: '4.2 km/h', estado: 'Operando', rpm: 2100, fuel: '62%' },
-      { id: 'MAQ-03', codigo: 'FUM-01', nombre: 'Fumigadora Jacto Uniport 3030', tipo: 'Fumigadora Autopropulsada', implemento: 'Barra 28m', op: 'Fabián Ortiz', vel: '12.0 km/h', estado: 'Operando', rpm: 1600, fuel: '85%' },
-      { id: 'MAQ-04', codigo: 'DRON-01', nombre: 'Dron DJI Agras T40', tipo: 'Dron de Pulverización', implemento: 'Atomizadores Centrífugos', op: 'David Sarria', vel: '22.5 km/h', estado: 'Operando', rpm: 0, fuel: '92% (Batería)' },
-      { id: 'MAQ-05', codigo: 'CAM-01', nombre: 'Camión Alce Mercedes Axor', tipo: 'Transporte de Cosecha', implemento: 'Vagón Cañero', op: 'Mauricio Vivas', vel: '0.0 km/h', estado: 'En Espera', rpm: 750, fuel: '54%' }
-    ];
+    const baseLat = defaultCenter[0];
+    const baseLng = defaultCenter[1];
 
-    allSuertes.forEach((st, idx) => {
-      if (idx < machinesRef.length && st.geometria && st.geometria.length > 1) {
-        const mInfo = machinesRef[idx];
-        const pt = st.geometria[Math.min(1, st.geometria.length - 1)];
-        list.push({
-          ...mInfo,
-          suerteName: st.name,
-          fincaName: st.fincaName,
-          lat: pt[0] + (Math.cos(idx * 3) * 0.0005),
-          lng: pt[1] + (Math.sin(idx * 3) * 0.0005),
-          horometro: `${(1420 + idx * 85).toFixed(1)} h`,
-          ultimaConexion: 'En línea (GPS Activo)'
-        });
+    return [
+      {
+        id: 'MAQ-01',
+        codigo: 'TRAC-01',
+        nombre: 'Tractor John Deere 6125M',
+        tipo: 'Tractor Agrícola',
+        implemento: 'Rastra 24 Discos',
+        op: 'Jorge Salazar',
+        vel: '6.4 km/h',
+        estado: 'Operando en Lote',
+        rpm: 1850,
+        fuel: '78%',
+        horometro: '1,485.2 h',
+        esProductivo: true,
+        distanciaTotal: '24.6 km',
+        tiempoTotal: '6h 15m',
+        tiempoProductivo: '5h 30m',
+        tiempoImproductivo: '45m',
+        porcentajeEficiencia: 88,
+        tiempoDetenidoActual: 3,
+        alertaParada: null,
+        lat: baseLat + 0.0007,
+        lng: baseLng - 0.0008,
+        ruta: [
+          { lat: baseLat + 0.0035, lng: baseLng - 0.0040, hora: '06:00 AM', esProductivo: false, velocidad: '0.0 km/h', dwellMin: 15, lugar: 'Taller de Maquinaria' },
+          { lat: baseLat + 0.0020, lng: baseLng - 0.0025, hora: '06:35 AM', esProductivo: false, velocidad: '15.0 km/h', dwellMin: 5, lugar: 'Traslado por Callejón' },
+          { lat: baseLat + 0.0009, lng: baseLng - 0.0009, hora: '07:15 AM', esProductivo: true, velocidad: '6.2 km/h', dwellMin: 8, lugar: 'Suerte A-01 (Pasada 1 Rastra)' },
+          { lat: baseLat + 0.0008, lng: baseLng - 0.0008, hora: '09:00 AM', esProductivo: true, velocidad: '6.5 km/h', dwellMin: 6, lugar: 'Suerte A-01 (Pasada 2 Rastra)' },
+          { lat: baseLat + 0.0007, lng: baseLng - 0.0008, hora: '11:40 AM', esProductivo: true, velocidad: '6.4 km/h', dwellMin: 3, lugar: 'Suerte A-01 (Pasada 3)' }
+        ]
+      },
+      {
+        id: 'MAQ-02',
+        codigo: 'FUM-01',
+        nombre: 'Fumigadora Jacto Uniport 3030',
+        tipo: 'Fumigadora Autopropulsada',
+        implemento: 'Barra Hidráulica 28m',
+        op: 'Fabián Ortiz',
+        vel: '0.0 km/h',
+        estado: 'Alerta: Falla Mecánica en Campo',
+        rpm: 0,
+        fuel: '65%',
+        horometro: '2,110.5 h',
+        esProductivo: false,
+        distanciaTotal: '11.8 km',
+        tiempoTotal: '5h 40m',
+        tiempoProductivo: '3h 10m',
+        tiempoImproductivo: '2h 30m',
+        porcentajeEficiencia: 56,
+        tiempoDetenidoActual: 52, // 52 min detenida!
+        alertaParada: {
+          tipo: 'Daño Mecánico en Campo',
+          mensaje: 'DETENCIÓN POR AVERÍA (52 min): Máquina parada en medio del surco con motor apagado. Código de falla OBD: F-302 (Pérdida de presión en barra de pulverización). Requiere asistencia técnica.',
+          severidad: 'Crítica'
+        },
+        lat: baseLat + 0.0005,
+        lng: baseLng - 0.0003,
+        ruta: [
+          { lat: baseLat + 0.0035, lng: baseLng - 0.0040, hora: '06:30 AM', esProductivo: false, velocidad: '0.0 km/h', dwellMin: 20, lugar: 'Carga de Tanque (Caldo)' },
+          { lat: baseLat + 0.0010, lng: baseLng - 0.0010, hora: '07:20 AM', esProductivo: true, velocidad: '12.5 km/h', dwellMin: 5, lugar: 'Suerte A-01 (Inicio Fumigación)' },
+          { lat: baseLat + 0.0007, lng: baseLng - 0.0005, hora: '08:45 AM', esProductivo: true, velocidad: '11.8 km/h', dwellMin: 8, lugar: 'Suerte A-01 (Frente Norte)' },
+          { lat: baseLat + 0.0005, lng: baseLng - 0.0003, hora: '10:15 AM', esProductivo: false, velocidad: '0.0 km/h', dwellMin: 52, lugar: 'Suerte A-01 (Averiada en Surco)' }
+        ]
+      },
+      {
+        id: 'MAQ-03',
+        codigo: 'CAM-01',
+        nombre: 'Camión Alce Mercedes Axor 3340',
+        tipo: 'Transporte de Cosecha',
+        implemento: 'Vagón Cañero Volcable',
+        op: 'Mauricio Vivas',
+        vel: '0.0 km/h',
+        estado: 'Parada Operativa (Cargue)',
+        rpm: 800,
+        fuel: '54%',
+        horometro: '4,820.0 h',
+        esProductivo: true,
+        distanciaTotal: '42.0 km',
+        tiempoTotal: '6h 30m',
+        tiempoProductivo: '5h 45m',
+        tiempoImproductivo: '45m',
+        porcentajeEficiencia: 88,
+        tiempoDetenidoActual: 24, // 24 min en tolva
+        alertaParada: {
+          tipo: 'Parada Operativa Autorizada',
+          mensaje: 'ESPERA DE CARGUE (24 min): Vehículo posicionado en cabecera de suerte recibiendo caña picada desde cosechadora combinada.',
+          severidad: 'Baja'
+        },
+        lat: baseLat - 0.0015,
+        lng: baseLng - 0.0025,
+        ruta: [
+          { lat: baseLat + 0.0040, lng: baseLng - 0.0050, hora: '05:30 AM', esProductivo: false, velocidad: '0.0 km/h', dwellMin: 15, lugar: 'Báscula Ingenio Central' },
+          { lat: baseLat - 0.0005, lng: baseLng - 0.0035, hora: '06:40 AM', esProductivo: false, velocidad: '35.0 km/h', dwellMin: 8, lugar: 'Vía Principal de Acceso' },
+          { lat: baseLat - 0.0015, lng: baseLng - 0.0025, hora: '08:00 AM', esProductivo: true, velocidad: '0.0 km/h', dwellMin: 24, lugar: 'Suerte A-02 (Punto de Alce)' }
+        ]
+      },
+      {
+        id: 'MAQ-04',
+        codigo: 'COS-01',
+        nombre: 'Cosechadora Case IH 8800',
+        tipo: 'Cosechadora Combinada',
+        implemento: 'Cabezal Picador 1.5m',
+        op: 'Hernán Duque',
+        vel: '4.5 km/h',
+        estado: 'Operando en Cosecha',
+        rpm: 2150,
+        fuel: '62%',
+        horometro: '3,140.8 h',
+        esProductivo: true,
+        distanciaTotal: '18.2 km',
+        tiempoTotal: '6h 00m',
+        tiempoProductivo: '5h 10m',
+        tiempoImproductivo: '50m',
+        porcentajeEficiencia: 86,
+        tiempoDetenidoActual: 4,
+        alertaParada: null,
+        lat: baseLat - 0.0013,
+        lng: baseLng - 0.0020,
+        ruta: [
+          { lat: baseLat - 0.0010, lng: baseLng - 0.0018, hora: '06:30 AM', esProductivo: true, velocidad: '4.2 km/h', dwellMin: 10, lugar: 'Suerte A-02 (Inicio Corte)' },
+          { lat: baseLat - 0.0013, lng: baseLng - 0.0020, hora: '11:45 AM', esProductivo: true, velocidad: '4.5 km/h', dwellMin: 4, lugar: 'Suerte A-02 (Corte Continuo)' }
+        ]
       }
-    });
-
-    return list;
-  }, [allSuertes]);
+    ];
+  }, [defaultCenter]);
 
   // ── Generador / Modelado de Censo Individual Palma a Palma ──────────────
   const [palmsList, setPalmsList] = useState(() => {
@@ -296,7 +501,6 @@ export default function MapaCalor() {
     const targetSuerte = selectedSuerte ? selectedSuerte.suerte : allSuertes[0];
     if (!targetSuerte || !targetSuerte.geometria || targetSuerte.geometria.length < 3) return;
 
-    // If already generated and has matching target, keep
     if (palmsList.length > 0 && palmsList[0].suerteName === targetSuerte.name) return;
 
     const baseLat = targetSuerte.geometria[0][0];
@@ -372,6 +576,7 @@ export default function MapaCalor() {
           attribution: '© AgroGestión GIS / Esri / CARTO / OSM'
         }).addTo(mapInstance.current);
 
+        trailsLayer.current = window.L.layerGroup().addTo(mapInstance.current);
         markersLayer.current = window.L.layerGroup().addTo(mapInstance.current);
         heatLayerGroup.current = window.L.layerGroup().addTo(mapInstance.current);
 
@@ -423,6 +628,7 @@ export default function MapaCalor() {
     if (!mapInstance.current || !markersLayer.current || !window.L) return;
 
     markersLayer.current.clearLayers();
+    if (trailsLayer.current) trailsLayer.current.clearLayers();
     if (heatLayerGroup.current) heatLayerGroup.current.clearLayers();
 
     const boundsPoints = [];
@@ -432,13 +638,17 @@ export default function MapaCalor() {
       if (suerte.geometria && Array.isArray(suerte.geometria) && suerte.geometria.length >= 3) {
         let strokeColor = '#10b981';
         let fillColor = '#10b981';
-        let fillOpacity = 0.35;
+        let fillOpacity = 0.30;
 
         if (showNdviSimulation) {
           const hash = (suerte.name || suerte.id || 'A').charCodeAt(0) % 3;
           fillColor = hash === 0 ? '#10b981' : hash === 1 ? '#fbbf24' : '#ef4444';
           strokeColor = hash === 0 ? '#059669' : hash === 1 ? '#d97706' : '#dc2626';
           fillOpacity = 0.65;
+        } else if (gisMode === 'personal' || gisMode === 'maquinaria') {
+          fillColor = '#0f172a';
+          strokeColor = '#10b981';
+          fillOpacity = 0.15;
         } else if (gisMode === 'palmas') {
           fillColor = '#065F46';
           strokeColor = '#10B981';
@@ -456,9 +666,6 @@ export default function MapaCalor() {
         } else if (suerte.cultivo?.toLowerCase().includes('aguacate')) {
           fillColor = '#8B5CF6';
           strokeColor = '#7C3AED';
-        } else if (suerte.cultivo?.toLowerCase().includes('palma')) {
-          fillColor = '#06B6D4';
-          strokeColor = '#0891B2';
         }
 
         const polygon = window.L.polygon(suerte.geometria, {
@@ -490,22 +697,6 @@ export default function MapaCalor() {
                   <span style="font-family: monospace; color: #475569;">${pt[0].toFixed(5)}, ${pt[1].toFixed(5)}</span>
                 </div>
               `, { sticky: true, className: 'leaflet-custom-tooltip' });
-
-              vertexMarker.on('click', (e) => {
-                window.L.DomEvent.stopPropagation(e);
-                setTestGps({
-                  lat: pt[0].toFixed(5),
-                  lng: pt[1].toFixed(5)
-                });
-                setSelectedSuerte({
-                  suerte,
-                  lote: suerte.loteName,
-                  finca: suerte.fincaName,
-                  sector: suerte.sectorName,
-                  cultivo: suerte.cultivo || 'Caña de Azúcar',
-                  selectedVertex: { index: vertexIdx + 1, lat: pt[0], lng: pt[1] }
-                });
-              });
             }
           }
         });
@@ -528,10 +719,7 @@ export default function MapaCalor() {
             <span>📍 Lote: ${suerte.loteName} · ${suerte.fincaName}</span><br/>
             <span style="color: #0284c7;">📐 Superficie: ${suerte.hectareas} Ha</span>
           </div>
-        `, {
-          sticky: true,
-          className: 'leaflet-custom-tooltip'
-        });
+        `, { sticky: true, className: 'leaflet-custom-tooltip' });
       }
     });
 
@@ -570,20 +758,6 @@ export default function MapaCalor() {
           fillOpacity: 1
         }).addTo(markersLayer.current);
 
-        heatPin.bindPopup(`
-          <div style="font-size: 12px; color: #1e293b; padding: 4px; min-width: 180px;">
-            <div style="font-weight: 800; color: ${hp.color}; font-size: 13px; margin-bottom: 4px;">
-              🌡️ Foco Fitosanitario #${idx + 1}
-            </div>
-            <strong>Plaga/Enfermedad:</strong> ${hp.plaga}<br/>
-            <strong>Incidencia/Severidad:</strong> <span style="font-weight: bold; color: ${hp.color};">${hp.severidad}% (${hp.nivel})</span><br/>
-            <strong>GPS:</strong> ${hp.lat.toFixed(4)}, ${hp.lng.toFixed(4)}<br/>
-            <div style="margin-top: 6px; padding: 4px 6px; background: #f1f5f9; border-radius: 6px; font-size: 11px;">
-              ⚠️ <em>Acción sugerida: Aplicación biológica / trampeo focalizado.</em>
-            </div>
-          </div>
-        `);
-
         heatPin.on('click', () => {
           setSelectedEntity({
             type: 'calor',
@@ -599,23 +773,115 @@ export default function MapaCalor() {
       });
     }
 
-    // ── 3. MODO PERSONAL: TRACKING DE OPERARIOS & CUADRILLAS ─────────────
+    // ── 3. MODO PERSONAL: TRACKING CON ICONOS DE PERSONA Y RECORRIDO COMPLETO ──
     if (gisMode === 'personal') {
-      workersTelemetry.forEach(w => {
-        const workerMarker = window.L.circleMarker([w.lat, w.lng], {
-          radius: 9,
-          fillColor: w.estado === 'En Labor' ? '#10b981' : w.estado === 'En Desplazamiento' ? '#3b82f6' : '#f59e0b',
-          color: '#ffffff',
-          weight: 3,
-          fillOpacity: 1
-        }).addTo(markersLayer.current);
+      workersTelemetry.forEach((w) => {
+        if (selectedTrackingFilter !== 'all' && selectedTrackingFilter !== w.id) return;
 
-        workerMarker.bindTooltip(`
-          <div style="font-size: 12px; font-weight: bold; color: #1e293b; padding: 2px;">
-            👤 ${w.nombre}<br/>
-            <span style="font-size: 10px; color: #64748b;">${w.cargo} · ${w.estado}</span>
+        const isInside = w.esProductivo;
+        const hasAnomaly = !!w.alertaParada;
+
+        // 3.1. Dibujar el recorrido histórico punto a punto (Trazas)
+        if (showTrails && w.ruta && w.ruta.length > 1) {
+          for (let i = 0; i < w.ruta.length - 1; i++) {
+            const p1 = w.ruta[i];
+            const p2 = w.ruta[i + 1];
+            // Si ambos puntos o el destino están dentro del lote = Verde (Productivo), si no = Rojo (Improductivo)
+            const segColor = (p1.esProductivo && p2.esProductivo) ? '#10B981' : '#EF4444';
+            
+            window.L.polyline([[p1.lat, p1.lng], [p2.lat, p2.lng]], {
+              color: segColor,
+              weight: 3.5,
+              opacity: 0.85,
+              dashArray: segColor === '#EF4444' ? '5, 5' : null
+            }).addTo(trailsLayer.current);
+          }
+
+          // Dibujar los waypoints / puntos del recorrido
+          w.ruta.forEach((wp, wpIdx) => {
+            const isStart = wpIdx === 0;
+            const isEnd = wpIdx === w.ruta.length - 1;
+            const wpColor = wp.esProductivo ? '#10B981' : '#EF4444';
+
+            const wpMarker = window.L.circleMarker([wp.lat, wp.lng], {
+              radius: isStart || isEnd ? 6 : 4,
+              fillColor: isStart ? '#3b82f6' : wpColor,
+              color: '#ffffff',
+              weight: 2,
+              fillOpacity: 1
+            }).addTo(trailsLayer.current);
+
+            wpMarker.bindTooltip(`
+              <div style="font-size: 11px; font-weight: 600; padding: 2px;">
+                <strong style="color: ${wpColor};">${isStart ? '▶ INICIO' : isEnd ? '📍 POSICIÓN ACTUAL' : `Punto #${wpIdx + 1}`} - ${w.nombre}</strong><br/>
+                <span>⏱️ Hora: <strong>${wp.hora}</strong></span><br/>
+                <span>📍 Lugar: ${wp.lugar}</span><br/>
+                <span>⏳ Detenido en punto: <strong style="color: ${wp.dwellMin > 25 ? '#ef4444' : '#059669'};">${wp.dwellMin} min</strong></span><br/>
+                <span>🚦 Estado: <strong style="color: ${wpColor};">${wp.esProductivo ? '🟢 Productivo (En Lote)' : '🔴 Improductivo (Fuera)'}</strong></span>
+              </div>
+            `, { sticky: true });
+
+            wpMarker.on('click', () => {
+              setSelectedEntity({
+                type: 'personal',
+                ...w,
+                activeWaypoint: wp
+              });
+            });
+          });
+        }
+
+        // 3.2. Icono de Persona Personalizado (L.divIcon)
+        const personIconHtml = `
+          <div style="position: relative; display: flex; flex-direction: column; align-items: center; transform: translate(-50%, -100%); cursor: pointer;">
+            <div style="
+              background: ${hasAnomaly ? '#fef3c7' : isInside ? '#ecfdf5' : '#fef2f2'}; 
+              border: 2.5px solid ${hasAnomaly ? '#f59e0b' : isInside ? '#10b981' : '#ef4444'}; 
+              box-shadow: 0 4px 14px rgba(0,0,0,0.35); 
+              border-radius: 9999px; 
+              width: 38px; 
+              height: 38px; 
+              display: flex; 
+              align-items: center; 
+              justify-content: center;
+            ">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="${hasAnomaly ? '#d97706' : isInside ? '#059669' : '#dc2626'}" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"></path>
+                <circle cx="12" cy="7" r="4"></circle>
+              </svg>
+              ${hasAnomaly ? `<span style="position: absolute; top: -4px; right: -4px; width: 15px; height: 15px; background: #ef4444; border: 2px solid white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 9px; color: white; font-weight: 900;">!</span>` : ''}
+            </div>
+            <div style="
+              background: rgba(15, 23, 42, 0.92); 
+              color: white; 
+              padding: 2px 7px; 
+              border-radius: 8px; 
+              font-size: 10px; 
+              font-weight: 800; 
+              margin-top: 3px; 
+              white-space: nowrap; 
+              box-shadow: 0 2px 8px rgba(0,0,0,0.4); 
+              border: 1px solid rgba(255,255,255,0.25);
+              display: flex;
+              align-items: center;
+              gap: 4px;
+            ">
+              <span>${w.nombre.split(' ')[0]}</span>
+              <span>${isInside ? '🟢' : '🔴'}</span>
+              ${w.tiempoDetenidoActual > 20 ? `<span style="color: #fca5a5; font-size: 9px;">⏱️${w.tiempoDetenidoActual}m</span>` : ''}
+            </div>
+            <div style="width: 2px; height: 6px; background: ${hasAnomaly ? '#f59e0b' : isInside ? '#10b981' : '#ef4444'};"></div>
           </div>
-        `, { sticky: true });
+        `;
+
+        const personDivIcon = window.L.divIcon({
+          className: 'custom-person-pin',
+          html: personIconHtml,
+          iconSize: [42, 54],
+          iconAnchor: [21, 54]
+        });
+
+        const workerMarker = window.L.marker([w.lat, w.lng], { icon: personDivIcon }).addTo(markersLayer.current);
 
         workerMarker.on('click', () => {
           setSelectedEntity({
@@ -626,25 +892,115 @@ export default function MapaCalor() {
       });
     }
 
-    // ── 4. MODO MAQUINARIA: TELEMETRÍA IOT & EQUIPOS ──────────────────────
+    // ── 4. MODO MAQUINARIA: TRACKING CON ICONOS DE VEHÍCULO Y RECORRIDOS ───
     if (gisMode === 'maquinaria') {
       machineryTelemetry.forEach(m => {
-        const iconColor = m.estado === 'Operando' ? '#3b82f6' : '#f59e0b';
-        
-        const machineMarker = window.L.circleMarker([m.lat, m.lng], {
-          radius: 11,
-          fillColor: iconColor,
-          color: '#ffffff',
-          weight: 3,
-          fillOpacity: 1
-        }).addTo(markersLayer.current);
+        if (selectedTrackingFilter !== 'all' && selectedTrackingFilter !== m.id) return;
 
-        machineMarker.bindTooltip(`
-          <div style="font-size: 12px; font-weight: bold; color: #1e293b; padding: 2px;">
-            🚜 ${m.nombre}<br/>
-            <span style="font-size: 10px; color: #64748b;">Vel: ${m.vel} | Operador: ${m.op}</span>
+        const isInside = m.esProductivo;
+        const hasAnomaly = !!m.alertaParada;
+
+        // 4.1. Dibujar traza de ruta punto a punto
+        if (showTrails && m.ruta && m.ruta.length > 1) {
+          for (let i = 0; i < m.ruta.length - 1; i++) {
+            const p1 = m.ruta[i];
+            const p2 = m.ruta[i + 1];
+            const segColor = (p1.esProductivo && p2.esProductivo) ? '#10B981' : '#EF4444';
+            
+            window.L.polyline([[p1.lat, p1.lng], [p2.lat, p2.lng]], {
+              color: segColor,
+              weight: 4,
+              opacity: 0.85,
+              dashArray: segColor === '#EF4444' ? '6, 6' : null
+            }).addTo(trailsLayer.current);
+          }
+
+          m.ruta.forEach((wp, wpIdx) => {
+            const isStart = wpIdx === 0;
+            const isEnd = wpIdx === m.ruta.length - 1;
+            const wpColor = wp.esProductivo ? '#10B981' : '#EF4444';
+
+            const wpMarker = window.L.circleMarker([wp.lat, wp.lng], {
+              radius: isStart || isEnd ? 7 : 4.5,
+              fillColor: isStart ? '#3b82f6' : wpColor,
+              color: '#ffffff',
+              weight: 2,
+              fillOpacity: 1
+            }).addTo(trailsLayer.current);
+
+            wpMarker.bindTooltip(`
+              <div style="font-size: 11px; font-weight: 600; padding: 2px;">
+                <strong style="color: ${wpColor};">${isStart ? '▶ SALIDA TALLER' : isEnd ? '📍 POSICIÓN ACTUAL' : `Paso #${wpIdx + 1}`} - ${m.codigo}</strong><br/>
+                <span>⏱️ Hora: <strong>${wp.hora}</strong></span><br/>
+                <span>📍 Lugar: ${wp.lugar}</span><br/>
+                <span>🚜 Velocidad: <strong>${wp.velocidad}</strong></span><br/>
+                <span>⏳ Detenido en punto: <strong style="color: ${wp.dwellMin > 25 ? '#ef4444' : '#059669'};">${wp.dwellMin} min</strong></span>
+              </div>
+            `, { sticky: true });
+
+            wpMarker.on('click', () => {
+              setSelectedEntity({
+                type: 'maquinaria',
+                ...m,
+                activeWaypoint: wp
+              });
+            });
+          });
+        }
+
+        // 4.2. Icono de Maquinaria Personalizado (L.divIcon)
+        const machineIconHtml = `
+          <div style="position: relative; display: flex; flex-direction: column; align-items: center; transform: translate(-50%, -100%); cursor: pointer;">
+            <div style="
+              background: ${hasAnomaly ? '#fef3c7' : isInside ? '#eff6ff' : '#fef2f2'}; 
+              border: 2.5px solid ${hasAnomaly ? '#f59e0b' : isInside ? '#3b82f6' : '#ef4444'}; 
+              box-shadow: 0 4px 14px rgba(0,0,0,0.35); 
+              border-radius: 12px; 
+              width: 40px; 
+              height: 40px; 
+              display: flex; 
+              align-items: center; 
+              justify-content: center;
+            ">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="${hasAnomaly ? '#d97706' : isInside ? '#1d4ed8' : '#dc2626'}" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M3 17h18"></path>
+                <path d="M19 17v-4l-3-4H8L5 13v4"></path>
+                <circle cx="7.5" cy="17.5" r="2.5"></circle>
+                <circle cx="16.5" cy="17.5" r="2.5"></circle>
+              </svg>
+              ${hasAnomaly ? `<span style="position: absolute; top: -5px; right: -5px; width: 16px; height: 16px; background: #f59e0b; border: 2px solid white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 9px; color: white; font-weight: 900;">⚠️</span>` : ''}
+            </div>
+            <div style="
+              background: rgba(15, 23, 42, 0.92); 
+              color: white; 
+              padding: 2px 7px; 
+              border-radius: 8px; 
+              font-size: 10px; 
+              font-weight: 800; 
+              margin-top: 3px; 
+              white-space: nowrap; 
+              box-shadow: 0 2px 8px rgba(0,0,0,0.4); 
+              border: 1px solid rgba(255,255,255,0.25);
+              display: flex;
+              align-items: center;
+              gap: 4px;
+            ">
+              <span>${m.codigo}</span>
+              <span>${isInside ? '🟢' : '🔴'}</span>
+              <span>${m.vel}</span>
+            </div>
+            <div style="width: 2px; height: 6px; background: ${hasAnomaly ? '#f59e0b' : isInside ? '#3b82f6' : '#ef4444'};"></div>
           </div>
-        `, { sticky: true });
+        `;
+
+        const machineDivIcon = window.L.divIcon({
+          className: 'custom-machine-pin',
+          html: machineIconHtml,
+          iconSize: [44, 56],
+          iconAnchor: [22, 56]
+        });
+
+        const machineMarker = window.L.marker([m.lat, m.lng], { icon: machineDivIcon }).addTo(markersLayer.current);
 
         machineMarker.on('click', () => {
           setSelectedEntity({
@@ -702,7 +1058,7 @@ export default function MapaCalor() {
       } catch (e) {}
     }
 
-  }, [allSuertes, gisMode, showNdviSimulation, showLoteBounds, showVertexPoints, mapType, filterPestSeverity, palmFilterStatus, palmsList, workersTelemetry, machineryTelemetry]);
+  }, [allSuertes, gisMode, showNdviSimulation, showLoteBounds, showVertexPoints, showTrails, mapType, filterPestSeverity, palmFilterStatus, palmsList, workersTelemetry, machineryTelemetry, selectedTrackingFilter]);
 
   // Point in Polygon helper for Geofence validation
   const isPointInPoly = (point, vs) => {
@@ -781,7 +1137,7 @@ export default function MapaCalor() {
             
             {/* 1. Catastro & Geocercas */}
             <button
-              onClick={() => { setGisMode('catastro'); setSelectedEntity(null); }}
+              onClick={() => { setGisMode('catastro'); setSelectedEntity(null); setSelectedTrackingFilter('all'); }}
               className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 ${
                 gisMode === 'catastro'
                   ? 'bg-emerald-600 text-white shadow-md'
@@ -794,7 +1150,7 @@ export default function MapaCalor() {
 
             {/* 2. Mapa de Calor & Muestreos */}
             <button
-              onClick={() => { setGisMode('calor'); setSelectedEntity(null); }}
+              onClick={() => { setGisMode('calor'); setSelectedEntity(null); setSelectedTrackingFilter('all'); }}
               className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 ${
                 gisMode === 'calor'
                   ? 'bg-rose-600 text-white shadow-md'
@@ -807,7 +1163,7 @@ export default function MapaCalor() {
 
             {/* 3. Tracking Personal */}
             <button
-              onClick={() => { setGisMode('personal'); setSelectedEntity(null); }}
+              onClick={() => { setGisMode('personal'); setSelectedEntity(null); setSelectedTrackingFilter('all'); }}
               className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 ${
                 gisMode === 'personal'
                   ? 'bg-purple-600 text-white shadow-md'
@@ -820,7 +1176,7 @@ export default function MapaCalor() {
 
             {/* 4. Tracking Maquinaria */}
             <button
-              onClick={() => { setGisMode('maquinaria'); setSelectedEntity(null); }}
+              onClick={() => { setGisMode('maquinaria'); setSelectedEntity(null); setSelectedTrackingFilter('all'); }}
               className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 ${
                 gisMode === 'maquinaria'
                   ? 'bg-blue-600 text-white shadow-md'
@@ -833,7 +1189,7 @@ export default function MapaCalor() {
 
             {/* 5. Censo Palma a Palma */}
             <button
-              onClick={() => { setGisMode('palmas'); setSelectedEntity(null); }}
+              onClick={() => { setGisMode('palmas'); setSelectedEntity(null); setSelectedTrackingFilter('all'); }}
               className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 ${
                 gisMode === 'palmas'
                   ? 'bg-amber-600 text-white shadow-md'
@@ -851,7 +1207,7 @@ export default function MapaCalor() {
             <button
               onClick={() => setShowConfigModal(true)}
               className="flex items-center gap-1.5 bg-white/95 dark:bg-slate-900/90 backdrop-blur-md border border-slate-200 dark:border-slate-700/60 px-3 py-2 rounded-2xl text-xs font-bold shadow-2xl text-slate-800 dark:text-white hover:bg-slate-50 dark:hover:bg-slate-800 transition-all pointer-events-auto"
-              title="Configuración de Parámetros GIS y Censos"
+              title="Configuración de Parámetros GIS, Telemetría y Censos"
             >
               <Settings size={15} className="text-emerald-500" />
               <span className="hidden sm:inline">Configurar GIS</span>
@@ -910,6 +1266,39 @@ export default function MapaCalor() {
                 🌙 Carto Dark
               </button>
             </div>
+
+            {/* Tracking Trails Toggle for Personal and Machinery */}
+            {(gisMode === 'personal' || gisMode === 'maquinaria') && (
+              <>
+                <button
+                  onClick={() => setShowTrails(!showTrails)}
+                  className={`px-2.5 py-1 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 ${
+                    showTrails 
+                      ? 'bg-gradient-to-r from-emerald-600 to-teal-600 text-white shadow' 
+                      : 'bg-slate-100 dark:bg-white/10 text-slate-700 dark:text-slate-300'
+                  }`}
+                  title="Activar/Desactivar visualización de trazas punto a punto del recorrido"
+                >
+                  <Route size={14} />
+                  <span>{showTrails ? 'Recorrido GPS ON' : 'Recorrido OFF'}</span>
+                </button>
+
+                {/* Filter by specific person/machine */}
+                <select
+                  value={selectedTrackingFilter}
+                  onChange={e => setSelectedTrackingFilter(e.target.value)}
+                  className="bg-slate-100 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-lg px-2 py-1 text-xs text-slate-900 dark:text-white"
+                >
+                  <option value="all">Ver toda la flota / equipo</option>
+                  {gisMode === 'personal' && workersTelemetry.map(w => (
+                    <option key={w.id} value={w.id}>{w.nombre} ({w.esProductivo ? '🟢 Productivo' : '🔴 Fuera'})</option>
+                  ))}
+                  {gisMode === 'maquinaria' && machineryTelemetry.map(m => (
+                    <option key={m.id} value={m.id}>{m.codigo} - {m.nombre}</option>
+                  ))}
+                </select>
+              </>
+            )}
 
             {/* Contextual Filters for Calor Mode */}
             {gisMode === 'calor' && (
@@ -980,19 +1369,17 @@ export default function MapaCalor() {
 
           </div>
 
-          {/* Mode Summary Indicator */}
+          {/* Mode Summary Indicator with Productive/Unproductive Badges */}
           <div className="hidden lg:flex items-center gap-3 bg-white/95 dark:bg-slate-900/90 backdrop-blur-md border border-slate-200 dark:border-slate-700/60 px-3.5 py-1.5 rounded-2xl text-xs shadow-xl text-slate-800 dark:text-white">
-            <span className="text-slate-500 dark:text-slate-400">Total Delimitado:</span>
-            <strong className="text-emerald-700 dark:text-emerald-400 font-extrabold">{totalHaCount.toFixed(1)} Ha</strong>
+            <div className="flex items-center gap-1.5 text-emerald-700 dark:text-emerald-400 font-bold">
+              <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse" />
+              <span>Verde = Tiempo Productivo</span>
+            </div>
             <span className="text-slate-300 dark:text-slate-700">|</span>
-            <span className="text-slate-500 dark:text-slate-400">Modo Activo:</span>
-            <span className="font-bold text-cyan-600 dark:text-cyan-400 uppercase tracking-wide">
-              {gisMode === 'catastro' && 'Catastro & Geocercas'}
-              {gisMode === 'calor' && 'Sanidad & Focos'}
-              {gisMode === 'personal' && `${workersTelemetry.length} Operarios`}
-              {gisMode === 'maquinaria' && `${machineryTelemetry.length} Maquinarias`}
-              {gisMode === 'palmas' && `${palmsList.length} Palmas Censadas`}
-            </span>
+            <div className="flex items-center gap-1.5 text-rose-600 dark:text-rose-400 font-bold">
+              <span className="w-2.5 h-2.5 rounded-full bg-rose-500" />
+              <span>Rojo = Improductivo / Fuera</span>
+            </div>
           </div>
 
         </div>
@@ -1016,7 +1403,7 @@ export default function MapaCalor() {
                 <span>Panel GIS: {gisMode.toUpperCase()}</span>
                 <span className="text-[10px] text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 px-1.5 py-0.2 rounded font-bold">Minimizado</span>
               </div>
-              <p className="text-[10px] text-slate-500 dark:text-slate-400">Clic para abrir validador, telemetría y detalles</p>
+              <p className="text-[10px] text-slate-500 dark:text-slate-400">Clic para abrir métricas de productividad, telemetría y tiempos muertos</p>
             </div>
             <ChevronUp size={18} className="text-slate-400 group-hover:text-emerald-500 ml-1 transition-colors" />
           </button>
@@ -1040,14 +1427,14 @@ export default function MapaCalor() {
                 <h4 className="text-xs font-extrabold uppercase tracking-wider text-slate-900 dark:text-white">
                   {gisMode === 'catastro' && 'Validador de Geocerca GPS en Terreno'}
                   {gisMode === 'calor' && 'Nivel de Muestreos & Severidad Fitosanitaria'}
-                  {gisMode === 'personal' && 'Supervisión y Cuadrillas en Terreno'}
-                  {gisMode === 'maquinaria' && 'Telemetría y Control de Flota Agrícola'}
+                  {gisMode === 'personal' && 'Tracking de Cuadrillas & Tiempos Productivos'}
+                  {gisMode === 'maquinaria' && 'Telemetría de Flota, Paradas & Detección de Averías'}
                   {gisMode === 'palmas' && `Censo Botánico Individual: ${selectedSuerte ? selectedSuerte.suerte.name : 'Palmar Principal'}`}
                 </h4>
               </div>
               <div className="flex items-center gap-2">
                 <span className="text-[10px] text-emerald-700 dark:text-emerald-400 font-bold bg-emerald-500/15 px-2 py-0.5 rounded-full border border-emerald-500/30">
-                  AgroGestión GIS v2.5
+                  AgroGestión Telemetría v3.0
                 </span>
                 <button
                   onClick={() => setIsPanelMinimized(true)}
@@ -1130,44 +1517,92 @@ export default function MapaCalor() {
               </div>
             )}
 
-            {/* Content for Mode 3: Personal Tracking */}
+            {/* Content for Mode 3: Personal Tracking & Dwell Time Analysis */}
             {gisMode === 'personal' && (
-              <div className="space-y-2 text-xs">
-                <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 max-h-36 overflow-y-auto pr-1">
-                  {workersTelemetry.map((w, idx) => (
+              <div className="space-y-2.5 text-xs">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 max-h-40 overflow-y-auto pr-1">
+                  {workersTelemetry.map((w) => (
                     <div 
-                      key={idx}
-                      onClick={() => setSelectedEntity({ type: 'personal', ...w })}
-                      className="p-2 rounded-xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700/60 cursor-pointer hover:border-purple-500 transition-all"
+                      key={w.id}
+                      onClick={() => { setSelectedEntity({ type: 'personal', ...w }); setSelectedTrackingFilter(w.id); }}
+                      className={`p-2.5 rounded-2xl border transition-all cursor-pointer ${
+                        w.alertaParada 
+                          ? 'bg-rose-500/10 border-rose-500/40 hover:border-rose-500' 
+                          : w.esProductivo 
+                            ? 'bg-emerald-500/10 border-emerald-500/30 hover:border-emerald-500' 
+                            : 'bg-amber-500/10 border-amber-500/30 hover:border-amber-500'
+                      }`}
                     >
                       <div className="flex items-center justify-between">
-                        <strong className="text-slate-900 dark:text-white text-[11px] truncate">{w.nombre}</strong>
-                        <span className={`w-2 h-2 rounded-full ${w.estado === 'En Labor' ? 'bg-emerald-500' : 'bg-blue-500'}`} />
+                        <div className="flex items-center gap-1.5">
+                          <User size={14} className={w.esProductivo ? "text-emerald-600" : "text-rose-600"} />
+                          <strong className="text-slate-900 dark:text-white font-bold">{w.nombre}</strong>
+                        </div>
+                        <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${
+                          w.esProductivo ? 'bg-emerald-500/20 text-emerald-800 dark:text-emerald-300' : 'bg-rose-500/20 text-rose-800 dark:text-rose-300'
+                        }`}>
+                          {w.esProductivo ? '🟢 En Lote' : '🔴 Fuera'}
+                        </span>
                       </div>
-                      <span className="text-[10px] text-slate-500 block truncate">{w.cargo}</span>
-                      <span className="text-[10px] text-purple-600 dark:text-purple-400 font-bold">{w.suerteName}</span>
+
+                      <div className="grid grid-cols-2 gap-1 text-[11px] text-slate-600 dark:text-slate-300 mt-1.5">
+                        <div>Productivo: <strong className="text-emerald-600 font-bold">{w.tiempoProductivo}</strong></div>
+                        <div>Improductivo: <strong className="text-rose-600 font-bold">{w.tiempoImproductivo}</strong></div>
+                        <div>Eficiencia: <strong className="text-slate-900 dark:text-white font-bold">{w.porcentajeEficiencia}%</strong></div>
+                        <div>Detenido: <strong className={w.tiempoDetenidoActual > 25 ? "text-rose-600 font-bold" : "text-slate-700 dark:text-slate-300"}>{w.tiempoDetenidoActual} min</strong></div>
+                      </div>
+
+                      {w.alertaParada && (
+                        <div className="mt-1.5 p-1.5 bg-rose-500/20 border border-rose-500/40 rounded-xl text-[10px] text-rose-800 dark:text-rose-200 font-semibold flex items-center gap-1">
+                          <AlertTriangle size={12} className="shrink-0 text-rose-600" />
+                          <span className="truncate">{w.alertaParada.tipo}: {w.tiempoDetenidoActual}m inmóvil</span>
+                        </div>
+                      )}
                     </div>
                   ))}
                 </div>
               </div>
             )}
 
-            {/* Content for Mode 4: Machinery Telemetry */}
+            {/* Content for Mode 4: Machinery Telemetry & Stop Dwell Analysis */}
             {gisMode === 'maquinaria' && (
-              <div className="space-y-2 text-xs">
-                <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 max-h-36 overflow-y-auto pr-1">
-                  {machineryTelemetry.map((m, idx) => (
+              <div className="space-y-2.5 text-xs">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 max-h-40 overflow-y-auto pr-1">
+                  {machineryTelemetry.map((m) => (
                     <div 
-                      key={idx}
-                      onClick={() => setSelectedEntity({ type: 'maquinaria', ...m })}
-                      className="p-2 rounded-xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700/60 cursor-pointer hover:border-blue-500 transition-all"
+                      key={m.id}
+                      onClick={() => { setSelectedEntity({ type: 'maquinaria', ...m }); setSelectedTrackingFilter(m.id); }}
+                      className={`p-2.5 rounded-2xl border transition-all cursor-pointer ${
+                        m.alertaParada?.severidad === 'Crítica'
+                          ? 'bg-rose-500/10 border-rose-500/40 hover:border-rose-500'
+                          : m.esProductivo
+                            ? 'bg-blue-500/10 border-blue-500/30 hover:border-blue-500'
+                            : 'bg-amber-500/10 border-amber-500/30 hover:border-amber-500'
+                      }`}
                     >
                       <div className="flex items-center justify-between">
-                        <strong className="text-slate-900 dark:text-white text-[11px] truncate">{m.codigo}</strong>
+                        <div className="flex items-center gap-1.5">
+                          <Tractor size={14} className={m.esProductivo ? "text-blue-600" : "text-amber-600"} />
+                          <strong className="text-slate-900 dark:text-white font-bold">{m.codigo} - {m.nombre}</strong>
+                        </div>
                         <span className="text-[10px] font-bold text-blue-600 dark:text-blue-400">{m.vel}</span>
                       </div>
-                      <span className="text-[10px] text-slate-500 block truncate">{m.nombre}</span>
-                      <span className="text-[10px] text-emerald-600 dark:text-emerald-400 font-bold">{m.implemento}</span>
+
+                      <div className="grid grid-cols-2 gap-1 text-[11px] text-slate-600 dark:text-slate-300 mt-1.5">
+                        <div>Operador: <strong className="text-slate-900 dark:text-white">{m.op}</strong></div>
+                        <div>Horómetro: <strong className="text-slate-900 dark:text-white">{m.horometro}</strong></div>
+                        <div>T. Productivo: <strong className="text-emerald-600 font-bold">{m.tiempoProductivo}</strong></div>
+                        <div>Detenido: <strong className={m.tiempoDetenidoActual > 25 ? "text-rose-600 font-bold" : "text-slate-700"}>{m.tiempoDetenidoActual} min</strong></div>
+                      </div>
+
+                      {m.alertaParada && (
+                        <div className={`mt-1.5 p-1.5 rounded-xl text-[10px] font-semibold flex items-center gap-1 ${
+                          m.alertaParada.severidad === 'Crítica' ? 'bg-rose-500/20 text-rose-800 dark:text-rose-200 border border-rose-500/40' : 'bg-amber-500/20 text-amber-800 dark:text-amber-200 border border-amber-500/40'
+                        }`}>
+                          <AlertTriangle size={12} className="shrink-0" />
+                          <span className="truncate">{m.alertaParada.tipo} ({m.tiempoDetenidoActual} min)</span>
+                        </div>
+                      )}
                     </div>
                   ))}
                 </div>
@@ -1212,28 +1647,119 @@ export default function MapaCalor() {
           </div>
 
           {/* RIGHT 5 COLS: Selected Entity Details or Agronomic Legend */}
-          <div className="md:col-span-5 pointer-events-auto bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl border border-slate-200 dark:border-slate-700/70 p-4 rounded-3xl shadow-2xl space-y-2 text-slate-800 dark:text-slate-100">
+          <div className="md:col-span-5 pointer-events-auto bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl border border-slate-200 dark:border-slate-700/70 p-4 rounded-3xl shadow-2xl space-y-2.5 text-slate-800 dark:text-slate-100">
             
             {/* If a specific entity (Worker, Machine, or Palm) is selected */}
             {selectedEntity ? (
-              <div className="space-y-2 text-xs">
+              <div className="space-y-2.5 text-xs">
                 <div className="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 pb-2">
-                  <div className="flex items-center gap-1.5">
-                    {selectedEntity.type === 'palma' && <Trees size={15} className="text-amber-500" />}
-                    {selectedEntity.type === 'personal' && <Users size={15} className="text-purple-500" />}
-                    {selectedEntity.type === 'maquinaria' && <Tractor size={15} className="text-blue-500" />}
-                    {selectedEntity.type === 'calor' && <Flame size={15} className="text-rose-500" />}
-                    <strong className="text-sm text-slate-900 dark:text-white font-bold">
-                      {selectedEntity.nombre || selectedEntity.title || selectedEntity.id}
-                    </strong>
+                  <div className="flex items-center gap-2">
+                    {selectedEntity.type === 'palma' && <Trees size={16} className="text-amber-500" />}
+                    {selectedEntity.type === 'personal' && <User size={16} className={selectedEntity.esProductivo ? "text-emerald-500" : "text-rose-500"} />}
+                    {selectedEntity.type === 'maquinaria' && <Tractor size={16} className={selectedEntity.esProductivo ? "text-blue-500" : "text-rose-500"} />}
+                    {selectedEntity.type === 'calor' && <Flame size={16} className="text-rose-500" />}
+                    <div>
+                      <strong className="text-sm text-slate-900 dark:text-white font-bold block">
+                        {selectedEntity.nombre || selectedEntity.title || selectedEntity.id}
+                      </strong>
+                      <span className="text-[10px] text-slate-500">{selectedEntity.cargo || selectedEntity.tipo || selectedEntity.codigo}</span>
+                    </div>
                   </div>
                   <button
-                    onClick={() => setSelectedEntity(null)}
-                    className="text-slate-400 hover:text-slate-600 dark:hover:text-white"
+                    onClick={() => { setSelectedEntity(null); setSelectedTrackingFilter('all'); }}
+                    className="text-slate-400 hover:text-slate-600 dark:hover:text-white p-1"
                   >
                     <X size={14} />
                   </button>
                 </div>
+
+                {/* Personal Detailed Card with Productivity & Dwell Anomaly */}
+                {selectedEntity.type === 'personal' && (
+                  <div className="space-y-2 text-[11px]">
+                    
+                    {/* Alerta de Inactividad / Dormido */}
+                    {selectedEntity.alertaParada && (
+                      <div className="p-2.5 bg-rose-500/15 border border-rose-500/40 rounded-2xl text-rose-800 dark:text-rose-200 space-y-1">
+                        <div className="flex items-center gap-1.5 font-bold">
+                          <AlertOctagon size={14} className="text-rose-600" />
+                          <span>ALERTA DE PARADA ANÓMALA ({selectedEntity.tiempoDetenidoActual} min)</span>
+                        </div>
+                        <p className="text-[10px] opacity-95">{selectedEntity.alertaParada.mensaje}</p>
+                      </div>
+                    )}
+
+                    {/* Sensor de Celular y Estado */}
+                    <div className="p-2 bg-slate-50 dark:bg-slate-800/80 rounded-2xl space-y-1 border border-slate-200 dark:border-slate-700/60">
+                      <div className="flex items-center justify-between">
+                        <span className="text-slate-500 flex items-center gap-1"><Smartphone size={12} /> Sensor Celular:</span>
+                        <strong className="text-slate-900 dark:text-white font-mono">{selectedEntity.sensorMovimiento}</strong>
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <span className="text-slate-500 flex items-center gap-1"><BatteryCharging size={12} /> Batería GPS:</span>
+                        <strong className="text-emerald-600 font-bold">{selectedEntity.bateria}%</strong>
+                      </div>
+                    </div>
+
+                    {/* Métricas de Productividad */}
+                    <div className="grid grid-cols-2 gap-2 text-center">
+                      <div className="p-2 bg-emerald-500/10 border border-emerald-500/20 rounded-xl">
+                        <span className="text-[10px] text-emerald-700 dark:text-emerald-400 font-bold block">🟢 T. Productivo (Lote)</span>
+                        <strong className="text-sm text-emerald-700 dark:text-emerald-300 font-extrabold">{selectedEntity.tiempoProductivo}</strong>
+                      </div>
+                      <div className="p-2 bg-rose-500/10 border border-rose-500/20 rounded-xl">
+                        <span className="text-[10px] text-rose-700 dark:text-rose-400 font-bold block">🔴 T. Improductivo (Fuera)</span>
+                        <strong className="text-sm text-rose-700 dark:text-rose-300 font-extrabold">{selectedEntity.tiempoImproductivo}</strong>
+                      </div>
+                    </div>
+
+                    {/* Waypoint activo seleccionado */}
+                    {selectedEntity.activeWaypoint && (
+                      <div className="p-2 bg-cyan-500/10 border border-cyan-500/20 rounded-xl text-[10px] text-cyan-800 dark:text-cyan-300 space-y-0.5">
+                        <strong className="block">📍 Waypoint Inspeccionado ({selectedEntity.activeWaypoint.hora})</strong>
+                        <div>Lugar: {selectedEntity.activeWaypoint.lugar} · Detenido: {selectedEntity.activeWaypoint.dwellMin} min</div>
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                {/* Machine Detailed Card with Telemetry & Damage Alarms */}
+                {selectedEntity.type === 'maquinaria' && (
+                  <div className="space-y-2 text-[11px]">
+                    
+                    {/* Alerta de Falla Mecánica / Parada */}
+                    {selectedEntity.alertaParada && (
+                      <div className={`p-2.5 rounded-2xl border space-y-1 ${
+                        selectedEntity.alertaParada.severidad === 'Crítica' 
+                          ? 'bg-rose-500/15 border-rose-500/40 text-rose-800 dark:text-rose-200' 
+                          : 'bg-amber-500/15 border-amber-500/40 text-amber-800 dark:text-amber-200'
+                      }`}>
+                        <div className="flex items-center gap-1.5 font-bold">
+                          <AlertTriangle size={14} />
+                          <span>{selectedEntity.alertaParada.tipo.toUpperCase()} ({selectedEntity.tiempoDetenidoActual} min)</span>
+                        </div>
+                        <p className="text-[10px] opacity-95">{selectedEntity.alertaParada.mensaje}</p>
+                      </div>
+                    )}
+
+                    <div className="grid grid-cols-2 gap-1.5 text-slate-600 dark:text-slate-300">
+                      <div>Operador: <strong className="text-slate-900 dark:text-white">{selectedEntity.op}</strong></div>
+                      <div>Implemento: <strong className="text-slate-900 dark:text-white">{selectedEntity.implemento}</strong></div>
+                      <div>Velocidad: <strong className="text-blue-600 font-bold">{selectedEntity.vel}</strong></div>
+                      <div>Combustible: <strong className="text-emerald-600 font-bold">{selectedEntity.fuel}</strong></div>
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-2 text-center">
+                      <div className="p-2 bg-emerald-500/10 border border-emerald-500/20 rounded-xl">
+                        <span className="text-[10px] text-emerald-700 dark:text-emerald-400 font-bold block">🟢 T. Productivo</span>
+                        <strong className="text-sm text-emerald-700 dark:text-emerald-300 font-extrabold">{selectedEntity.tiempoProductivo}</strong>
+                      </div>
+                      <div className="p-2 bg-rose-500/10 border border-rose-500/20 rounded-xl">
+                        <span className="text-[10px] text-rose-700 dark:text-rose-400 font-bold block">🔴 T. Improductivo / Parada</span>
+                        <strong className="text-sm text-rose-700 dark:text-rose-300 font-extrabold">{selectedEntity.tiempoImproductivo}</strong>
+                      </div>
+                    </div>
+                  </div>
+                )}
 
                 {/* Palm details */}
                 {selectedEntity.type === 'palma' && (
@@ -1249,42 +1775,6 @@ export default function MapaCalor() {
                     <div className="p-2 bg-slate-100 dark:bg-slate-800 rounded-xl text-[10px]">
                       <strong>Diagnóstico:</strong> {selectedEntity.diagnostico}
                     </div>
-                  </div>
-                )}
-
-                {/* Worker details */}
-                {selectedEntity.type === 'personal' && (
-                  <div className="space-y-1.5 text-[11px]">
-                    <div>Cargo: <strong>{selectedEntity.cargo}</strong></div>
-                    <div>Cuadrilla: <strong>{selectedEntity.cuadrilla}</strong></div>
-                    <div>Ubicación: <strong>{selectedEntity.suerteName} ({selectedEntity.fincaName})</strong></div>
-                    <div>Estado: <strong className="text-emerald-600 font-bold">{selectedEntity.estado}</strong></div>
-                    <div>Batería Dispositivo GPS: <strong>{selectedEntity.bateria}%</strong></div>
-                    <div>Geocerca: <strong className="text-emerald-600">✓ En Polígono Asignado</strong></div>
-                  </div>
-                )}
-
-                {/* Machine details */}
-                {selectedEntity.type === 'maquinaria' && (
-                  <div className="space-y-1.5 text-[11px]">
-                    <div>Tipo: <strong>{selectedEntity.tipo}</strong></div>
-                    <div>Implemento: <strong>{selectedEntity.implemento}</strong></div>
-                    <div>Operador: <strong>{selectedEntity.op}</strong></div>
-                    <div className="grid grid-cols-2 gap-1">
-                      <div>Velocidad: <strong className="text-blue-600 font-bold">{selectedEntity.vel}</strong></div>
-                      <div>Combustible: <strong>{selectedEntity.fuel}</strong></div>
-                      <div>Horómetro: <strong>{selectedEntity.horometro}</strong></div>
-                      <div>Estado: <strong className="text-emerald-600 font-bold">{selectedEntity.estado}</strong></div>
-                    </div>
-                  </div>
-                )}
-
-                {/* Heat point details */}
-                {selectedEntity.type === 'calor' && (
-                  <div className="space-y-1.5 text-[11px]">
-                    <div>Nivel: <strong style={{ color: selectedEntity.color }}>{selectedEntity.nivel} ({selectedEntity.severidad})</strong></div>
-                    <div>Coordenadas: <span className="font-mono text-[10px]">{selectedEntity.lat.toFixed(5)}, {selectedEntity.lng.toFixed(5)}</span></div>
-                    <p className="text-slate-600 dark:text-slate-300">{selectedEntity.detalles}</p>
                   </div>
                 )}
               </div>
@@ -1312,27 +1802,32 @@ export default function MapaCalor() {
                   <div>Superficie: <strong className="text-emerald-700 dark:text-emerald-400 font-bold">{selectedSuerte.suerte.hectareas || 0} Ha</strong></div>
                   <div>Sector: <strong className="text-cyan-700 dark:text-cyan-400 font-bold">{selectedSuerte.sector}</strong></div>
                 </div>
-                {selectedSuerte.selectedVertex && (
-                  <div className="p-2 bg-cyan-500/10 border border-cyan-500/20 rounded-xl text-[11px] text-cyan-800 dark:text-cyan-300 flex items-center justify-between">
-                    <span>📍 <strong>Vértice #{selectedSuerte.selectedVertex.index}</strong>: {selectedSuerte.selectedVertex.lat.toFixed(5)}, {selectedSuerte.selectedVertex.lng.toFixed(5)}</span>
-                  </div>
-                )}
               </div>
             ) : (
-              /* Default Agronomic Legend */
-              <div className="space-y-2 text-xs">
+              /* Default Agronomic & Telemetry Legend */
+              <div className="space-y-2.5 text-xs">
                 <div className="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 pb-1">
-                  <span className="text-[11px] font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider">Leyenda GIS Multicapa</span>
-                  <span className="text-[10px] text-slate-500 dark:text-slate-400">{allSuertes.length} Geocercas</span>
+                  <span className="text-[11px] font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider">Telemetría & Eficiencia Operativa</span>
+                  <span className="text-[10px] text-emerald-600 dark:text-emerald-400 font-bold">En Vivo</span>
                 </div>
-                <div className="grid grid-cols-2 gap-2 text-[11px] text-slate-800 dark:text-slate-200 font-medium">
-                  <div className="flex items-center gap-1.5"><span className="w-3 h-3 rounded-full bg-emerald-500 shrink-0" /> Caña de Azúcar</div>
-                  <div className="flex items-center gap-1.5"><span className="w-3 h-3 rounded-full bg-amber-500 shrink-0" /> Café Variedad Castillo</div>
-                  <div className="flex items-center gap-1.5"><span className="w-3 h-3 rounded-full bg-purple-500 shrink-0" /> Aguacate Hass</div>
-                  <div className="flex items-center gap-1.5"><span className="w-3 h-3 rounded-full bg-cyan-500 shrink-0" /> Palma de Aceite</div>
+                
+                <div className="space-y-1.5 text-[11px]">
+                  <div className="flex items-center gap-2">
+                    <span className="w-3 h-3 rounded-full bg-emerald-500 shrink-0" />
+                    <span><strong>Trazas Verdes:</strong> Operación dentro de geocerca (Tiempo Productivo).</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className="w-3 h-3 rounded-full bg-rose-500 shrink-0" />
+                    <span><strong>Trazas Rojas:</strong> Fuera de lote / Tiempos improductivos o desvíos.</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className="w-3 h-3 rounded-full bg-amber-500 shrink-0" />
+                    <span><strong>Alertas Dwell (Paradas):</strong> Inactividad prolongada (&gt;25 min) o daño mecánico.</span>
+                  </div>
                 </div>
-                <p className="text-[10px] text-slate-500 dark:text-slate-400">
-                  Selecciona cualquier modo en la barra superior para alternar entre Catastro, Focos de Calor, Personal, Maquinaria y Censo de Palmas.
+
+                <p className="text-[10px] text-slate-500 dark:text-slate-400 pt-1 border-t border-slate-200 dark:border-slate-800">
+                  Haz clic en cualquier operario, tractor, camión o punto del recorrido para auditar sus paradas y tiempos muertos.
                 </p>
               </div>
             )}
@@ -1349,7 +1844,7 @@ export default function MapaCalor() {
             <div className="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 pb-3">
               <div className="flex items-center gap-2">
                 <Settings className="text-emerald-500" size={20} />
-                <h3 className="font-extrabold text-base text-slate-900 dark:text-white">Configuración del Sistema GIS</h3>
+                <h3 className="font-extrabold text-base text-slate-900 dark:text-white">Configuración del Sistema GIS & Telemetría</h3>
               </div>
               <button 
                 onClick={() => setShowConfigModal(false)}
@@ -1361,25 +1856,25 @@ export default function MapaCalor() {
 
             <div className="space-y-3 text-xs">
               <h4 className="font-bold text-slate-900 dark:text-white uppercase tracking-wider text-[11px] text-emerald-600 dark:text-emerald-400">
-                Parámetros de Censo Palma a Palma / Árbol a Árbol
+                Parámetros de Telemetría & Detección de Paradas
               </h4>
               
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="text-slate-600 dark:text-slate-400 font-semibold block mb-1">Distancia de Siembra (m)</label>
+                  <label className="text-slate-600 dark:text-slate-400 font-semibold block mb-1">Umbral Alerta Inactividad (Minutos)</label>
                   <input 
                     type="number" 
-                    value={palmSettings.distanciaSiembra} 
-                    onChange={e => setPalmSettings({ ...palmSettings, distanciaSiembra: Number(e.target.value) })}
+                    value={palmSettings.umbralInactividadMin || 25} 
+                    onChange={e => setPalmSettings({ ...palmSettings, umbralInactividadMin: Number(e.target.value) })}
                     className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl"
                   />
                 </div>
                 <div>
-                  <label className="text-slate-600 dark:text-slate-400 font-semibold block mb-1">Año de Siembra</label>
+                  <label className="text-slate-600 dark:text-slate-400 font-semibold block mb-1">Distancia Siembra Palmas (m)</label>
                   <input 
                     type="number" 
-                    value={palmSettings.anodeSiembra} 
-                    onChange={e => setPalmSettings({ ...palmSettings, anodeSiembra: Number(e.target.value) })}
+                    value={palmSettings.distanciaSiembra} 
+                    onChange={e => setPalmSettings({ ...palmSettings, distanciaSiembra: Number(e.target.value) })}
                     className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl"
                   />
                 </div>
@@ -1396,8 +1891,8 @@ export default function MapaCalor() {
               </div>
 
               <div className="p-3 bg-slate-50 dark:bg-slate-800/80 rounded-2xl space-y-1 text-[11px]">
-                <span className="font-bold text-slate-900 dark:text-white block">📡 Fuente de Datos de Posicionamiento:</span>
-                <p className="text-slate-500 dark:text-slate-400">Integración con CARTO Basemaps API & Esri World Imagery. Precisión submétrica georreferenciada.</p>
+                <span className="font-bold text-slate-900 dark:text-white block">📡 Sensores de Telemetría & Acelerómetro:</span>
+                <p className="text-slate-500 dark:text-slate-400">Integración con sensores móviles de campo, CAN bus de maquinaria y cálculo de tiempos productivos/improductivos en geocercas.</p>
               </div>
             </div>
 
