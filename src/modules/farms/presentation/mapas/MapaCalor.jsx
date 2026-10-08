@@ -31,7 +31,7 @@ export default function MapaCalor() {
   const markersLayer = useRef(null);
   const baseTileLayer = useRef(null);
 
-  const [mapType, setMapType] = useState('osm'); // 'osm' | 'dark' | 'satellite'
+  const [mapType, setMapType] = useState('satellite'); // 'satellite' | 'osm' | 'dark'
   const [selectedSuerte, setSelectedSuerte] = useState(null);
   const [showNdviSimulation, setShowNdviSimulation] = useState(false);
   const [showLaborsLayer, setShowLaborsLayer] = useState(true);
@@ -122,9 +122,9 @@ export default function MapaCalor() {
 
       window.L.control.zoom({ position: 'bottomright' }).addTo(mapInstance.current);
 
-      // Default OpenStreetMap (Modo Calles en Español)
-      baseTileLayer.current = window.L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: '© OpenStreetMap contributors'
+      // Default Esri Satélite (Alta definición, libre sin API key)
+      baseTileLayer.current = window.L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+        attribution: '© Esri, Maxar, Earthstar Geographics'
       }).addTo(mapInstance.current);
 
       markersLayer.current = window.L.layerGroup().addTo(mapInstance.current);
@@ -143,12 +143,12 @@ export default function MapaCalor() {
   useEffect(() => {
     if (!mapInstance.current || !baseTileLayer.current || !window.L) return;
 
-    if (mapType === 'osm') {
+    if (mapType === 'satellite') {
+      baseTileLayer.current.setUrl('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}');
+    } else if (mapType === 'osm') {
       baseTileLayer.current.setUrl('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png');
     } else if (mapType === 'dark') {
       baseTileLayer.current.setUrl('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png');
-    } else if (mapType === 'satellite') {
-      baseTileLayer.current.setUrl('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}');
     }
   }, [mapType]);
 
@@ -362,8 +362,16 @@ export default function MapaCalor() {
             <span className="text-xs font-bold text-emerald-300">GIS & Geocercas</span>
           </div>
 
-          {/* Base Layer Switcher: 1. Modo Calles, 2. Modo Oscuro (Carto), 3. Satélite */}
+          {/* Base Layer Switcher: 1. Satélite (Esri), 2. Modo Calles, 3. Modo Oscuro (Carto) */}
           <div className="flex items-center gap-1 bg-white/[0.06] p-1 rounded-xl border border-white/10">
+            <button
+              onClick={() => setMapType('satellite')}
+              className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 ${
+                mapType === 'satellite' ? 'bg-emerald-600 text-white shadow-md' : 'text-slate-300 hover:text-white'
+              }`}
+            >
+              <span>🛰️ Satélite (Esri)</span>
+            </button>
             <button
               onClick={() => setMapType('osm')}
               className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 ${
@@ -379,14 +387,6 @@ export default function MapaCalor() {
               }`}
             >
               <span>🌙 Modo Oscuro (Carto)</span>
-            </button>
-            <button
-              onClick={() => setMapType('satellite')}
-              className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 ${
-                mapType === 'satellite' ? 'bg-emerald-600 text-white shadow-md' : 'text-slate-300 hover:text-white'
-              }`}
-            >
-              <span>🛰️ Satélite (Esri)</span>
             </button>
           </div>
 

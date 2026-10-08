@@ -274,105 +274,261 @@ export default function Configuraciones() {
   const handleLoadFullDemoData = () => {
     // 1. Cultivos
     const demoCultivos = [
-      { id: 'CUL-01', nombre: 'Caña de Azúcar', tipo: 'Gramínea Industrial', ciclo: '12-14 Meses', descripcion: 'Variedades Cenicaña de alto rendimiento en sacarosa' },
-      { id: 'CUL-02', nombre: 'Aguacate Hass', tipo: 'Frutal Perenne', ciclo: 'Permanente', descripcion: 'Cultivo para exportación con certificación GlobalGAP' },
-      { id: 'CUL-03', nombre: 'Café', tipo: 'Arábica Suave', ciclo: 'Permanente', descripcion: 'Variedades Castillo y Cenicafé 1 resistentes a roya' },
-      { id: 'CUL-04', nombre: 'Palma de Aceite', tipo: 'Oleaginosa', ciclo: 'Permanente', descripcion: 'Híbridos OxG con alta tasa de extracción de aceite' },
-      { id: 'CUL-05', nombre: 'Cacao Fino y de Aroma', tipo: 'Frutal Agroforestal', ciclo: 'Permanente', descripcion: 'Variedades seleccionadas CCN-51 y clones regionales' },
-      { id: 'CUL-06', nombre: 'Maíz Tecnificado', tipo: 'Cereal / Grano', ciclo: '4 Meses', descripcion: 'Híbridos de alta densidad y rotación de suelos' }
+      { id: 'CUL-01', code: 'CUL-01', codigo: 'CUL-01', name: 'Caña de Azúcar', nombre: 'Caña de Azúcar', tipo: 'Gramínea Industrial', ciclo: '12-14 Meses', variedad: 'CC 01-1940 / CC 85-92', estado: 'Activo', activo: true, descripcion: 'Variedades Cenicaña de alto rendimiento en sacarosa' },
+      { id: 'CUL-02', code: 'CUL-02', codigo: 'CUL-02', name: 'Aguacate Hass', nombre: 'Aguacate Hass', tipo: 'Frutal Perenne', ciclo: 'Permanente', variedad: 'Hass Criollo Export', estado: 'Activo', activo: true, descripcion: 'Cultivo para exportación con certificación GlobalGAP' },
+      { id: 'CUL-03', code: 'CUL-03', codigo: 'CUL-03', name: 'Café Especial', nombre: 'Café Especial', tipo: 'Arábica Suave', ciclo: 'Permanente', variedad: 'Castillo Naranjal / Cenicafé 1', estado: 'Activo', activo: true, descripcion: 'Variedades Castillo y Cenicafé 1 resistentes a roya' },
+      { id: 'CUL-04', code: 'CUL-04', codigo: 'CUL-04', name: 'Palma de Aceite', nombre: 'Palma de Aceite', tipo: 'Oleaginosa', ciclo: 'Permanente', variedad: 'Híbrido OxG Coari x La Mé', estado: 'Activo', activo: true, descripcion: 'Híbridos OxG con alta tasa de extracción de aceite' },
+      { id: 'CUL-05', code: 'CUL-05', codigo: 'CUL-05', name: 'Cacao Fino y de Aroma', nombre: 'Cacao Fino y de Aroma', tipo: 'Frutal Agroforestal', ciclo: 'Permanente', variedad: 'CCN-51 / TCH-565', estado: 'Activo', activo: true, descripcion: 'Variedades seleccionadas CCN-51 y clones regionales' },
+      { id: 'CUL-06', code: 'CUL-06', codigo: 'CUL-06', name: 'Maíz Tecnificado', nombre: 'Maíz Tecnificado', tipo: 'Cereal / Grano', ciclo: '4 Meses', variedad: 'Híbrido Pioneer P30F35', estado: 'Activo', activo: true, descripcion: 'Híbridos de alta densidad y rotación de suelos' }
     ];
 
     // 2. Grupos de Actividades
     const demoGrupos = [
-      { id: 'GRP-01', nombre: 'Adecuación y Preparación de Suelos', descripcion: 'Arada profunda, subsolado, rastrillado y caballoneo' },
-      { id: 'GRP-02', nombre: 'Siembra y Establecimiento', descripcion: 'Trazado, ahoyado, desinfección de semilla y siembra' },
-      { id: 'GRP-03', nombre: 'Nutrición Vegetal y Fertilización', descripcion: 'Fertilización edáfica en corona, drench y aplicaciones foliares' },
-      { id: 'GRP-04', nombre: 'Manejo Integrado Fitosanitario (MIPE)', descripcion: 'Control químico y biológico de plagas, malezas y patógenos' },
-      { id: 'GRP-05', nombre: 'Labores Culturales y Mantenimiento', descripcion: 'Podas de aclareo, deschuponado, plateos y desyerbes' },
-      { id: 'GRP-06', nombre: 'Riego, Drenaje y Manejo Hídrico', descripcion: 'Operación de fertirriego por goteo, compuertas y purga de líneas' },
-      { id: 'GRP-07', nombre: 'Cosecha, Recolección y Alce', descripcion: 'Corte manual, cosecha mecanizada y cargue a transporte' },
-      { id: 'GRP-08', nombre: 'Postcosecha, Beneficio y Despacho', descripcion: 'Lavado, clasificación, empaque y despacho a báscula' }
+      { id: 'GRP-01', code: 'GRP-01', codigo: 'GRP-01', name: 'Adecuación y Preparación de Suelos', nombre: 'Adecuación y Preparación de Suelos', descripcion: 'Arada profunda, subsolado, rastrillado y caballoneo', estado: 'Activo' },
+      { id: 'GRP-02', code: 'GRP-02', codigo: 'GRP-02', name: 'Siembra y Establecimiento', nombre: 'Siembra y Establecimiento', descripcion: 'Trazado, ahoyado, desinfección de semilla y siembra', estado: 'Activo' },
+      { id: 'GRP-03', code: 'GRP-03', codigo: 'GRP-03', name: 'Nutrición Vegetal y Fertilización', nombre: 'Nutrición Vegetal y Fertilización', descripcion: 'Fertilización edáfica en corona, drench y aplicaciones foliares', estado: 'Activo' },
+      { id: 'GRP-04', code: 'GRP-04', codigo: 'GRP-04', name: 'Manejo Integrado Fitosanitario (MIPE)', nombre: 'Manejo Integrado Fitosanitario (MIPE)', descripcion: 'Control químico y biológico de plagas, malezas y patógenos', estado: 'Activo' },
+      { id: 'GRP-05', code: 'GRP-05', codigo: 'GRP-05', name: 'Labores Culturales y Mantenimiento', nombre: 'Labores Culturales y Mantenimiento', descripcion: 'Podas de aclareo, deschuponado, plateos y desyerbes', estado: 'Activo' },
+      { id: 'GRP-06', code: 'GRP-06', codigo: 'GRP-06', name: 'Riego, Drenaje y Manejo Hídrico', nombre: 'Riego, Drenaje y Manejo Hídrico', descripcion: 'Operación de fertirriego por goteo, compuertas y purga de líneas', estado: 'Activo' },
+      { id: 'GRP-07', code: 'GRP-07', codigo: 'GRP-07', name: 'Cosecha, Recolección y Alce', nombre: 'Cosecha, Recolección y Alce', descripcion: 'Corte manual, cosecha mecanizada y cargue a transporte', estado: 'Activo' },
+      { id: 'GRP-08', code: 'GRP-08', codigo: 'GRP-08', name: 'Postcosecha, Beneficio y Despacho', nombre: 'Postcosecha, Beneficio y Despacho', descripcion: 'Lavado, clasificación, empaque y despacho a báscula', estado: 'Activo' }
     ];
 
-    // 3. Actividades Maestras
+    // 3. Actividades Maestras (Con todos los campos de ActividadesTab)
     const demoActividades = [
-      { id: 'ACT-01', nombre: 'Arada profunda con cincel vibratorio', grupo: 'Adecuación y Preparación de Suelos', cultivo: 'Todos', unidad: 'Ha', costoBase: 130000 },
-      { id: 'ACT-02', nombre: 'Rastrillado y nivelación láser', grupo: 'Adecuación y Preparación de Suelos', cultivo: 'Caña de Azúcar', unidad: 'Ha', costoBase: 95000 },
-      { id: 'ACT-03', nombre: 'Siembra manual de esquejes con semilla tratada', grupo: 'Siembra y Establecimiento', cultivo: 'Caña de Azúcar', unidad: 'Ha', costoBase: 160000 },
-      { id: 'ACT-04', nombre: 'Siembra en hoyos con micorrizas y compost', grupo: 'Siembra y Establecimiento', cultivo: 'Aguacate Hass', unidad: 'Planta', costoBase: 3500 },
-      { id: 'ACT-05', nombre: 'Fertilización edáfica mayor (NPK) mecanizada', grupo: 'Nutrición Vegetal y Fertilización', cultivo: 'Todos', unidad: 'Ha', costoBase: 70000 },
-      { id: 'ACT-06', nombre: 'Aplicación foliar de microelementos y boro-zinc', grupo: 'Nutrición Vegetal y Fertilización', cultivo: 'Café', unidad: 'Ha', costoBase: 80000 },
-      { id: 'ACT-07', nombre: 'Control fitosanitario para Diatraea saccharalis', grupo: 'Manejo Integrado Fitosanitario (MIPE)', cultivo: 'Caña de Azúcar', unidad: 'Ha', costoBase: 95000 },
-      { id: 'ACT-08', nombre: 'Tratamiento fitosanitario contra Phytophthora', grupo: 'Manejo Integrado Fitosanitario (MIPE)', cultivo: 'Aguacate Hass', unidad: 'Planta', costoBase: 2900 },
-      { id: 'ACT-09', nombre: 'Poda sanitaria de aclareo y formación', grupo: 'Labores Culturales y Mantenimiento', cultivo: 'Aguacate Hass', unidad: 'Planta', costoBase: 3200 },
-      { id: 'ACT-10', nombre: 'Desyerbe manual y plateo con azadón', grupo: 'Labores Culturales y Mantenimiento', cultivo: 'Café', unidad: 'Jor', costoBase: 58000 },
-      { id: 'ACT-11', nombre: 'Mantenimiento y purga de líneas de goteo', grupo: 'Riego, Drenaje y Manejo Hídrico', cultivo: 'Todos', unidad: 'Hr', costoBase: 45000 },
-      { id: 'ACT-12', nombre: 'Corte de caña y alce mecanizado a vagón', grupo: 'Cosecha, Recolección y Alce', cultivo: 'Caña de Azúcar', unidad: 'Ton', costoBase: 34000 }
+      { 
+        id: 'ACT-01', code: 'ACT-01', codigo: 'ACT-01',
+        name: 'Arada profunda con cincel vibratorio', nombre: 'Arada profunda con cincel vibratorio',
+        groupId: 'GRP-01', grupo: 'Adecuación y Preparación de Suelos',
+        cultivo: 'Caña de Azúcar', tipo: 'Mecánica', clasificacion: 'Labores de siembra',
+        unidadProduccion: 'Hectáreas', unidadMedida: 'Hectáreas', unidad: 'Ha',
+        tarifaBase: 130000, costoBase: 130000,
+        estado: 'Activo', activo: true, productosEstandar: []
+      },
+      { 
+        id: 'ACT-02', code: 'ACT-02', codigo: 'ACT-02',
+        name: 'Rastrillado y nivelación láser', nombre: 'Rastrillado y nivelación láser',
+        groupId: 'GRP-01', grupo: 'Adecuación y Preparación de Suelos',
+        cultivo: 'Caña de Azúcar', tipo: 'Mecánica', clasificacion: 'Labores de siembra',
+        unidadProduccion: 'Hectáreas', unidadMedida: 'Hectáreas', unidad: 'Ha',
+        tarifaBase: 95000, costoBase: 95000,
+        estado: 'Activo', activo: true, productosEstandar: []
+      },
+      { 
+        id: 'ACT-03', code: 'ACT-03', codigo: 'ACT-03',
+        name: 'Siembra manual de esquejes con semilla tratada', nombre: 'Siembra manual de esquejes con semilla tratada',
+        groupId: 'GRP-02', grupo: 'Siembra y Establecimiento',
+        cultivo: 'Caña de Azúcar', tipo: 'Manual', clasificacion: 'Labores de siembra',
+        unidadProduccion: 'Hectáreas', unidadMedida: 'Hectáreas', unidad: 'Ha',
+        tarifaBase: 160000, costoBase: 160000,
+        estado: 'Activo', activo: true, productosEstandar: []
+      },
+      { 
+        id: 'ACT-04', code: 'ACT-04', codigo: 'ACT-04',
+        name: 'Siembra en hoyos con micorrizas y compost', nombre: 'Siembra en hoyos con micorrizas y compost',
+        groupId: 'GRP-02', grupo: 'Siembra y Establecimiento',
+        cultivo: 'Aguacate Hass', tipo: 'Manual', clasificacion: 'Labores de siembra',
+        unidadProduccion: 'Plantas', unidadMedida: 'Plantas', unidad: 'Planta',
+        tarifaBase: 3500, costoBase: 3500,
+        estado: 'Activo', activo: true, productosEstandar: []
+      },
+      { 
+        id: 'ACT-05', code: 'ACT-05', codigo: 'ACT-05',
+        name: 'Fertilización edáfica mayor (NPK) mecanizada', nombre: 'Fertilización edáfica mayor (NPK) mecanizada',
+        groupId: 'GRP-03', grupo: 'Nutrición Vegetal y Fertilización',
+        cultivo: 'Todos', tipo: 'Mecánica', clasificacion: 'Aplicación de fertilizantes',
+        unidadProduccion: 'Hectáreas', unidadMedida: 'Hectáreas', unidad: 'Ha',
+        tarifaBase: 70000, costoBase: 70000,
+        estado: 'Activo', activo: true, productosEstandar: []
+      },
+      { 
+        id: 'ACT-06', code: 'ACT-06', codigo: 'ACT-06',
+        name: 'Aplicación foliar de microelementos y boro-zinc', nombre: 'Aplicación foliar de microelementos y boro-zinc',
+        groupId: 'GRP-03', grupo: 'Nutrición Vegetal y Fertilización',
+        cultivo: 'Café Especial', tipo: 'Mixta', clasificacion: 'Aplicación de fertilizantes',
+        unidadProduccion: 'Hectáreas', unidadMedida: 'Hectáreas', unidad: 'Ha',
+        tarifaBase: 80000, costoBase: 80000,
+        estado: 'Activo', activo: true, productosEstandar: []
+      },
+      { 
+        id: 'ACT-07', code: 'ACT-07', codigo: 'ACT-07',
+        name: 'Control fitosanitario para Diatraea saccharalis', nombre: 'Control fitosanitario para Diatraea saccharalis',
+        groupId: 'GRP-04', grupo: 'Manejo Integrado Fitosanitario (MIPE)',
+        cultivo: 'Caña de Azúcar', tipo: 'Manual', clasificacion: 'Aplicación de insumos',
+        unidadProduccion: 'Hectáreas', unidadMedida: 'Hectáreas', unidad: 'Ha',
+        tarifaBase: 95000, costoBase: 95000,
+        estado: 'Activo', activo: true, productosEstandar: []
+      },
+      { 
+        id: 'ACT-08', code: 'ACT-08', codigo: 'ACT-08',
+        name: 'Tratamiento fitosanitario contra Phytophthora', nombre: 'Tratamiento fitosanitario contra Phytophthora',
+        groupId: 'GRP-04', grupo: 'Manejo Integrado Fitosanitario (MIPE)',
+        cultivo: 'Aguacate Hass', tipo: 'Manual', clasificacion: 'Aplicación de insumos',
+        unidadProduccion: 'Plantas', unidadMedida: 'Plantas', unidad: 'Planta',
+        tarifaBase: 2900, costoBase: 2900,
+        estado: 'Activo', activo: true, productosEstandar: []
+      },
+      { 
+        id: 'ACT-09', code: 'ACT-09', codigo: 'ACT-09',
+        name: 'Poda sanitaria de aclareo y formación', nombre: 'Poda sanitaria de aclareo y formación',
+        groupId: 'GRP-05', grupo: 'Labores Culturales y Mantenimiento',
+        cultivo: 'Aguacate Hass', tipo: 'Manual', clasificacion: 'N/A',
+        unidadProduccion: 'Plantas', unidadMedida: 'Plantas', unidad: 'Planta',
+        tarifaBase: 3200, costoBase: 3200,
+        estado: 'Activo', activo: true, productosEstandar: []
+      },
+      { 
+        id: 'ACT-10', code: 'ACT-10', codigo: 'ACT-10',
+        name: 'Desyerbe manual y plateo con azadón', nombre: 'Desyerbe manual y plateo con azadón',
+        groupId: 'GRP-05', grupo: 'Labores Culturales y Mantenimiento',
+        cultivo: 'Café Especial', tipo: 'Manual', clasificacion: 'N/A',
+        unidadProduccion: 'Hectáreas', unidadMedida: 'Jornales', unidad: 'Jor',
+        tarifaBase: 58000, costoBase: 58000,
+        estado: 'Activo', activo: true, productosEstandar: []
+      },
+      { 
+        id: 'ACT-11', code: 'ACT-11', codigo: 'ACT-11',
+        name: 'Mantenimiento y purga de líneas de goteo', nombre: 'Mantenimiento y purga de líneas de goteo',
+        groupId: 'GRP-06', grupo: 'Riego, Drenaje y Manejo Hídrico',
+        cultivo: 'Todos', tipo: 'Manual', clasificacion: 'Riego',
+        unidadProduccion: 'Hectáreas', unidadMedida: 'Horas', unidad: 'Hr',
+        tarifaBase: 45000, costoBase: 45000,
+        estado: 'Activo', activo: true, productosEstandar: []
+      },
+      { 
+        id: 'ACT-12', code: 'ACT-12', codigo: 'ACT-12',
+        name: 'Corte de caña y alce mecanizado a vagón', nombre: 'Corte de caña y alce mecanizado a vagón',
+        groupId: 'GRP-07', grupo: 'Cosecha, Recolección y Alce',
+        cultivo: 'Caña de Azúcar', tipo: 'Mecánica', clasificacion: 'Corte',
+        unidadProduccion: 'Toneladas', unidadMedida: 'Toneladas', unidad: 'Ton',
+        tarifaBase: 34000, costoBase: 34000,
+        estado: 'Activo', activo: true, productosEstandar: []
+      }
     ];
 
     // 4. Proveedores
     const demoProveedores = [
-      { id: 'PROV-01', nombre: 'Monómeros Colombo Venezolanos S.A.', nit: '890101234-5', contacto: 'Ing. Roberto Mendoza', telefono: '(605) 3718000', email: 'ventas@monomeros.com.co', categoria: 'Fertilizantes y Nutrición' },
-      { id: 'PROV-02', nombre: 'Yara Colombia S.A.S.', nit: '860002345-1', contacto: 'Dra. Claudia Benítez', telefono: '(602) 6902000', email: 'servicio.cliente@yara.com', categoria: 'Nutrición de Precisión' },
-      { id: 'PROV-03', nombre: 'Syngenta Crop Protection', nit: '830056789-2', contacto: 'Dr. Fernando Salazar', telefono: '(601) 6589000', email: 'agro.colombia@syngenta.com', categoria: 'Protección de Cultivos' },
-      { id: 'PROV-04', nombre: 'Bayer CropScience Colombia', nit: '860001928-3', contacto: 'Ing. Marcela Pardo', telefono: '(604) 4443210', email: 'bayer.agrotech@bayer.com', categoria: 'Bioinsumos y Fitosanitarios' },
-      { id: 'PROV-05', nombre: 'Casa Toro Automotriz (John Deere)', nit: '860004567-8', contacto: 'Juan Camilo Ortiz', telefono: '(602) 2859000', email: 'maquinaria@casatoro.com', categoria: 'Tractores y Repuestos' },
-      { id: 'PROV-06', nombre: 'Jacto Colombia & Equipos de Riego', nit: '900123987-4', contacto: 'Gustavo Echeverri', telefono: '(602) 2254321', email: 'ventas@jactocolombia.com', categoria: 'Pulverizadoras y Tecnología' }
+      { id: 'PROV-01', codigo: 'PROV-01', name: 'Monómeros Colombo Venezolanos S.A.', nombre: 'Monómeros Colombo Venezolanos S.A.', nit: '890101234-5', tipo: 'Materia Prima', categoria: 'Fertilizantes y Nutrición', contacto: 'Ing. Roberto Mendoza', telefono: '(605) 3718000', email: 'ventas@monomeros.com.co', estado: 'Activo', activo: true },
+      { id: 'PROV-02', codigo: 'PROV-02', name: 'Yara Colombia S.A.S.', nombre: 'Yara Colombia S.A.S.', nit: '860002345-1', tipo: 'Materia Prima', categoria: 'Nutrición de Precisión', contacto: 'Dra. Claudia Benítez', telefono: '(602) 6902000', email: 'servicio.cliente@yara.com', estado: 'Activo', activo: true },
+      { id: 'PROV-03', codigo: 'PROV-03', name: 'Syngenta Crop Protection', nombre: 'Syngenta Crop Protection', nit: '830056789-2', tipo: 'Materia Prima', categoria: 'Protección de Cultivos', contacto: 'Dr. Fernando Salazar', telefono: '(601) 6589000', email: 'agro.colombia@syngenta.com', estado: 'Activo', activo: true },
+      { id: 'PROV-04', codigo: 'PROV-04', name: 'Bayer CropScience Colombia', nombre: 'Bayer CropScience Colombia', nit: '860001928-3', tipo: 'Materia Prima', categoria: 'Bioinsumos y Fitosanitarios', contacto: 'Ing. Marcela Pardo', telefono: '(604) 4443210', email: 'bayer.agrotech@bayer.com', estado: 'Activo', activo: true },
+      { id: 'PROV-05', codigo: 'PROV-05', name: 'Casa Toro Automotriz (John Deere)', nombre: 'Casa Toro Automotriz (John Deere)', nit: '860004567-8', tipo: 'Maquinaria y Servicios', categoria: 'Tractores y Repuestos', contacto: 'Juan Camilo Ortiz', telefono: '(602) 2859000', email: 'maquinaria@casatoro.com', estado: 'Activo', activo: true },
+      { id: 'PROV-06', codigo: 'PROV-06', name: 'Jacto Colombia & Equipos de Riego', nombre: 'Jacto Colombia & Equipos de Riego', nit: '900123987-4', tipo: 'Maquinaria y Servicios', categoria: 'Pulverizadoras y Tecnología', contacto: 'Gustavo Echeverri', telefono: '(602) 2254321', email: 'ventas@jactocolombia.com', estado: 'Activo', activo: true }
     ];
 
-    // 5. Controles Agronómicos
+    // 5. Controles Agronómicos (Con variables completas y rangos para ControlesTab)
     const demoControles = [
-      { id: 'CTRL-01', nombre: 'Diatraea saccharalis (Barrenador del Tallo)', tipo: 'Plaga', cultivo: 'Caña de Azúcar', umbral: 'Incidencia > 5% entrenudos barrenados', unidad: '% Incidencia', frecuencia: 'Semanal' },
-      { id: 'CTRL-02', nombre: 'Mahanarva andicola (Salivazo de la Caña)', tipo: 'Plaga', cultivo: 'Caña de Azúcar', umbral: 'Más de 2 ninfas por tallo', unidad: 'Ninfas/Tallo', frecuencia: 'Quincenal' },
-      { id: 'CTRL-03', nombre: 'Phytophthora cinnamomi (Tristeza del Aguacate)', tipo: 'Enfermedad', cultivo: 'Aguacate Hass', umbral: 'Presencia de clorosis o necrosis radicular', unidad: 'Visual', frecuencia: 'Semanal' },
-      { id: 'CTRL-04', nombre: 'Heilipus lauri (Picudo del Fruto)', tipo: 'Plaga', cultivo: 'Aguacate Hass', umbral: 'Más de 1 adulto por trampa de feromona', unidad: 'Adultos/Trampa', frecuencia: 'Semanal' },
-      { id: 'CTRL-05', nombre: 'Hemileia vastatrix (Roya del Cafeto)', tipo: 'Enfermedad', cultivo: 'Café', umbral: 'Incidencia foliar > 5%', unidad: '% Hojas', frecuencia: 'Mensual' },
-      { id: 'CTRL-06', nombre: 'Hypothenemus hampei (Broca del Café)', tipo: 'Plaga', cultivo: 'Café', umbral: 'Infestación en frutos > 2%', unidad: '% Frutos', frecuencia: 'Quincenal' },
-      { id: 'CTRL-07', nombre: 'Moniliophthora roreri (Moniliasis del Cacao)', tipo: 'Enfermedad', cultivo: 'Cacao Fino y de Aroma', umbral: 'Mazorcas con manchas > 3%', unidad: '% Mazorcas', frecuencia: 'Semanal' },
-      { id: 'CTRL-08', nombre: 'Humedad de Suelo y Potencial Mátrico (TDR)', tipo: 'Suelo / Agua', cultivo: 'Todos', umbral: 'Humedad disponible < 60% capacidad de campo', unidad: '% Humedad', frecuencia: 'Diario' }
+      { 
+        id: 'CTRL-01', codigo: 'CTRL-01',
+        name: 'Diatraea saccharalis (Barrenador del Tallo)', nombre: 'Diatraea saccharalis (Barrenador del Tallo)',
+        tipo: 'Plaga', cultivo: 'Caña de Azúcar', frecuencia: 'Semanal', activo: true, estado: 'Activo',
+        descripcion: 'Monitoreo de entrenudos perforados y presencia de larvas en tallos de caña.',
+        variables: [
+          {
+            id: 'VAR-01', nombre: 'Porcentaje de Entrenudos Barrenados', tipo: 'numérico', unidad: '% Incidencia',
+            descripcion: 'Evaluación de 100 tallos al azar', requerida: true, sumarMuestras: false,
+            rangos: [
+              { id: 'RNG-01', min: 0, max: 3, mensaje: 'Bajo / Nivel Seguro', color: '#10b981' },
+              { id: 'RNG-02', min: 3.1, max: 6, mensaje: 'Moderado / Alerta Fitosanitaria', color: '#f59e0b' },
+              { id: 'RNG-03', min: 6.1, max: 100, mensaje: 'Crítico / Aplicar Control', color: '#ef4444' }
+            ]
+          }
+        ]
+      },
+      { 
+        id: 'CTRL-02', codigo: 'CTRL-02',
+        name: 'Mahanarva andicola (Salivazo de la Caña)', nombre: 'Mahanarva andicola (Salivazo de la Caña)',
+        tipo: 'Plaga', cultivo: 'Caña de Azúcar', frecuencia: 'Quincenal', activo: true, estado: 'Activo',
+        descripcion: 'Conteo de ninfas con espuma en la base del tallo y adultos en follaje.',
+        variables: [
+          {
+            id: 'VAR-02', nombre: 'Ninfas por Tallo', tipo: 'numérico', unidad: 'Ninfas/Tallo',
+            descripcion: 'Conteo en base de macollas', requerida: true, sumarMuestras: false,
+            rangos: [
+              { id: 'RNG-04', min: 0, max: 1, mensaje: 'Control Normal', color: '#10b981' },
+              { id: 'RNG-05', min: 1.1, max: 3, mensaje: 'Alerta / Preparar Aplicación', color: '#f59e0b' },
+              { id: 'RNG-06', min: 3.1, max: 50, mensaje: 'Daño Económico Inminente', color: '#ef4444' }
+            ]
+          }
+        ]
+      },
+      { 
+        id: 'CTRL-03', codigo: 'CTRL-03',
+        name: 'Phytophthora cinnamomi (Tristeza del Aguacate)', nombre: 'Phytophthora cinnamomi (Tristeza del Aguacate)',
+        tipo: 'Enfermedad', cultivo: 'Aguacate Hass', frecuencia: 'Semanal', activo: true, estado: 'Activo',
+        descripcion: 'Inspección de clorosis foliar, muerte descendente y necrosis radicular.',
+        variables: [
+          {
+            id: 'VAR-03', nombre: 'Árboles Afectados por Lote', tipo: 'numérico', unidad: 'Árboles',
+            descripcion: 'Árboles con síntomas de marchitez', requerida: true, sumarMuestras: true,
+            rangos: [
+              { id: 'RNG-07', min: 0, max: 0, mensaje: 'Lote Sano', color: '#10b981' },
+              { id: 'RNG-08', min: 1, max: 3, mensaje: 'Foco Inicial / Aislar', color: '#f59e0b' },
+              { id: 'RNG-09', min: 4, max: 500, mensaje: 'Epidemia / Inyectar Fosfito', color: '#ef4444' }
+            ]
+          }
+        ]
+      },
+      { 
+        id: 'CTRL-04', codigo: 'CTRL-04',
+        name: 'Hemileia vastatrix (Roya del Cafeto)', nombre: 'Hemileia vastatrix (Roya del Cafeto)',
+        tipo: 'Enfermedad', cultivo: 'Café Especial', frecuencia: 'Mensual', activo: true, estado: 'Activo',
+        descripcion: 'Monitoreo de pústulas anaranjadas en el envés de hojas de ramas intermedias.',
+        variables: [
+          {
+            id: 'VAR-04', nombre: 'Incidencia de Hojas con Roya', tipo: 'numérico', unidad: '% Hojas',
+            descripcion: 'Muestra de 30 ramas por lote', requerida: true, sumarMuestras: false,
+            rangos: [
+              { id: 'RNG-10', min: 0, max: 5, mensaje: 'Baja Incidencia', color: '#10b981' },
+              { id: 'RNG-11', min: 5.1, max: 10, mensaje: 'Umbral Económico', color: '#f59e0b' },
+              { id: 'RNG-12', min: 10.1, max: 100, mensaje: 'Severo / Aplicar Fungicida', color: '#ef4444' }
+            ]
+          }
+        ]
+      }
     ];
 
     // 6. Tipos de Maquinaria
     const demoTiposMaquinaria = [
-      { id: 'TMAQ-01', nombre: 'Tractor Agrícola Doble Tracción (4WD)', descripcion: 'Tractores de 100 a 160 HP para labores pesadas de arada y siembra' },
-      { id: 'TMAQ-02', nombre: 'Tractor Utilitario Estándar (2WD)', descripcion: 'Tractores de 75 a 90 HP para transporte, fumigación y fertilización' },
-      { id: 'TMAQ-03', nombre: 'Cosechadora Combinada Autopropulsada', descripcion: 'Cosechadoras integrales de caña y granos con picador de paja' },
-      { id: 'TMAQ-04', nombre: 'Pulverizadora Autopropulsada de Botalón', descripcion: 'Equipos hidrostáticos de alto despeje para fumigación de precisión' },
-      { id: 'TMAQ-05', nombre: 'Alce y Cargador Frontal de Caña', descripcion: 'Equipos hidráulicos para levantamiento de caña en campo' },
-      { id: 'TMAQ-06', nombre: 'Aperos de Preparación (Rastra/Subsolador)', descripcion: 'Implementos de tiro acoplados al enganche de tres puntos' },
-      { id: 'TMAQ-07', nombre: 'Vagón Cañero y Remolque Basculante', descripcion: 'Vagones de volteo lateral para transporte de cosecha' }
+      { id: 'TMAQ-01', name: 'Tractor Agrícola Doble Tracción (4WD)', nombre: 'Tractor Agrícola Doble Tracción (4WD)', descripcion: 'Tractores de 100 a 160 HP para labores pesadas de arada y siembra', estado: 'Activo' },
+      { id: 'TMAQ-02', name: 'Tractor Utilitario Estándar (2WD)', nombre: 'Tractor Utilitario Estándar (2WD)', descripcion: 'Tractores de 75 a 90 HP para transporte, fumigación y fertilización', estado: 'Activo' },
+      { id: 'TMAQ-03', name: 'Cosechadora Combinada Autopropulsada', nombre: 'Cosechadora Combinada Autopropulsada', descripcion: 'Cosechadoras integrales de caña y granos con picador de paja', estado: 'Activo' },
+      { id: 'TMAQ-04', name: 'Pulverizadora Autopropulsada de Botalón', nombre: 'Pulverizadora Autopropulsada de Botalón', descripcion: 'Equipos hidrostáticos de alto despeje para fumigación de precisión', estado: 'Activo' },
+      { id: 'TMAQ-05', name: 'Alce y Cargador Frontal de Caña', nombre: 'Alce y Cargador Frontal de Caña', descripcion: 'Equipos hidráulicos para levantamiento de caña en campo', estado: 'Activo' },
+      { id: 'TMAQ-06', name: 'Aperos de Preparación (Rastra/Subsolador)', nombre: 'Aperos de Preparación (Rastra/Subsolador)', descripcion: 'Implementos de tiro acoplados al enganche de tres puntos', estado: 'Activo' },
+      { id: 'TMAQ-07', name: 'Vagón Cañero y Remolque Basculante', nombre: 'Vagón Cañero y Remolque Basculante', descripcion: 'Vagones de volteo lateral para transporte de cosecha', estado: 'Activo' }
     ];
 
     // 7. Cuadrillas
     const demoCuadrillas = [
-      { id: 'CUAD-01', nombre: 'Cuadrilla Mecanizada Occidente', lider: 'Carlos Andrés Restrepo', integrantes: 6, especialidad: 'Operación de Tractores y Cosechadoras' },
-      { id: 'CUAD-02', nombre: 'Cuadrilla Sanidad Vegetal & MIPE', lider: 'María Eugenia Gómez', integrantes: 8, especialidad: 'Monitoreo y Aplicaciones Fitosanitarias' },
-      { id: 'CUAD-03', nombre: 'Cuadrilla de Riego y Drenaje', lider: 'Luis Fernando Mosquera', integrantes: 5, especialidad: 'Operación de Válvulas y Fertirriego' },
-      { id: 'CUAD-04', nombre: 'Cuadrilla Técnica de Podas y Labores', lider: 'Jorge Iván Caicedo', integrantes: 10, especialidad: 'Podas de Formación y Labores Manuales' },
-      { id: 'CUAD-05', nombre: 'Cuadrilla de Corte y Recolección', lider: 'Hernando Mina', integrantes: 15, especialidad: 'Corte Selectivo y Cosecha' }
+      { id: 'CUAD-01', name: 'Cuadrilla Mecanizada Occidente', nombre: 'Cuadrilla Mecanizada Occidente', lider: 'Carlos Andrés Restrepo', integrantes: 6, especialidad: 'Operación de Tractores y Cosechadoras', estado: 'Activo' },
+      { id: 'CUAD-02', name: 'Cuadrilla Sanidad Vegetal & MIPE', nombre: 'Cuadrilla Sanidad Vegetal & MIPE', lider: 'María Eugenia Gómez', integrantes: 8, especialidad: 'Monitoreo y Aplicaciones Fitosanitarias', estado: 'Activo' },
+      { id: 'CUAD-03', name: 'Cuadrilla de Riego y Drenaje', nombre: 'Cuadrilla de Riego y Drenaje', lider: 'Luis Fernando Mosquera', integrantes: 5, especialidad: 'Operación de Válvulas y Fertirriego', estado: 'Activo' },
+      { id: 'CUAD-04', name: 'Cuadrilla Técnica de Podas y Labores', nombre: 'Cuadrilla Técnica de Podas y Labores', lider: 'Jorge Iván Caicedo', integrantes: 10, especialidad: 'Podas de Formación y Labores Manuales', estado: 'Activo' },
+      { id: 'CUAD-05', name: 'Cuadrilla de Corte y Recolección', nombre: 'Cuadrilla de Corte y Recolección', lider: 'Hernando Mina', integrantes: 15, especialidad: 'Corte Selectivo y Cosecha', estado: 'Activo' }
     ];
 
     // 8. Unidades de Medida
     const demoUnidades = [
-      { id: 'Ha', nombre: 'Hectárea', simbolo: 'Ha', tipo: 'Superficie' },
-      { id: 'Kg', nombre: 'Kilogramo', simbolo: 'Kg', tipo: 'Masa / Peso' },
-      { id: 'Ton', nombre: 'Tonelada Métrica', simbolo: 'Ton', tipo: 'Masa / Peso' },
-      { id: 'Litros', nombre: 'Litro', simbolo: 'L', tipo: 'Volumen Líquido' },
-      { id: 'Hr', nombre: 'Hora Máquina', simbolo: 'Hr', tipo: 'Tiempo Operativo' },
-      { id: 'Jor', nombre: 'Jornal Laboral', simbolo: 'Jor', tipo: 'Trabajo / Nómina' },
-      { id: 'Planta', nombre: 'Planta / Árbol', simbolo: 'Plt', tipo: 'Unidad Biológica' },
-      { id: 'Bulto', nombre: 'Bulto (50 Kg)', simbolo: 'Blto', tipo: 'Empaque' }
+      { id: 'Ha', name: 'Hectárea', nombre: 'Hectárea', simbolo: 'Ha', tipo: 'Superficie', estado: 'Activo' },
+      { id: 'Kg', name: 'Kilogramo', nombre: 'Kilogramo', simbolo: 'Kg', tipo: 'Masa / Peso', estado: 'Activo' },
+      { id: 'Ton', name: 'Tonelada Métrica', nombre: 'Tonelada Métrica', simbolo: 'Ton', tipo: 'Masa / Peso', estado: 'Activo' },
+      { id: 'Litros', name: 'Litro', nombre: 'Litro', simbolo: 'L', tipo: 'Volumen Líquido', estado: 'Activo' },
+      { id: 'Hr', name: 'Hora Máquina', nombre: 'Hora Máquina', simbolo: 'Hr', tipo: 'Tiempo Operativo', estado: 'Activo' },
+      { id: 'Jor', name: 'Jornal Laboral', nombre: 'Jornal Laboral', simbolo: 'Jor', tipo: 'Trabajo / Nómina', estado: 'Activo' },
+      { id: 'Planta', name: 'Planta / Árbol', nombre: 'Planta / Árbol', simbolo: 'Plt', tipo: 'Unidad Biológica', estado: 'Activo' },
+      { id: 'Bulto', name: 'Bulto (50 Kg)', nombre: 'Bulto (50 Kg)', simbolo: 'Blto', tipo: 'Empaque', estado: 'Activo' }
     ];
 
     // 9. Tipos de Productos
     const demoTiposProductos = [
-      { id: 'TP-01', nombre: 'Fertilizantes Químicos Mayores (NPK)', descripcion: 'Fuentes edáficas de Nitrógeno, Fósforo y Potasio' },
-      { id: 'TP-02', nombre: 'Fertilizantes Foliares y Quelatos', descripcion: 'Microelementos y bioestimulantes de absorción estomática' },
-      { id: 'TP-03', nombre: 'Herbicidas Pre y Post-emergentes', descripcion: 'Control selectivo y no selectivo de malezas' },
-      { id: 'TP-04', nombre: 'Insecticidas y Acaricidas', descripcion: 'Control de lepidópteros, hemípteros y coleópteros' },
-      { id: 'TP-05', nombre: 'Fungicidas Sistémicos y Protectores', descripcion: 'Prevención y curación de hongos fitopatógenos' },
-      { id: 'TP-06', nombre: 'Bioinsumos y Antagonistas Biológicos', descripcion: 'Cepas de Trichoderma, Bacillus y micorrizas' },
-      { id: 'TP-07', nombre: 'Coadyuvantes y Acondicionadores de Agua', descripcion: 'Surfactantes, adherentes y reguladores de pH' }
+      { id: 'TP-01', name: 'Fertilizantes Químicos Mayores (NPK)', nombre: 'Fertilizantes Químicos Mayores (NPK)', descripcion: 'Fuentes edáficas de Nitrógeno, Fósforo y Potasio', estado: 'Activo' },
+      { id: 'TP-02', name: 'Fertilizantes Foliares y Quelatos', nombre: 'Fertilizantes Foliares y Quelatos', descripcion: 'Microelementos y bioestimulantes de absorción estomática', estado: 'Activo' },
+      { id: 'TP-03', name: 'Herbicidas Pre y Post-emergentes', nombre: 'Herbicidas Pre y Post-emergentes', descripcion: 'Control selectivo y no selectivo de malezas', estado: 'Activo' },
+      { id: 'TP-04', name: 'Insecticidas y Acaricidas', nombre: 'Insecticidas y Acaricidas', descripcion: 'Control de lepidópteros, hemípteros y coleópteros', estado: 'Activo' },
+      { id: 'TP-05', name: 'Fungicidas Sistémicos y Protectores', nombre: 'Fungicidas Sistémicos y Protectores', descripcion: 'Prevención y curación de hongos fitopatógenos', estado: 'Activo' },
+      { id: 'TP-06', name: 'Bioinsumos y Antagonistas Biológicos', nombre: 'Bioinsumos y Antagonistas Biológicos', descripcion: 'Cepas de Trichoderma, Bacillus y micorrizas', estado: 'Activo' },
+      { id: 'TP-07', name: 'Coadyuvantes y Acondicionadores de Agua', nombre: 'Coadyuvantes y Acondicionadores de Agua', descripcion: 'Surfactantes, adherentes y reguladores de pH', estado: 'Activo' }
     ];
 
     // 10. Estructura Territorial (6 niveles)
@@ -545,28 +701,28 @@ export default function Configuraciones() {
 
     // 11. Insumos
     const demoProductos = [
-      { id: 'INS-01', codigo: 'INS-01', nombre: 'Urea Granulada 46% N', ingrediente: 'Nitrógeno 46%', categoria: 'Fertilizantes', unidad: 'Kg', stock: 1250, costoUnitario: 85000 },
-      { id: 'INS-02', codigo: 'INS-02', nombre: 'DAP Fosfato Diamónico 18-46-0', ingrediente: 'N-P', categoria: 'Fertilizantes', unidad: 'Kg', stock: 800, costoUnitario: 110000 },
-      { id: 'INS-03', codigo: 'INS-03', nombre: 'Cloruro de Potasio (KCl)', ingrediente: 'Potasio 60%', categoria: 'Fertilizantes', unidad: 'Kg', stock: 950, costoUnitario: 95000 },
-      { id: 'INS-04', codigo: 'INS-04', nombre: 'Glifosato 480 SL', ingrediente: 'Glifosato', categoria: 'Herbicidas', unidad: 'Litros', stock: 350, costoUnitario: 42000 },
-      { id: 'INS-05', codigo: 'INS-05', nombre: 'Lorsban 4EC', ingrediente: 'Clorpirifos', categoria: 'Insecticidas', unidad: 'Litros', stock: 120, costoUnitario: 78000 },
-      { id: 'INS-06', codigo: 'INS-06', nombre: 'Bio-Trichoderma Harzianum', ingrediente: 'Trichoderma', categoria: 'Bioinsumos', unidad: 'Kg', stock: 180, costoUnitario: 35000 }
+      { id: 'INS-01', codigo: 'INS-01', nombre: 'Urea Granulada 46% N', name: 'Urea Granulada 46% N', ingrediente: 'Nitrógeno 46%', categoria: 'Fertilizantes', tipoId: 'TP-01', unidadMedida: 'Kg', unidad: 'Kg', stockActual: 1250, stock: 1250, costoUnitario: 85000, estado: 'Activo', activo: true },
+      { id: 'INS-02', codigo: 'INS-02', nombre: 'DAP Fosfato Diamónico 18-46-0', name: 'DAP Fosfato Diamónico 18-46-0', ingrediente: 'N-P', categoria: 'Fertilizantes', tipoId: 'TP-01', unidadMedida: 'Kg', unidad: 'Kg', stockActual: 800, stock: 800, costoUnitario: 110000, estado: 'Activo', activo: true },
+      { id: 'INS-03', codigo: 'INS-03', nombre: 'Cloruro de Potasio (KCl)', name: 'Cloruro de Potasio (KCl)', ingrediente: 'Potasio 60%', categoria: 'Fertilizantes', tipoId: 'TP-01', unidadMedida: 'Kg', unidad: 'Kg', stockActual: 950, stock: 950, costoUnitario: 95000, estado: 'Activo', activo: true },
+      { id: 'INS-04', codigo: 'INS-04', nombre: 'Glifosato 480 SL', name: 'Glifosato 480 SL', ingrediente: 'Glifosato', categoria: 'Herbicidas', tipoId: 'TP-03', unidadMedida: 'Litros', unidad: 'Litros', stockActual: 350, stock: 350, costoUnitario: 42000, estado: 'Activo', activo: true },
+      { id: 'INS-05', codigo: 'INS-05', nombre: 'Lorsban 4EC', name: 'Lorsban 4EC', ingrediente: 'Clorpirifos', categoria: 'Insecticidas', tipoId: 'TP-04', unidadMedida: 'Litros', unidad: 'Litros', stockActual: 120, stock: 120, costoUnitario: 78000, estado: 'Activo', activo: true },
+      { id: 'INS-06', codigo: 'INS-06', nombre: 'Bio-Trichoderma Harzianum', name: 'Bio-Trichoderma Harzianum', ingrediente: 'Trichoderma', categoria: 'Bioinsumos', tipoId: 'TP-06', unidadMedida: 'Kg', unidad: 'Kg', stockActual: 180, stock: 180, costoUnitario: 35000, estado: 'Activo', activo: true }
     ];
 
     // 12. Maquinaria
     const demoMaquinaria = [
-      { id: 'MAQ-01', codigo: 'MAQ-01', nombre: 'Tractor John Deere 6125M', tipo: 'Tractor Agrícola', marca: 'John Deere', tarifa: 135000, estado: 'Operativo', horometro: 1420.5 },
-      { id: 'MAQ-02', codigo: 'MAQ-02', nombre: 'Tractor New Holland TT4.75', tipo: 'Tractor Agrícola', marca: 'New Holland', tarifa: 98000, estado: 'Operativo', horometro: 980.0 },
-      { id: 'MAQ-03', codigo: 'MAQ-03', nombre: 'Cosechadora Case IH Austoft 8810', tipo: 'Cosechadora', marca: 'Case IH', tarifa: 320000, estado: 'Operativo', horometro: 3100.0 },
-      { id: 'MAQ-04', codigo: 'MAQ-04', nombre: 'Pulverizadora Autopropulsada Jacto', tipo: 'Fumigadora', marca: 'Jacto', tarifa: 180000, estado: 'Operativo', horometro: 650.0 }
+      { id: 'MAQ-01', codigo: 'MAQ-01', name: 'Tractor John Deere 6125M 4WD', nombre: 'Tractor John Deere 6125M 4WD', tipoId: 'TMAQ-01', tipo: 'Tractor Agrícola Doble Tracción (4WD)', marca: 'John Deere', tarifa: 135000, propiaAlquilada: 'Propia', status: 'Operativo', estado: 'Operativo', horometroActual: 1420.5, horometro: 1420.5, frecuenciaMantenimiento: 250, ultimoMantenimientoHoras: 1250.0 },
+      { id: 'MAQ-02', codigo: 'MAQ-02', name: 'Tractor New Holland TT4.75', nombre: 'Tractor New Holland TT4.75', tipoId: 'TMAQ-02', tipo: 'Tractor Utilitario Estándar (2WD)', marca: 'New Holland', tarifa: 98000, propiaAlquilada: 'Propia', status: 'Operativo', estado: 'Operativo', horometroActual: 980.0, horometro: 980.0, frecuenciaMantenimiento: 250, ultimoMantenimientoHoras: 750.0 },
+      { id: 'MAQ-03', codigo: 'MAQ-03', name: 'Cosechadora Case IH Austoft 8810', nombre: 'Cosechadora Case IH Austoft 8810', tipoId: 'TMAQ-03', tipo: 'Cosechadora Combinada Autopropulsada', marca: 'Case IH', tarifa: 320000, propiaAlquilada: 'Propia', status: 'Operativo', estado: 'Operativo', horometroActual: 3100.0, horometro: 3100.0, frecuenciaMantenimiento: 250, ultimoMantenimientoHoras: 3000.0 },
+      { id: 'MAQ-04', codigo: 'MAQ-04', name: 'Pulverizadora Autopropulsada Jacto', nombre: 'Pulverizadora Autopropulsada Jacto', tipoId: 'TMAQ-04', tipo: 'Pulverizadora Autopropulsada de Botalón', marca: 'Jacto', tarifa: 180000, propiaAlquilada: 'Propia', status: 'Operativo', estado: 'Operativo', horometroActual: 650.0, horometro: 650.0, frecuenciaMantenimiento: 250, ultimoMantenimientoHoras: 500.0 }
     ];
 
     // 13. Trabajadores
     const demoTrabajadores = [
-      { id: 'TRA-01', codigo: 'TRA-01', nombre: 'Carlos Andrés Restrepo', cedula: '1144123456', cargo: 'Operador de Maquinaria Pesada', cuadrilla: 'Cuadrilla Mecanizada Occidente', estado: 'Activo' },
-      { id: 'TRA-02', codigo: 'TRA-02', nombre: 'Jorge Iván Caicedo', cedula: '1130987654', cargo: 'Supervisor Agronómico de Campo', cuadrilla: 'Cuadrilla Técnica de Podas y Labores', estado: 'Activo' },
-      { id: 'TRA-03', codigo: 'TRA-03', nombre: 'María Eugenia Gómez', cedula: '66890123', cargo: 'Técnica de Sanidad Vegetal', cuadrilla: 'Cuadrilla Sanidad Vegetal & MIPE', estado: 'Activo' },
-      { id: 'TRA-04', codigo: 'TRA-04', nombre: 'Luis Fernando Mosquera', cedula: '94567890', cargo: 'Operario de Riego y Drenaje', cuadrilla: 'Cuadrilla de Riego y Drenaje', estado: 'Activo' }
+      { id: 'TRAB-01', codigo: 'TRAB-01', identificacion: '1144123456', cedula: '1144123456', nombre: 'Carlos Andrés', apellido: 'Restrepo', cargo: 'Operador de Maquinaria Pesada', cuadrillaId: 'CUAD-01', cuadrilla: 'Cuadrilla Mecanizada Occidente', estado: 'Activo', activo: true, telefono: '3101234567' },
+      { id: 'TRAB-02', codigo: 'TRAB-02', identificacion: '1130987654', cedula: '1130987654', nombre: 'Jorge Iván', apellido: 'Caicedo', cargo: 'Supervisor Agronómico de Campo', cuadrillaId: 'CUAD-04', cuadrilla: 'Cuadrilla Técnica de Podas y Labores', estado: 'Activo', activo: true, telefono: '3159876543' },
+      { id: 'TRAB-03', codigo: 'TRAB-03', identificacion: '66890123', cedula: '66890123', nombre: 'María Eugenia', apellido: 'Gómez', cargo: 'Técnica de Sanidad Vegetal', cuadrillaId: 'CUAD-02', cuadrilla: 'Cuadrilla Sanidad Vegetal & MIPE', estado: 'Activo', activo: true, telefono: '3187654321' },
+      { id: 'TRAB-04', codigo: 'TRAB-04', identificacion: '94567890', cedula: '94567890', nombre: 'Luis Fernando', apellido: 'Mosquera', cargo: 'Operario de Riego y Drenaje', cuadrillaId: 'CUAD-03', cuadrilla: 'Cuadrilla de Riego y Drenaje', estado: 'Activo', activo: true, telefono: '3123456789' }
     ];
 
     // 14. Planificaciones con Geocerca

@@ -64,13 +64,13 @@ export default function Maestros() {
   };
 
   const mainMasters = [
-    { id: 'actividades', label: 'Actividades', icon: <Layers size={18} />, count: (actividades || []).length, permission: 'Maestros', badgeColor: 'bg-blue-500/20 text-blue-400 border-blue-500/30' },
-    { id: 'maquinaria', label: 'Maquinaria', icon: <Tractor size={18} />, count: (maquinarias || []).length, permission: 'Maestros', badgeColor: 'bg-amber-500/20 text-amber-400 border-amber-500/30' },
-    { id: 'trabajadores', label: 'Trabajadores', icon: <Users size={18} />, count: (trabajadores || []).length, permission: 'Maestros', badgeColor: 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30' },
-    { id: 'productos', label: 'Productos & Insumos', icon: <Package size={18} />, count: (productos || []).length, permission: 'Maestros', badgeColor: 'bg-cyan-500/20 text-cyan-400 border-cyan-500/30' },
-    { id: 'proveedores', label: 'Proveedores', icon: <Building2 size={18} />, count: (proveedores || []).length, permission: 'Maestros', badgeColor: 'bg-purple-500/20 text-purple-400 border-purple-500/30' },
-    { id: 'cultivos', label: 'Cultivos', icon: <Sprout size={18} />, count: (cultivos || []).length, permission: 'Maestros', badgeColor: 'bg-green-500/20 text-green-400 border-green-500/30' },
-    { id: 'controles', label: 'Controles Agronómicos', icon: <Microscope size={18} />, count: (controlesAgro || []).length, permission: 'Monitoreo', badgeColor: 'bg-rose-500/20 text-rose-400 border-rose-500/30' }
+    { id: 'actividades', label: 'Actividades', icon: <Layers size={18} />, count: (actividades || []).length, permission: 'Maestros', badgeColor: 'bg-blue-500/15 text-blue-700 dark:text-blue-300 border-blue-500/30' },
+    { id: 'maquinaria', label: 'Maquinaria', icon: <Tractor size={18} />, count: (maquinarias || []).length, permission: 'Maestros', badgeColor: 'bg-amber-500/15 text-amber-800 dark:text-amber-300 border-amber-500/30' },
+    { id: 'trabajadores', label: 'Trabajadores', icon: <Users size={18} />, count: (trabajadores || []).length, permission: 'Maestros', badgeColor: 'bg-emerald-500/15 text-emerald-800 dark:text-emerald-300 border-emerald-500/30' },
+    { id: 'productos', label: 'Productos & Insumos', icon: <Package size={18} />, count: (productos || []).length, permission: 'Maestros', badgeColor: 'bg-cyan-500/15 text-cyan-800 dark:text-cyan-300 border-cyan-500/30' },
+    { id: 'proveedores', label: 'Proveedores', icon: <Building2 size={18} />, count: (proveedores || []).length, permission: 'Maestros', badgeColor: 'bg-purple-500/15 text-purple-800 dark:text-purple-300 border-purple-500/30' },
+    { id: 'cultivos', label: 'Cultivos', icon: <Sprout size={18} />, count: (cultivos || []).length, permission: 'Maestros', badgeColor: 'bg-green-500/15 text-green-800 dark:text-green-300 border-green-500/30' },
+    { id: 'controles', label: 'Controles Agronómicos', icon: <Microscope size={18} />, count: (controlesAgro || []).length, permission: 'Monitoreo', badgeColor: 'bg-rose-500/15 text-rose-800 dark:text-rose-300 border-rose-500/30' }
   ].filter(m => hasPermission(m.permission) && isEnabled(configuraciones?.[masterVisibility[m.id]]));
 
   const typesMasters = [
@@ -86,7 +86,7 @@ export default function Maestros() {
   return (
     <div className="space-y-6 fade-in p-4 md:p-8 lg:p-10 h-full w-full overflow-y-auto custom-scrollbar bg-transparent">
       {/* Header */}
-      <div className="glass-card !p-6 flex flex-col md:flex-row md:items-center justify-between gap-4 border border-white/10 shadow-lg">
+      <div className="glass-card !p-6 flex flex-col md:flex-row md:items-center justify-between gap-4 border border-slate-200 dark:border-white/10 shadow-lg">
         <div>
           <div className="flex items-center gap-3 mb-1">
             <div className="p-2.5 rounded-xl bg-[var(--primary-color)]/20 text-[var(--primary-color)] border border-[var(--primary-color)]/30">
@@ -101,7 +101,7 @@ export default function Maestros() {
           </div>
         </div>
 
-        <div className="flex items-center gap-2 self-start md:self-auto bg-black/20 p-2 rounded-xl border border-white/10">
+        <div className="flex items-center gap-2 self-start md:self-auto bg-slate-100 dark:bg-black/30 p-2 rounded-xl border border-slate-200 dark:border-white/10">
           <span className="text-xs text-[var(--text-muted)] font-medium px-2">Cultivo Filtro:</span>
           <span className="px-3 py-1 rounded-lg text-xs font-bold bg-[var(--primary-color)] text-white shadow">
             {globalCultivo}
@@ -121,7 +121,7 @@ export default function Maestros() {
                 className={`flex items-center gap-2 px-4 py-2.5 rounded-xl font-semibold text-sm transition-all duration-200 border ${
                   isActive 
                     ? 'bg-[var(--primary-color)] text-white border-[var(--primary-color)] shadow-lg shadow-[var(--primary-color)]/25 scale-[1.02]' 
-                    : 'bg-[var(--card-bg)] text-[var(--text-contrast)] border-white/10 hover:border-[var(--primary-color)]/40 hover:bg-[var(--primary-color)]/10'
+                    : 'bg-white dark:bg-slate-900 text-[var(--text-contrast)] border-slate-200 dark:border-white/10 hover:border-[var(--primary-color)]/40 hover:bg-[var(--primary-color)]/10'
                 }`}
               >
                 <span className={isActive ? 'text-white' : 'text-[var(--primary-color)]'}>
@@ -141,13 +141,13 @@ export default function Maestros() {
             onClick={() => setShowTipos(!showTipos)} 
             className={`flex items-center gap-2 px-4 py-2.5 rounded-xl font-semibold text-sm transition-all duration-200 border ${
               showTipos || typesMasters.some(t => t.id === activeTab)
-                ? 'bg-amber-600/90 text-white border-amber-500 shadow-lg shadow-amber-600/20' 
-                : 'bg-[var(--card-bg)] text-[var(--text-contrast)] border-white/10 hover:border-amber-500/40 hover:bg-amber-500/10'
+                ? 'bg-amber-600 text-white border-amber-500 shadow-lg shadow-amber-600/20' 
+                : 'bg-white dark:bg-slate-900 text-[var(--text-contrast)] border-slate-200 dark:border-white/10 hover:border-amber-500/40 hover:bg-amber-500/10'
             }`}
           >
-            <SlidersHorizontal size={18} className={showTipos || typesMasters.some(t => t.id === activeTab) ? "text-white" : "text-amber-400"} />
+            <SlidersHorizontal size={18} className={showTipos || typesMasters.some(t => t.id === activeTab) ? "text-white" : "text-amber-600 dark:text-amber-400"} />
             <span>Catálogos & Tipos</span>
-            <span className="text-[11px] font-extrabold px-2 py-0.5 rounded-full bg-amber-400/20 text-amber-300 border border-amber-400/30">
+            <span className="text-[11px] font-extrabold px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-800 dark:text-amber-300 border border-amber-400/30">
               {totalCatalogsCount}
             </span>
             {showTipos ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
@@ -156,8 +156,8 @@ export default function Maestros() {
 
         {/* Submenú de Catálogos & Tipos */}
         {showTipos && (
-          <div className="p-4 rounded-2xl bg-gradient-to-r from-amber-500/10 via-black/20 to-amber-500/5 border border-amber-500/20 flex flex-wrap gap-2.5 backdrop-blur-md fade-in shadow-inner">
-            <div className="w-full flex items-center gap-2 text-xs font-bold text-amber-400 uppercase tracking-wider mb-1">
+          <div className="p-4 rounded-2xl bg-amber-50/80 dark:bg-slate-900/90 border border-amber-200 dark:border-amber-500/20 flex flex-wrap gap-2.5 backdrop-blur-md fade-in shadow-md">
+            <div className="w-full flex items-center gap-2 text-xs font-bold text-amber-800 dark:text-amber-400 uppercase tracking-wider mb-1">
               <Sparkles size={14} />
               <span>Subcatálogos y Clasificaciones Paramétricas</span>
             </div>
@@ -169,14 +169,14 @@ export default function Maestros() {
                   onClick={() => setActiveTab(m.id)} 
                   className={`flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-bold transition-all duration-200 border ${
                     isActive 
-                      ? 'bg-amber-500 text-white border-amber-400 shadow-md scale-[1.02]' 
-                      : 'bg-black/30 text-[var(--text-contrast)] border-white/10 hover:border-amber-400/40 hover:bg-amber-500/10'
+                      ? 'bg-amber-600 text-white border-amber-500 shadow-md scale-[1.02]' 
+                      : 'bg-white dark:bg-slate-800 text-[var(--text-contrast)] border-slate-200 dark:border-white/10 hover:border-amber-400/40 hover:bg-amber-500/10'
                   }`}
                 >
-                  <span className={isActive ? 'text-white' : 'text-amber-400'}>{m.icon}</span>
+                  <span className={isActive ? 'text-white' : 'text-amber-600 dark:text-amber-400'}>{m.icon}</span>
                   <span>{m.label}</span>
                   <span className={`px-1.5 py-0.2 rounded-full text-[10px] font-black ${
-                    isActive ? 'bg-black/30 text-white' : 'bg-amber-500/20 text-amber-300 border border-amber-500/30'
+                    isActive ? 'bg-black/30 text-white' : 'bg-amber-500/20 text-amber-800 dark:text-amber-300 border border-amber-500/30'
                   }`}>
                     {m.count}
                   </span>
