@@ -2,6 +2,30 @@ import React from 'react';
 import { useAgro } from '@/providers/AgroContext';
 import { useAuth } from '@/providers/AuthProvider';
 import { useTenant } from '@/providers/TenantProvider';
+import { useTheme } from '@/providers/ThemeProvider';
+import {
+  LayoutDashboard,
+  Layers,
+  BookOpen,
+  Users,
+  CalendarRange,
+  Tractor,
+  BarChart3,
+  Microscope,
+  Wrench,
+  RefreshCw,
+  Map,
+  Building2,
+  Settings,
+  LogOut,
+  Sprout,
+  ChevronRight,
+  ShieldAlert,
+  ShieldCheck,
+  Sparkles,
+  Sun,
+  Moon
+} from 'lucide-react';
 
 const Sidebar = ({ currentView, onNavClick, isMobileMenuOpen, setIsMobileMenuOpen }) => {
   const { 
@@ -12,37 +36,86 @@ const Sidebar = ({ currentView, onNavClick, isMobileMenuOpen, setIsMobileMenuOpe
   
   const { currentUser, hasPermission } = useAuth();
   const { currentClient } = useTenant();
+  const { modoOscuroGlobal, toggleThemeMode } = useTheme();
   
   const isAdminUser = currentUser?.rol === 'Super Admin' || currentUser?.rol === 'Administrador' || currentUser?.modulos?.includes('ALL');
 
-  const handleClientSwitch = (clientKey) => {
-    if (clients[clientKey]?.status === 'Suspendido') {
-      alert('Esta instancia está suspendida por falta de pago.');
-      return;
-    }
-    switchClient(clientKey);
-    onNavClick('dashboard');
-  };
+  const navGroups = [
+    {
+      title: 'OPERACIÓN AGRÍCOLA',
+      items: [
+        { view: 'dashboard', icon: LayoutDashboard, label: 'Dashboard', permission: 'Dashboard' },
+        { view: 'aiCopilot', icon: Sparkles, label: 'Copiloto IA & Satélite', permission: 'Monitoreo', badge: '✨ IA', highlight: true },
+        { view: 'estructura', icon: Layers, label: 'Estructura Agrícola', permission: 'Estructura' },
+        { view: 'planificacion', icon: CalendarRange, label: 'Planificación', permission: 'Planificacion' },
+        { view: 'ejecucion', icon: Tractor, label: 'Ejecución (Campo)', permission: 'Ejecucion' },
+        { view: 'monitoreo', icon: Microscope, label: 'Monitoreo & Sanidad', permission: 'Monitoreo' },
+      ]
+    },
+    {
+      title: 'GESTIÓN & CONTROL',
+      items: [
+        { view: 'maestros', icon: BookOpen, label: 'Maestros', permission: 'Maestros' },
+        { view: 'mantenimiento', icon: Wrench, label: 'Mantenimiento', permission: 'Mantenimiento' },
+        { view: 'mapas', icon: Map, label: 'Mapas GIS', permission: 'Mapas' },
+        { view: 'sincronizacion', icon: RefreshCw, label: 'Sincronización', permission: 'Sincronizacion', badge: syncQueue?.length > 0 ? `${syncQueue.length}` : null },
+        { view: 'reportes', icon: BarChart3, label: 'Reportes & BI', permission: 'Reportes' },
+        { view: 'usuarios', icon: Users, label: 'Usuarios & Permisos', permission: 'Usuarios' },
+      ]
+    },
+    ...(isAdminUser ? [{
+      title: 'ADMINISTRACIÓN SAAS',
+      items: [
+        { view: 'gestionClientes', icon: Building2, label: 'Gestión Empresas', permission: 'ALL', highlight: true },
+        { view: 'auditoria', icon: ShieldCheck, label: 'Auditoría & Trazabilidad', permission: 'Configuraciones' },
+        { view: 'configuraciones', icon: Settings, label: 'Configuraciones', permission: 'Configuraciones' },
+      ]
+    }] : [])
+  ];
 
-  const NavItem = ({ view, icon, label, specialColor }) => {
-    // Si es superadmin o tiene todos los modulos, lo ve todo. Sino, valida permisos.
-    if (!isAdminUser && !hasPermission(view === 'gestionClientes' ? 'Dashboard' : view) && view !== 'gestionClientes') return null;
+  const NavItem = ({ item }) => {
+    const isSuperAdminView = item.view === 'gestionClientes';
+    if (!isAdminUser && !hasPermission(item.permission) && !isSuperAdminView) return null;
     
-    const isActive = currentView === view;
+    const isActive = currentView === item.view;
+    const Icon = item.icon;
     
     return (
       <li 
-        onClick={() => onNavClick(view)}
-        className={`px-4 py-2.5 rounded-xl cursor-pointer transition-all duration-200 flex items-center gap-3 text-[0.98rem]
+        onClick={() => onNavClick(item.view)}
+        className={`group relative px-3 py-2.5 rounded-xl cursor-pointer transition-all duration-200 flex items-center justify-between text-[13.5px] font-semibold
           ${isActive 
-            ? 'bg-primary text-black font-semibold shadow-md' 
-            : 'text-[var(--sidebar-text-muted)] hover:bg-white/10 hover:translate-x-1'
+            ? 'bg-emerald-500/25 border border-emerald-400/50 text-white font-bold shadow-lg shadow-emerald-950/40' 
+            : 'text-slate-300 hover:text-white hover:bg-white/[0.08] hover:translate-x-0.5'
           }
+          ${item.highlight && !isActive ? 'text-amber-300 font-bold' : ''}
         `}
-        style={specialColor && !isActive ? { color: specialColor, borderTop: '1px solid rgba(255,255,255,0.08)', marginTop: '0.5rem', paddingTop: '0.75rem' } : {}}
       >
-        <span>{icon}</span>
-        {label}
+        <div className="flex items-center gap-3 truncate">
+          <Icon 
+            size={18} 
+            className={`shrink-0 transition-colors ${
+              isActive 
+                ? 'text-emerald-300' 
+                : item.highlight 
+                  ? 'text-amber-400' 
+                  : 'text-slate-400 group-hover:text-emerald-400'
+            }`} 
+          />
+          <span className={`truncate text-[13px] ${isActive ? 'text-white font-extrabold' : 'text-slate-200 group-hover:text-white'}`}>
+            {item.label}
+          </span>
+        </div>
+
+        {item.badge && (
+          <span className={`text-[10px] font-extrabold px-2 py-0.5 rounded-full ${isActive ? 'bg-emerald-400 text-black font-black' : 'bg-amber-500/25 text-amber-300 border border-amber-500/40'}`}>
+            {item.badge}
+          </span>
+        )}
+
+        {isActive && (
+          <ChevronRight size={14} className="text-emerald-300 shrink-0 ml-1" />
+        )}
       </li>
     );
   };
@@ -51,123 +124,109 @@ const Sidebar = ({ currentView, onNavClick, isMobileMenuOpen, setIsMobileMenuOpe
     <>
       {isMobileMenuOpen && (
         <div 
-          className="fixed inset-0 bg-black/60 z-30 lg:hidden backdrop-blur-sm"
+          className="fixed inset-0 bg-black/70 z-40 lg:hidden backdrop-blur-sm transition-opacity"
           onClick={() => setIsMobileMenuOpen(false)}
         />
       )}
       
-      <div className={`
-        fixed lg:static inset-y-0 left-0 z-40
-        w-[260px] bg-[var(--sidebar-bg)] text-[var(--sidebar-text)] p-5 lg:p-6
-        flex flex-col shadow-2xl lg:shadow-[4px_0_20px_rgba(0,0,0,0.1)]
+      <aside className={`
+        fixed lg:static inset-y-0 left-0 z-50
+        w-[275px] bg-[#0f172a] text-white p-5
+        flex flex-col shadow-2xl lg:shadow-[4px_0_24px_rgba(0,0,0,0.2)]
         transform transition-transform duration-300 ease-in-out
-        border-r border-white/5
+        border-r border-slate-800 select-none
         ${isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
       `}>
         
-        {/* Logo Area */}
-        <div className="flex items-center justify-between w-full mb-8">
+        {/* Header / Brand Logo */}
+        <div className="flex items-center justify-between w-full mb-5 pb-4 border-b border-slate-800">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-primary/20 border border-primary/40 flex items-center justify-center text-primary font-bold text-xl shadow-md">
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary to-emerald-600 flex items-center justify-center text-black font-extrabold text-xl shadow-lg shadow-primary/20">
               🌱
             </div>
             <div>
-              <span className="font-extrabold text-[var(--sidebar-text)] tracking-tight text-base block leading-tight">SarriaTech</span>
-              <span className="text-[10px] font-bold text-primary tracking-wider uppercase block mt-0.5">Solutions S.A.S.</span>
+              <span className="font-extrabold text-white tracking-tight text-[16px] block leading-tight">
+                AgroGestión
+              </span>
+              <span className="text-[10px] font-bold text-primary tracking-wider uppercase block mt-0.5">
+                {currentClient?.name ? currentClient.name.slice(0, 18) : 'Plataforma SaaS'}
+              </span>
             </div>
           </div>
-          <div className="flex items-center gap-2">
-            {syncQueue?.length > 0 && (
-              <span className="bg-yellow-500/20 text-yellow-400 text-[10px] px-2 py-0.5 rounded-full font-bold">
-                {syncQueue.length} ⏳
-              </span>
-            )}
-            <div className="w-2.5 h-2.5 rounded-full bg-primary shadow-sm"></div>
-          </div>
+          
           <button 
-            className="lg:hidden text-[var(--sidebar-text-muted)] hover:text-[var(--sidebar-text)] p-1"
+            className="lg:hidden text-slate-400 hover:text-white p-1 rounded-lg hover:bg-white/10"
             onClick={() => setIsMobileMenuOpen(false)}
+            aria-label="Cerrar menú"
           >
             ✕
           </button>
         </div>
 
-        {/* Instancia Activa eliminada por petición del usuario */}
+        {/* Navigation List */}
+        <nav className="flex-1 overflow-y-auto custom-scrollbar pr-1 -mr-1 space-y-6">
+          {navGroups.map((group, gIdx) => (
+            <div key={gIdx} className="space-y-1.5">
+              <span className="text-[10px] font-extrabold uppercase tracking-wider text-slate-400 px-3 block mb-1">
+                {group.title}
+              </span>
+              <ul className="space-y-1">
+                {group.items.map((item) => (
+                  <NavItem key={item.view} item={item} />
+                ))}
+              </ul>
+            </div>
+          ))}
+        </nav>
 
-        <ul className="flex-1 space-y-1.5 overflow-y-auto custom-scrollbar pr-2 -mr-2">
-          <NavItem view="dashboard" icon="📊" label="Dashboard" />
-          <NavItem view="estructura" icon="🏢" label="Estructura Agrícola" />
-          <NavItem view="maestros" icon="📑" label="Maestros" />
-          <NavItem view="usuarios" icon="👥" label="Usuarios" />
-          <NavItem view="planificacion" icon="📅" label="Planificación" />
-          <NavItem view="ejecucion" icon="🚜" label="Ejecución (Campo)" />
-          <NavItem view="reportes" icon="📈" label="Reportes" />
-          <NavItem view="monitoreo" icon="🔬" label="Monitoreo" />
-          <NavItem view="mantenimiento" icon="🛠️" label="Mantenimiento" />
-          <NavItem view="sincronizacion" icon="🔄" label="Sincronización" />
-          <NavItem view="mapas" icon="🗺️" label="Mapas" />
+        {/* Footer: Quick Theme Toggle & User Profile */}
+        <div className="mt-4 pt-3 border-t border-slate-800 space-y-2">
+          
+          {/* Quick Theme Switcher Button */}
+          <button
+            onClick={toggleThemeMode}
+            className="w-full flex items-center justify-between p-2 rounded-xl bg-white/[0.06] hover:bg-white/[0.12] border border-slate-700/50 text-xs font-bold text-slate-200 hover:text-white transition-all shadow-sm"
+          >
+            <div className="flex items-center gap-2">
+              {modoOscuroGlobal ? (
+                <Moon size={15} className="text-indigo-400" />
+              ) : (
+                <Sun size={15} className="text-amber-400" />
+              )}
+              <span>{modoOscuroGlobal ? 'Modo Oscuro Activo' : 'Modo Claro Activo'}</span>
+            </div>
+            <span className="text-[10px] px-2 py-0.5 rounded-full bg-white/10 text-primary font-extrabold">
+              Cambiar
+            </span>
+          </button>
 
-          {isAdminUser && (
-            <>
-              <NavItem view="gestionClientes" icon="🏢" label="Gestión Empresas" specialColor="#fbbf24" />
-              <NavItem view="configuraciones" icon="⚙️" label="Configuraciones" />
-            </>
-          )}
-
-          <NavItem view="logout" icon="🚪" label="Cerrar Sesión" specialColor="#ef4444" />
-        </ul>
-
-        {/* Global Selectors */}
-        {(currentView === 'ejecucion' || currentView === 'mapas' || currentView === 'planificacion') && (
-          <div className="mt-6 space-y-4 pt-6 border-t border-white/10">
-            <div className="space-y-2">
-              <label className="text-[11px] font-medium text-[var(--sidebar-text-muted)] pl-1 block">Planta Activa</label>
-              <div className="relative">
-                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--sidebar-text-muted)]">🏢</span>
-                <select 
-                  className="w-full bg-[var(--input-bg)] border border-white/10 rounded-xl px-9 py-2.5 text-xs text-[var(--sidebar-text)] appearance-none focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all"
-                  value={globalPlanta} 
-                  onChange={e => setGlobalPlanta(e.target.value)}
-                >
-                  <option value="ALL">Todas las plantas</option>
-                  {plantas.map(p => <option key={p.id} value={p.id}>{p.nombre}</option>)}
-                </select>
-                <span className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--sidebar-text-muted)] pointer-events-none text-[10px]">▼</span>
+          {/* User Card */}
+          <div className="flex items-center justify-between p-2.5 rounded-xl bg-white/[0.04] border border-slate-800">
+            <div className="flex items-center gap-2.5 overflow-hidden">
+              <div className="w-8 h-8 rounded-lg bg-primary/20 text-primary flex items-center justify-center font-bold text-xs shrink-0">
+                {currentUser?.nombres?.[0] || currentUser?.nombre?.[0] || 'U'}
+              </div>
+              <div className="overflow-hidden">
+                <p className="text-xs font-bold text-white truncate">
+                  {currentUser?.nombres ? `${currentUser.nombres} ${currentUser.apellidos || ''}` : (currentUser?.nombre || currentUser?.correo || 'Usuario')}
+                </p>
+                <p className="text-[10px] text-primary truncate font-semibold">
+                  {currentUser?.rol || 'Operador'}
+                </p>
               </div>
             </div>
             
-            <div className="space-y-2">
-              <label className="text-[11px] font-medium text-[var(--sidebar-text-muted)] pl-1 block">Cultivo Activo</label>
-              <div className="relative">
-                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--sidebar-text-muted)]">🌱</span>
-                <select 
-                  className="w-full bg-[var(--input-bg)] border border-white/10 rounded-xl px-9 py-2.5 text-xs text-[var(--sidebar-text)] appearance-none focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all"
-                  value={globalCultivo} 
-                  onChange={e => setGlobalCultivo(e.target.value)}
-                >
-                  <option value="ALL">Todos los cultivos</option>
-                  {cultivos.map(c => <option key={c.id} value={c.id}>{c.nombre}</option>)}
-                </select>
-                <span className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--sidebar-text-muted)] pointer-events-none text-[10px]">▼</span>
-              </div>
-            </div>
+            <button
+              onClick={() => onNavClick('logout')}
+              className="p-1.5 rounded-lg text-rose-400 hover:bg-rose-500/20 hover:text-rose-300 transition-colors"
+              title="Cerrar Sesión"
+            >
+              <LogOut size={16} />
+            </button>
           </div>
-        )}
 
-        <div className="mt-6 pt-5 border-t border-white/10">
-          <div className="flex items-center justify-between p-3 rounded-xl bg-[var(--input-bg)] border border-white/5 hover:border-white/10 transition-colors cursor-pointer group">
-            <div className="flex items-center gap-3">
-              <div className="w-9 h-9 rounded-full bg-primary/20 flex items-center justify-center text-primary font-bold shadow-inner">
-                {currentUser?.nombre?.[0] || 'U'}
-              </div>
-              <div className="overflow-hidden">
-                <p className="text-[13px] font-bold text-[var(--sidebar-text)] truncate max-w-[130px]">{currentUser?.nombre}</p>
-                <p className="text-[10px] text-[var(--sidebar-text-muted)] truncate max-w-[130px] group-hover:text-[var(--sidebar-text-muted)] transition-colors">{currentUser?.email}</p>
-              </div>
-            </div>
-          </div>
         </div>
-      </div>
+      </aside>
     </>
   );
 };

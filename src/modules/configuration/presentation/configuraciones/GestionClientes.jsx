@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { Building2, Plus, Pencil, Trash2, Users, MapPin, ShieldCheck, CheckCircle2, XCircle, Search, ChevronDown, ChevronRight, Settings2 } from 'lucide-react';
 import { useAgro } from '@/providers/AgroContext';
 import { MODULES_PRINCIPALES, MODULES_CONFIGURACION } from '@/providers/mocks';
@@ -186,9 +186,8 @@ export default function GestionClientes() {
                       const isExpanded = expandedRow === empresa.id;
 
                       return (
-                        <>
+                        <React.Fragment key={empresa.id}>
                           <tr
-                            key={empresa.id}
                             className={`border-b border-[var(--glass-border)] hover:bg-[var(--glass-bg)] transition-colors cursor-pointer ${editingId === empresa.id ? 'bg-primary/5' : ''}`}
                             onClick={() => setExpandedRow(isExpanded ? null : empresa.id)}
                           >
@@ -264,7 +263,7 @@ export default function GestionClientes() {
                               </td>
                             </tr>
                           )}
-                        </>
+                        </React.Fragment>
                       );
                     })
                   )}

@@ -1,5 +1,13 @@
 import app from './src/backend/app.js';
 
+process.on('uncaughtException', (err) => {
+  console.error('CRITICAL Uncaught Exception:', err);
+});
+
+process.on('unhandledRejection', (reason, promise) => {
+  console.error('CRITICAL Unhandled Rejection at:', promise, 'reason:', reason);
+});
+
 const START_PORT = 3000;
 const startServer = (port) => {
   const server = app.listen(port, () => {

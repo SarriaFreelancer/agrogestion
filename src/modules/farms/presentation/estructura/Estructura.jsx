@@ -1,16 +1,52 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { useAgro } from '@/providers/AgroContext';
 import HojaDeVida from '@/modules/farms/presentation/estructura/HojaDeVida';
-import { Network, Home, Package, Sprout, Plus, ChevronRight, ChevronDown, MousePointerClick, MoreVertical, Trees, CheckCircle2, TrendingUp, BarChart3, ShieldCheck } from 'lucide-react';
+import { 
+  Network, 
+  Home, 
+  Package, 
+  Sprout, 
+  Plus, 
+  ChevronRight, 
+  ChevronDown, 
+  MousePointerClick, 
+  MoreVertical, 
+  Trees, 
+  CheckCircle2, 
+  TrendingUp, 
+  BarChart3, 
+  ShieldCheck,
+  Droplets,
+  Layers,
+  Search,
+  SlidersHorizontal,
+  Compass
+} from 'lucide-react';
+import { notifySuccess } from '@/utils/swal';
 
 export default function Estructura() {
-  const { globalPlanta, globalCultivo, cultivos, sectores, updateEstructura, addSector, addElementoEstructura, configuraciones } = useAgro();
+  const { 
+    globalPlanta, 
+    globalCultivo, 
+    cultivos, 
+    sectores, 
+    updateEstructura, 
+    addSector, 
+    addElementoEstructura, 
+    configuraciones,
+    calcTotalHa,
+    calcLotesActivos
+  } = useAgro();
+
   const [selectedNode, setSelectedNode] = useState(null); 
   const [creatingType, setCreatingType] = useState(null); 
+  const [creatingParent, setCreatingParent] = useState(null);
   const [newElementName, setNewElementName] = useState('');
   const [newElementCode, setNewElementCode] = useState('');
-  const [newSectorPlant, setNewSectorPlant] = useState('');
-  const [expandedNodes, setExpandedNodes] = useState({});
+  const [newElementHa, setNewElementHa] = useState('');
+  const [newElementCultivo, setNewElementCultivo] = useState('');
+  const [expandedNodes, setExpandedNodes] = useState({ 'ZON-01': true, 'SEC-01': true, 'FIN-01': true, 'LOT-01': true });
+  const [treeSearch, setTreeSearch] = useState('');
 
   const filterByGlobal = (suertes) => {
     if (!suertes) return [];
@@ -20,73 +56,56 @@ export default function Estructura() {
 
   const sectoresFiltrados = globalPlanta === 'Todas' ? sectores : sectores.filter(s => s.plantaId === globalPlanta);
 
-  const findNodeByIdAndType = (nodes, id, searchType, currentLevel = 'Sector') => {
+  const findNodeByIdAndType = (nodes, id, searchType) => {
     if (!id || !nodes) return null;
 
     for (const node of nodes) {
-      const nodeType = node.type || currentLevel;
-      if (node.id === id && (!searchType || nodeType === searchType)) {
-        return { ...node, type: nodeType };
+      if (node.id === id && (!searchType || node.type === searchType)) return node;
+      
+      if (node.sectores) {
+        const f = findNodeByIdAndType(node.sectores, id, searchType);
+        if (f) return f;
       }
-
-      const foundInFincas = findNodeByIdAndType(node.fincas, id, searchType, 'Finca');
-      if (foundInFincas) return foundInFincas;
-
-      const foundInLotes = findNodeByIdAndType(node.lotes, id, searchType, 'Lote');
-      if (foundInLotes) return foundInLotes;
-
-      const foundInSuertes = findNodeByIdAndType(node.suertes, id, searchType, 'Suerte');
-      if (foundInSuertes) return foundInSuertes;
+      if (node.fincas) {
+        const f = findNodeByIdAndType(node.fincas, id, searchType);
+        if (f) return f;
+      }
+      if (node.lotes) {
+        const f = findNodeByIdAndType(node.lotes, id, searchType);
+        if (f) return f;
+      }
+      if (node.suertes) {
+        const f = findNodeByIdAndType(node.suertes, id, searchType);
+        if (f) return f;
+      }
+      if (node.surcos) {
+        const f = findNodeByIdAndType(node.surcos, id, searchType);
+        if (f) return f;
+      }
     }
-
     return null;
   };
 
   const activeNode = findNodeByIdAndType(sectores, selectedNode?.id, selectedNode?.type) || selectedNode;
-  const structureLevelCount = Math.min(4, Math.max(2, configuraciones?.estructuraNiveles || 4));
+
   const levelLabels = [
-    configuraciones?.estructuraNivelNombres?.nivel1 || 'Sector',
-    configuraciones?.estructuraNivelNombres?.nivel2 || 'Finca',
-    configuraciones?.estructuraNivelNombres?.nivel3 || 'Lote',
-    configuraciones?.estructuraNivelNombres?.nivel4 || 'Suerte',
-    configuraciones?.estructuraNivelNombres?.nivel5 || 'Nivel 5',
-    configuraciones?.estructuraNivelNombres?.nivel6 || 'Nivel 6'
+    configuraciones?.estructuraNivelNombres?.nivel1 || 'Zona / Región',
+    configuraciones?.estructuraNivelNombres?.nivel2 || 'Sector',
+    configuraciones?.estructuraNivelNombres?.nivel3 || 'Finca / Hacienda',
+    configuraciones?.estructuraNivelNombres?.nivel4 || 'Lote / Bloque',
+    configuraciones?.estructuraNivelNombres?.nivel5 || 'Suerte / Tablón',
+    configuraciones?.estructuraNivelNombres?.nivel6 || 'Surco / Sección'
   ];
 
   const labelForType = (type) => {
-    if (type === 'Sector') return levelLabels[0];
-    if (type === 'Finca') return levelLabels[1];
-    if (type === 'Lote') return levelLabels[2];
-    if (type === 'Suerte') return levelLabels[3];
+    if (type === 'Zona') return levelLabels[0];
+    if (type === 'Sector') return levelLabels[1];
+    if (type === 'Finca') return levelLabels[2];
+    if (type === 'Lote') return levelLabels[3];
+    if (type === 'Suerte') return levelLabels[4];
+    if (type === 'Surco' || type === 'Seccion') return levelLabels[5];
     return type;
   };
-
-  const canRenderFincas = structureLevelCount >= 2;
-  const canRenderLotes = structureLevelCount >= 3;
-  const canRenderSuertes = structureLevelCount >= 4;
-
-  const canCreateChild = (nodeType) => {
-    if (nodeType === 'Sector') return structureLevelCount >= 2;
-    if (nodeType === 'Finca') return structureLevelCount >= 3;
-    if (nodeType === 'Lote') return structureLevelCount >= 4;
-    return false;
-  };
-
-  const typeForNextChild = (nodeType) => {
-    if (structureLevelCount === 2) {
-      if (nodeType === 'Sector') return 'Suerte';
-    } else if (structureLevelCount === 3) {
-      if (nodeType === 'Sector') return 'Finca';
-      if (nodeType === 'Finca') return 'Suerte';
-    } else {
-      if (nodeType === 'Sector') return 'Finca';
-      if (nodeType === 'Finca') return 'Lote';
-      if (nodeType === 'Lote') return 'Suerte';
-    }
-    return null;
-  };
-
-  const activeNodeLabel = activeNode ? labelForType(activeNode.type) : '';
 
   const toggleNode = (id) => {
     setExpandedNodes(prev => ({ ...prev, [id]: !prev[id] }));
@@ -94,59 +113,163 @@ export default function Estructura() {
 
   const isExpanded = (id) => Boolean(expandedNodes[id]);
 
-  const renderSuerteItem = (suerte) => (
-    <div key={suerte.id} className="flex items-center gap-2 mb-2">
-      <div className="w-7 h-7 flex-shrink-0"></div>
+  const handleOpenCreateChild = (parent, nextType) => {
+    setCreatingParent(parent);
+    setCreatingType(nextType);
+    setNewElementName('');
+    setNewElementCode(`${nextType.slice(0, 3).toUpperCase()}-${Math.floor(10 + Math.random() * 90)}`);
+    setNewElementHa('');
+    setNewElementCultivo(cultivos?.[0]?.name || 'Caña de Azúcar');
+  };
+
+  const handleSaveNewElement = () => {
+    if (!newElementName.trim()) return;
+
+    if (creatingType === 'Sector' && !creatingParent) {
+      addSector({
+        id: newElementCode || `SEC-${Date.now().toString().slice(-4)}`,
+        name: newElementName,
+        type: 'Sector',
+        plantaCliente: globalPlanta !== 'Todas' ? globalPlanta : 'PLN-01',
+        fincas: []
+      });
+    } else if (creatingParent) {
+      addElementoEstructura(creatingParent.id, creatingParent.type, {
+        id: newElementCode || `${creatingType.slice(0, 3).toUpperCase()}-${Date.now().toString().slice(-4)}`,
+        name: newElementName,
+        type: creatingType,
+        hectareas: Number(newElementHa || 0),
+        cultivo: newElementCultivo,
+        estado: 'Activo'
+      });
+    }
+
+    notifySuccess(`${creatingType} creado exitosamente`);
+    setCreatingType(null);
+    setCreatingParent(null);
+  };
+
+  // Node Renderers across 6 Levels
+  const renderSurcoItem = (surco) => (
+    <div key={surco.id} className="flex items-center gap-2 mb-1.5 ml-8">
       <button
-        onClick={() => setSelectedNode({ ...suerte, type: 'Suerte' })}
-        className={`flex-1 flex items-center justify-between p-2.5 rounded-xl border transition-all duration-200 ${(activeNode?.id === suerte.id && activeNode?.type === 'Suerte') ? 'bg-[var(--glass-bg)] border-primary shadow-[0_4px_12px_rgba(var(--primary-rgb)/0.15)]' : 'bg-[var(--glass-bg)] border-[var(--glass-border)] hover:border-primary/30 shadow-sm'}`}
+        onClick={() => setSelectedNode({ ...surco, type: 'Surco' })}
+        className={`flex-1 flex items-center justify-between p-2 rounded-xl border text-xs transition-all ${
+          activeNode?.id === surco.id ? 'bg-primary/20 border-primary text-white font-bold' : 'bg-white/[0.02] border-[var(--glass-border)] text-[var(--text-contrast)] hover:bg-white/[0.05]'
+        }`}
       >
-        <div className="flex items-center gap-3">
-          <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
-            <Sprout size={16} className="text-primary" />
-          </div>
-          <span className="text-[13px] font-bold text-[var(--text-contrast)] truncate">{suerte.id} - {suerte.name}</span>
+        <div className="flex items-center gap-2">
+          <Droplets size={13} className="text-cyan-400" />
+          <span>{surco.name}</span>
         </div>
-        <div className="w-7 h-7 rounded-full hover:bg-[var(--input-bg)] flex items-center justify-center text-[var(--text-muted)] transition-colors">
-          <MoreVertical size={15} />
-        </div>
+        <span className="text-[11px] text-emerald-400 font-mono">{surco.hectareas || 0} Ha</span>
       </button>
     </div>
   );
 
-  const renderLoteNode = (lote) => {
-    const loteSuertes = filterByGlobal(lote.suertes);
-    const loteExpanded = isExpanded(lote.id);
-    const hasChildren = canRenderSuertes && loteSuertes.length > 0;
+  const renderSuerteNode = (suerte) => {
+    const suerteExpanded = isExpanded(suerte.id);
+    const hasSurcos = suerte.surcos && suerte.surcos.length > 0;
 
     return (
-      <div key={lote.id} className="mb-2">
+      <div key={suerte.id} className="mb-2 ml-6">
         <div className="flex items-center gap-2">
-          {hasChildren ? (
-            <button className="w-7 h-7 flex-shrink-0 rounded-lg border border-[var(--glass-border)] bg-[var(--glass-bg)] flex items-center justify-center text-gray-500 dark:text-gray-400 hover:text-primary hover:border-primary/30 shadow-sm transition-colors" onClick={() => toggleNode(lote.id)}>
-              {loteExpanded ? <ChevronDown size={14} /> : <ChevronRight size={14} />}
+          {hasSurcos ? (
+            <button 
+              onClick={() => toggleNode(suerte.id)} 
+              className="p-1 rounded-md text-[var(--text-muted)] hover:text-white"
+            >
+              {suerteExpanded ? <ChevronDown size={14} /> : <ChevronRight size={14} />}
             </button>
-          ) : <div className="w-7 h-7 flex-shrink-0" />}
-          
+          ) : (
+            <div className="w-5" />
+          )}
+
           <button
-            onClick={() => setSelectedNode({ ...lote, type: 'Lote' })}
-            className={`flex-1 flex items-center justify-between p-2.5 rounded-xl border transition-all duration-200 ${(activeNode?.id === lote.id && activeNode?.type === 'Lote') ? 'bg-[var(--glass-bg)] border-primary shadow-[0_4px_12px_rgba(var(--primary-rgb)/0.15)]' : 'bg-[var(--glass-bg)] border-[var(--glass-border)] hover:border-primary/30 shadow-sm'}`}
+            onClick={() => setSelectedNode({ ...suerte, type: 'Suerte' })}
+            className={`flex-1 flex items-center justify-between p-2.5 rounded-xl border transition-all text-xs ${
+              activeNode?.id === suerte.id && activeNode?.type === 'Suerte'
+                ? 'bg-primary/20 border-primary text-white font-bold'
+                : 'bg-white/[0.02] border-[var(--glass-border)] text-[var(--text-contrast)] hover:bg-white/[0.05]'
+            }`}
           >
-            <div className="flex items-center gap-3">
-              <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
-                <Package size={16} className="text-primary" />
+            <div className="flex items-center gap-2.5">
+              <div className="w-6 h-6 rounded-lg bg-emerald-500/20 flex items-center justify-center text-emerald-400">
+                <Sprout size={13} />
               </div>
-              <span className="text-[13px] font-bold text-[var(--text-contrast)] truncate">{lote.id} - {lote.name}</span>
+              <span className="font-bold">{suerte.id} - {suerte.name}</span>
             </div>
-            <div className="w-7 h-7 rounded-full hover:bg-[var(--input-bg)] flex items-center justify-center text-[var(--text-muted)] transition-colors">
-              <MoreVertical size={15} />
+            <div className="flex items-center gap-2">
+              <span className="text-[11px] text-emerald-400 font-mono font-bold">{suerte.hectareas || 0} Ha</span>
+              <button 
+                onClick={(e) => { e.stopPropagation(); handleOpenCreateChild(suerte, 'Surco'); }}
+                className="p-1 rounded-md bg-white/10 hover:bg-white/20 text-[var(--text-muted)] hover:text-white"
+                title="Agregar Válvula/Surco"
+              >
+                <Plus size={12} />
+              </button>
             </div>
           </button>
         </div>
 
-        {hasChildren && loteExpanded && (
-          <div className="pl-[13px] border-l-2 border-[var(--glass-border)] ml-3.5 mt-2 mb-2 space-y-2">
-            {loteSuertes.map(renderSuerteItem)}
+        {suerteExpanded && hasSurcos && (
+          <div className="mt-1.5 space-y-1">
+            {suerte.surcos.map(renderSurcoItem)}
+          </div>
+        )}
+      </div>
+    );
+  };
+
+  const renderLoteNode = (lote) => {
+    const loteSuertes = filterByGlobal(lote.suertes || []);
+    const loteExpanded = isExpanded(lote.id);
+    const hasChildren = loteSuertes.length > 0;
+
+    return (
+      <div key={lote.id} className="mb-2 ml-4">
+        <div className="flex items-center gap-2">
+          {hasChildren ? (
+            <button 
+              onClick={() => toggleNode(lote.id)} 
+              className="p-1 rounded-md text-[var(--text-muted)] hover:text-white"
+            >
+              {loteExpanded ? <ChevronDown size={14} /> : <ChevronRight size={14} />}
+            </button>
+          ) : (
+            <div className="w-5" />
+          )}
+
+          <button
+            onClick={() => setSelectedNode({ ...lote, type: 'Lote' })}
+            className={`flex-1 flex items-center justify-between p-2.5 rounded-xl border transition-all text-xs ${
+              activeNode?.id === lote.id && activeNode?.type === 'Lote'
+                ? 'bg-blue-500/20 border-blue-500 text-white font-bold'
+                : 'bg-white/[0.02] border-[var(--glass-border)] text-[var(--text-contrast)] hover:bg-white/[0.05]'
+            }`}
+          >
+            <div className="flex items-center gap-2.5">
+              <div className="w-6 h-6 rounded-lg bg-blue-500/20 flex items-center justify-center text-blue-400">
+                <Package size={13} />
+              </div>
+              <span className="font-bold">{lote.id} - {lote.name}</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="text-[11px] text-[var(--text-muted)]">{loteSuertes.length} suertes</span>
+              <button 
+                onClick={(e) => { e.stopPropagation(); handleOpenCreateChild(lote, 'Suerte'); }}
+                className="p-1 rounded-md bg-white/10 hover:bg-white/20 text-[var(--text-muted)] hover:text-white"
+                title="Agregar Suerte"
+              >
+                <Plus size={12} />
+              </button>
+            </div>
+          </button>
+        </div>
+
+        {loteExpanded && hasChildren && (
+          <div className="mt-1.5 space-y-1">
+            {loteSuertes.map(renderSuerteNode)}
           </div>
         )}
       </div>
@@ -155,281 +278,275 @@ export default function Estructura() {
 
   const renderFincaNode = (finca) => {
     const fincaExpanded = isExpanded(finca.id);
-    const fincaLotes = finca.lotes || [];
-    const hasLotes = canRenderLotes && fincaLotes.length > 0;
-    const hasSuertesDirect = structureLevelCount === 3 && canRenderSuertes && filterByGlobal(finca.suertes).length > 0;
-    const hasChildren = hasLotes || hasSuertesDirect;
+    const hasLotes = finca.lotes && finca.lotes.length > 0;
 
     return (
-      <div key={finca.id} className="mb-2">
+      <div key={finca.id} className="mb-2.5 ml-2">
         <div className="flex items-center gap-2">
-          {hasChildren ? (
-            <button className="w-7 h-7 flex-shrink-0 rounded-lg border border-[var(--glass-border)] bg-[var(--glass-bg)] flex items-center justify-center text-gray-500 dark:text-gray-400 hover:text-primary hover:border-primary/30 shadow-sm transition-colors" onClick={() => toggleNode(finca.id)}>
+          {hasLotes ? (
+            <button 
+              onClick={() => toggleNode(finca.id)} 
+              className="p-1 rounded-md text-[var(--text-muted)] hover:text-white"
+            >
               {fincaExpanded ? <ChevronDown size={14} /> : <ChevronRight size={14} />}
             </button>
-          ) : <div className="w-7 h-7 flex-shrink-0" />}
-          
+          ) : (
+            <div className="w-5" />
+          )}
+
           <button
             onClick={() => setSelectedNode({ ...finca, type: 'Finca' })}
-            className={`flex-1 flex items-center justify-between p-2.5 rounded-xl border transition-all duration-200 ${(activeNode?.id === finca.id && activeNode?.type === 'Finca') ? 'bg-[var(--glass-bg)] border-primary shadow-[0_4px_12px_rgba(var(--primary-rgb)/0.15)]' : 'bg-[var(--glass-bg)] border-[var(--glass-border)] hover:border-primary/30 shadow-sm'}`}
+            className={`flex-1 flex items-center justify-between p-3 rounded-xl border transition-all text-xs ${
+              activeNode?.id === finca.id && activeNode?.type === 'Finca'
+                ? 'bg-amber-500/20 border-amber-500 text-white font-bold'
+                : 'bg-white/[0.03] border-[var(--glass-border)] text-[var(--text-contrast)] hover:bg-white/[0.06]'
+            }`}
           >
-            <div className="flex items-center gap-3">
-              <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
-                <Home size={16} className="text-primary" />
+            <div className="flex items-center gap-2.5">
+              <div className="w-7 h-7 rounded-lg bg-amber-500/20 flex items-center justify-center text-amber-400">
+                <Home size={14} />
               </div>
-              <span className="text-[13px] font-bold text-[var(--text-contrast)] truncate">{finca.id} - {finca.name}</span>
+              <span className="font-extrabold text-sm">{finca.name}</span>
             </div>
-            <div className="w-7 h-7 rounded-full hover:bg-[var(--input-bg)] flex items-center justify-center text-[var(--text-muted)] transition-colors">
-              <MoreVertical size={15} />
+            <div className="flex items-center gap-2">
+              <span className="text-[11px] text-[var(--text-muted)]">{finca.lotes?.length || 0} lotes</span>
+              <button 
+                onClick={(e) => { e.stopPropagation(); handleOpenCreateChild(finca, 'Lote'); }}
+                className="p-1 rounded-md bg-white/10 hover:bg-white/20 text-[var(--text-muted)] hover:text-white"
+                title="Agregar Lote"
+              >
+                <Plus size={12} />
+              </button>
             </div>
           </button>
         </div>
 
-        {hasChildren && fincaExpanded && (
-          <div className="pl-[13px] border-l-2 border-[var(--glass-border)] ml-3.5 mt-2 mb-2 space-y-2">
-            {hasLotes && fincaLotes.map(renderLoteNode)}
-            {hasSuertesDirect && filterByGlobal(finca.suertes).map(renderSuerteItem)}
+        {fincaExpanded && hasLotes && (
+          <div className="mt-2 space-y-1">
+            {finca.lotes.map(renderLoteNode)}
           </div>
         )}
       </div>
     );
   };
 
-  const renderSectorNode = (sector) => {
-    const sectorExpanded = isExpanded(sector.id);
-    const sectorFincas = sector.fincas || [];
-    const sectorSuertes = filterByGlobal(sector.suertes);
-    const hasFincas = sectorFincas.length > 0;
-    const hasSuertesDirect = structureLevelCount === 2 && sectorSuertes.length > 0;
-    const hasChildren = hasFincas || hasSuertesDirect;
+  const renderTopNode = (item) => {
+    const isNodeExpanded = isExpanded(item.id);
+    const hasSectoresOrFincas = (item.sectores && item.sectores.length > 0) || (item.fincas && item.fincas.length > 0);
 
     return (
-      <div key={sector.id} className="mb-3">
-        <div className="flex items-center gap-2">
-          {hasChildren ? (
-            <button className="w-7 h-7 flex-shrink-0 rounded-lg border border-[var(--glass-border)] bg-[var(--glass-bg)] flex items-center justify-center text-[var(--text-contrast)] opacity-70 hover:opacity-100 hover:text-primary hover:border-primary/30 shadow-sm transition-colors" onClick={() => toggleNode(sector.id)}>
-              {sectorExpanded ? <ChevronDown size={14} /> : <ChevronRight size={14} />}
+      <div key={item.id} className="mb-4 glass-card !p-3 border-[var(--glass-border)]">
+        <div className="flex items-center justify-between gap-2 pb-2 mb-2 border-b border-[var(--glass-border)]">
+          <div className="flex items-center gap-2">
+            <button 
+              onClick={() => toggleNode(item.id)} 
+              className="p-1 rounded-md text-[var(--text-muted)] hover:text-white"
+            >
+              {isNodeExpanded ? <ChevronDown size={16} /> : <ChevronRight size={16} />}
             </button>
-          ) : <div className="w-7 h-7 flex-shrink-0" />}
-          
-          <button
-            onClick={() => setSelectedNode({ ...sector, type: 'Sector' })}
-            className={`flex-1 flex items-center justify-between p-3 rounded-xl border transition-all duration-200 ${(activeNode?.id === sector.id && activeNode?.type === 'Sector') ? 'bg-[var(--glass-bg)] border-primary shadow-[0_4px_12px_rgba(var(--primary-rgb)/0.15)]' : 'bg-[var(--glass-bg)] border-[var(--glass-border)] hover:border-primary/30 shadow-sm'}`}
-          >
-            <div className="flex items-center gap-3">
-              <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
-                <Trees size={16} className="text-primary" />
-              </div>
-              <span className="text-[14px] font-bold text-[var(--text-contrast)] truncate">{sector.id} - {sector.name}</span>
+            <div className="w-8 h-8 rounded-xl bg-purple-500/20 flex items-center justify-center text-purple-400">
+              <Layers size={16} />
             </div>
-            <div className="w-7 h-7 rounded-full hover:bg-[var(--input-bg)] flex items-center justify-center text-[var(--text-muted)] transition-colors">
-              <MoreVertical size={16} />
+            <div>
+              <div className="font-extrabold text-sm text-[var(--text-contrast)]">{item.name}</div>
+              <div className="text-[10px] text-[var(--text-muted)]">{item.id} · {item.plantaCliente || 'General'}</div>
             </div>
-          </button>
+          </div>
+
+          <div className="flex items-center gap-1.5">
+            <button 
+              onClick={() => handleOpenCreateChild(item, 'Finca')}
+              className="px-2.5 py-1 rounded-lg bg-white/10 hover:bg-white/20 text-xs font-semibold text-[var(--text-contrast)] flex items-center gap-1"
+              title="Agregar Finca"
+            >
+              <Plus size={12} /> Finca
+            </button>
+          </div>
         </div>
 
-        {hasChildren && sectorExpanded && (
-          <div className="pl-[13px] border-l-2 border-[var(--glass-border)] ml-3.5 mt-2 mb-2 space-y-2">
-            {hasSuertesDirect && sectorSuertes.map(renderSuerteItem)}
-            {hasFincas && sectorFincas.map(renderFincaNode)}
+        {isNodeExpanded && (
+          <div className="space-y-2 pt-1">
+            {item.sectores?.map(s => (
+              <div key={s.id} className="ml-2 mb-2 border-l-2 border-primary/30 pl-2">
+                <div className="font-bold text-xs text-primary mb-1">{s.name}</div>
+                {s.fincas?.map(renderFincaNode)}
+              </div>
+            ))}
+            {item.fincas?.map(renderFincaNode)}
           </div>
         )}
       </div>
     );
-  };
-
-  const handleUpdate = (id, newProps) => {
-    updateEstructura(id, newProps, activeNode?.type);
-    if(activeNode && activeNode.id === id) {
-      setSelectedNode({ ...activeNode, ...newProps });
-    }
-  };
-
-  const handleCreate = () => {
-    if (!newElementName.trim() || !newElementCode.trim()) return alert("Debe ingresar Código y Nombre");
-    
-    const nodeData = { 
-      name: newElementName, id: newElementCode, 
-      type: creatingType 
-    };
-
-    if (creatingType === 'Sector') {
-      addSector({ ...nodeData, plantaId: newSectorPlant || globalPlanta || 'General', });
-    } else {
-      if (creatingType === 'Suerte') {
-        nodeData.hectareas = 0;
-        nodeData.cultivo = globalCultivo !== 'Todos' ? globalCultivo : (cultivos[0]?.name || '');
-        nodeData.estado = 'Activo';
-      }
-      addElementoEstructura(activeNode.id, activeNode.type, nodeData);
-    }
-
-    setCreatingType(null);
-    setNewElementName('');
-    setNewElementCode('');
-    setNewSectorPlant('');
   };
 
   return (
-    <div className="space-y-6 fade-in p-6 lg:p-10 h-full w-full overflow-y-auto custom-scrollbar bg-transparent">
-      {/* Header */}
-      <div className="flex items-center gap-4 pb-4">
-        <div className="w-12 h-12 rounded-full bg-[var(--glass-bg)] border border-[var(--glass-border)] flex items-center justify-center shadow-sm">
-          <Sprout size={24} className="text-primary" />
-        </div>
+    <div className="space-y-6 fade-in p-5 lg:p-8 h-full w-full overflow-y-auto custom-scrollbar bg-transparent text-[var(--text-contrast)]">
+      
+      {/* ── HEADER ──────────────────────────────────────────────────────── */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-[var(--glass-border)] pb-5">
         <div>
-          <div className="flex items-center gap-3 mb-1">
-            <h1 className="text-2xl md:text-3xl font-extrabold text-[var(--text-contrast)] tracking-tight">Estructura Agrícola</h1>
-            <span className="bg-primary text-primary-light px-3 py-1 rounded-full text-[11px] font-bold shadow-sm">{structureLevelCount} NIVELES</span>
+          <div className="flex items-center gap-2 text-xs font-bold text-primary uppercase tracking-wider">
+            <Network size={15} />
+            <span>Topología Jerárquica Agrícola</span>
           </div>
-          <p className="text-sm text-[var(--text-muted)]">
-            Organización y jerarquía territorial del sistema agrícola
+          <h1 className="text-2xl font-extrabold tracking-tight text-[var(--text-contrast)] mt-0.5">
+            Estructura Agrícola en 6 Niveles
+          </h1>
+          <p className="text-xs text-[var(--text-muted)]">
+            Organización espacial: Zona → Sector → Finca → Lote → Suerte → Surco / Válvula de Riego.
           </p>
         </div>
+
+        <button 
+          onClick={() => handleOpenCreateChild(null, 'Sector')}
+          className="btn-primary !py-2.5 !px-4 text-xs font-bold flex items-center gap-2 shadow-lg"
+        >
+          <Plus size={16} />
+          <span>Nueva Zona / Sector</span>
+        </button>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-        {/* Panel Izquierdo: Árbol Jerárquico */}
-        <div className="glass-card !p-5 lg:col-span-5 flex flex-col max-h-[800px]">
-          {/* Header */}
-          <div className="flex items-center justify-between border-b border-[var(--glass-border)] pb-4 mb-4">
-            <div className="flex items-center gap-3">
-              <Network className="text-primary flex-shrink-0" size={24} />
-              <div>
-                <h3 className="font-bold text-[var(--text-contrast)] text-base">Jerarquía Activa</h3>
-                <p className="text-xs text-[var(--text-muted)] mt-0.5">
-                  {levelLabels.slice(0, structureLevelCount).join(' › ')}
-                </p>
-              </div>
-            </div>
-            <button className="bg-primary text-primary-light font-bold text-xs px-3 py-2 rounded-lg hover:brightness-110 flex items-center gap-1.5 shadow-sm transition-all" onClick={() => setCreatingType('Sector')}>
-              <Plus size={15} />
-              <span>Nuevo {levelLabels[0]}</span>
-            </button>
+      {/* ── HIERARCHY PILLS ───────────────────────────────────────────── */}
+      <div className="flex flex-wrap items-center gap-2 p-3 rounded-2xl bg-white/[0.02] border border-[var(--glass-border)] text-xs">
+        <span className="font-bold text-[var(--text-muted)] mr-1">Jerarquía Activa:</span>
+        {levelLabels.map((lbl, idx) => (
+          <React.Fragment key={idx}>
+            <span className="px-2.5 py-1 rounded-xl bg-white/[0.05] border border-[var(--glass-border)] font-semibold text-[var(--text-contrast)] flex items-center gap-1.5">
+              <span className="w-2 h-2 rounded-full bg-primary" />
+              <span>N{idx + 1}: {lbl}</span>
+            </span>
+            {idx < levelLabels.length - 1 && (
+              <ChevronRight size={12} className="text-[var(--text-muted)]" />
+            )}
+          </React.Fragment>
+        ))}
+      </div>
+
+      {/* ── MAIN LAYOUT: TREE & HOJA DE VIDA ──────────────────────────── */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        
+        {/* Left Column: Interactive Tree (5 cols) */}
+        <div className="lg:col-span-5 space-y-3">
+          <div className="flex items-center justify-between mb-2">
+            <h3 className="text-sm font-bold text-[var(--text-contrast)] flex items-center gap-2">
+              <Trees size={16} className="text-emerald-400" />
+              Árbol de Ubicaciones
+            </h3>
+            <span className="text-xs text-[var(--text-muted)] font-mono font-medium">
+              {sectoresFiltrados?.length || 0} ramas principales
+            </span>
           </div>
-          
-          {/* Tree */}
-          <div className="flex-1 overflow-y-auto custom-scrollbar pr-1 pb-4">
-            {sectoresFiltrados.map(renderSectorNode)}
-          </div>
-          
-          {/* Legend */}
-          <div className="mt-4 pt-4 border-t border-[var(--glass-border)] flex items-center justify-between px-2">
-            <div className="flex items-center gap-2">
-               <Trees size={15} className="text-primary" />
-               <span className="text-[11px] font-semibold text-[var(--text-muted)]">Sector</span>
-            </div>
-            <div className="flex items-center gap-2">
-               <Home size={15} className="text-primary" />
-               <span className="text-[11px] font-semibold text-[var(--text-muted)]">Finca</span>
-            </div>
-            <div className="flex items-center gap-2">
-               <Package size={15} className="text-primary" />
-               <span className="text-[11px] font-semibold text-[var(--text-muted)]">Lote</span>
-            </div>
-            <div className="flex items-center gap-2">
-               <Sprout size={15} className="text-primary" />
-               <span className="text-[11px] font-semibold text-[var(--text-muted)]">Suerte</span>
-            </div>
+
+          <div className="space-y-3">
+            {sectoresFiltrados.map(renderTopNode)}
           </div>
         </div>
 
-        {/* Panel Derecho: Detalle o Creación */}
-        <div className="lg:col-span-7 space-y-6">
-          {creatingType && (
-            <div className="glass-card !p-6 border-2 border-primary/50 space-y-4 fade-in">
-              <h3 className="text-base font-bold text-[var(--text-contrast)] flex items-center gap-2">
-                <Plus size={18} className="text-primary-light" />
-                <span>Crear Nuevo {labelForType(creatingType)} {creatingType !== 'Sector' && `en ${activeNode?.name}`}</span>
+        {/* Right Column: Node Details / Hoja de Vida (7 cols) */}
+        <div className="lg:col-span-7">
+          {activeNode ? (
+            <HojaDeVida 
+              node={activeNode} 
+              onUpdate={(id, newProps, type) => updateEstructura(id, newProps, type)} 
+            />
+          ) : (
+            <div className="glass-card !p-12 text-center border-[var(--glass-border)] space-y-3">
+              <MousePointerClick size={40} className="mx-auto text-primary/60 animate-bounce" />
+              <h3 className="text-base font-bold text-[var(--text-contrast)]">
+                Seleccione un elemento del árbol
               </h3>
-              
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="input-group !mb-0">
-                  <label className="input-label">Código del {creatingType}</label>
-                  <input className="input-field" value={newElementCode} onChange={e => setNewElementCode(e.target.value)} placeholder="Ej: FIN-01" autoFocus />
-                </div>
-                <div className="input-group !mb-0">
-                  <label className="input-label">Nombre del {creatingType}</label>
-                  <input className="input-field" value={newElementName} onChange={e => setNewElementName(e.target.value)} placeholder="Ej: Finca La Esperanza" />
-                </div>
+              <p className="text-xs text-[var(--text-muted)] max-w-sm mx-auto">
+                Haga clic en cualquier Zona, Finca, Lote, Suerte o Válvula de la izquierda para ver su hoja de vida, coordenadas, topografía y métricas de producción.
+              </p>
+            </div>
+          )}
+        </div>
+
+      </div>
+
+      {/* ── CREATE MODAL ──────────────────────────────────────────────── */}
+      {creatingType && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm animate-fade-in">
+          <div className="glass-card !p-6 max-w-md w-full border-[var(--glass-border)] space-y-4 shadow-2xl">
+            <div className="flex items-center justify-between border-b border-[var(--glass-border)] pb-3">
+              <h3 className="text-base font-extrabold text-[var(--text-contrast)]">
+                Nuevo {labelForType(creatingType)}
+              </h3>
+              <span className="text-xs text-primary font-bold">
+                {creatingParent ? `Padre: ${creatingParent.name}` : 'Nivel Superior'}
+              </span>
+            </div>
+
+            <div className="space-y-3 text-xs">
+              <div className="input-group">
+                <label className="input-label">Código / Identificador</label>
+                <input 
+                  className="input-field" 
+                  value={newElementCode} 
+                  onChange={(e) => setNewElementCode(e.target.value)} 
+                />
               </div>
-              
-              {creatingType === 'Sector' && (
-                <div className="input-group !mb-0">
-                  <label className="input-label">ID de Planta</label>
-                  <input className="input-field" value={newSectorPlant} onChange={e => setNewSectorPlant(e.target.value)} placeholder="Ej: PLN-01" />
+
+              <div className="input-group">
+                <label className="input-label">Nombre del {labelForType(creatingType)}</label>
+                <input 
+                  className="input-field" 
+                  placeholder={`Ej: ${creatingType} 01`} 
+                  value={newElementName} 
+                  onChange={(e) => setNewElementName(e.target.value)} 
+                />
+              </div>
+
+              {(creatingType === 'Suerte' || creatingType === 'Surco') && (
+                <div className="input-group">
+                  <label className="input-label">Área Neta (Hectáreas)</label>
+                  <input 
+                    type="number" 
+                    step="any" 
+                    className="input-field" 
+                    placeholder="0.0" 
+                    value={newElementHa} 
+                    onChange={(e) => setNewElementHa(e.target.value)} 
+                  />
                 </div>
               )}
 
-              <div className="flex gap-3 pt-2">
-                <button className="btn-primary !m-0" onClick={handleCreate}>✓ Crear {creatingType}</button>
-                <button className="btn-secondary !m-0" onClick={() => setCreatingType(null)}>Cancelar</button>
-              </div>
+              {creatingType === 'Suerte' && (
+                <div className="input-group">
+                  <label className="input-label">Cultivo Asignado</label>
+                  <select 
+                    className="input-field" 
+                    value={newElementCultivo} 
+                    onChange={(e) => setNewElementCultivo(e.target.value)}
+                  >
+                    {(cultivos || []).map(c => (
+                      <option key={c.id} value={c.name}>{c.name}</option>
+                    ))}
+                  </select>
+                </div>
+              )}
             </div>
-          )}
 
-          {activeNode ? (
-            <div className="space-y-6">
-              <div className="flex items-center gap-3">
-                {canCreateChild(activeNode.type) && (
-                  <button className="bg-primary text-primary-light font-bold text-sm px-4 py-2 rounded-lg hover:brightness-110 flex items-center gap-2 shadow-sm transition-all" onClick={() => setCreatingType(typeForNextChild(activeNode.type))}>
-                    <Plus size={16} />
-                    <span>Agregar {labelForType(typeForNextChild(activeNode.type))}</span>
-                  </button>
-                )}
-              </div>
-              <HojaDeVida key={activeNode.id} node={activeNode} onUpdate={handleUpdate} onDelete={(id) => deleteEstructura(id, activeNode.type)} />
+            <div className="flex items-center justify-end gap-2 pt-3 border-t border-[var(--glass-border)]">
+              <button 
+                type="button" 
+                onClick={() => { setCreatingType(null); setCreatingParent(null); }} 
+                className="btn-secondary !py-2 !px-4 text-xs font-semibold"
+              >
+                Cancelar
+              </button>
+              <button 
+                type="button" 
+                onClick={handleSaveNewElement} 
+                className="btn-primary !py-2 !px-5 text-xs font-bold"
+              >
+                Crear {creatingType}
+              </button>
             </div>
-          ) : (
-            <div className="glass-card !p-0 h-full flex flex-col justify-between overflow-hidden relative">
-              <div className="p-12 flex-1 flex flex-col items-center justify-center text-center z-10 min-h-[400px]">
-                
-                <div className="w-48 h-48 rounded-full bg-gradient-to-b from-primary/5 to-[var(--glass-bg)] flex flex-col items-center justify-end mb-8 border-[6px] border-[var(--glass-bg)] shadow-xl relative overflow-hidden">
-                   <div className="absolute inset-0 bg-gradient-to-b from-transparent to-primary/10"></div>
-                   <Trees size={72} className="text-primary mb-4 relative z-10" />
-                   <div className="w-full h-1/4 bg-primary/20 rounded-t-full relative z-10 blur-sm"></div>
-                </div>
-
-                <h3 className="text-2xl font-extrabold text-[var(--text-contrast)] mb-3">Seleccione un elemento de la jerarquía</h3>
-                <p className="text-sm text-[var(--text-muted)] max-w-sm leading-relaxed">
-                  Haga clic en cualquier Sector, Finca, Lote o Suerte del árbol para ver y editar su Hoja de Vida.
-                </p>
-              </div>
-
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 p-6 z-10 bg-gradient-to-t from-[var(--glass-bg)] via-[var(--glass-bg)] to-transparent pt-12">
-                <div className="bg-[var(--glass-bg)] border border-[var(--glass-border)] rounded-xl p-3 flex items-start gap-3 shadow-sm hover:-translate-y-1 transition-transform">
-                  <Network className="text-primary mt-0.5 flex-shrink-0" size={20} />
-                  <div>
-                    <h4 className="text-xs font-bold text-[var(--text-contrast)]">Organización</h4>
-                    <p className="text-[10px] text-[var(--text-muted)] mt-0.5">Estructura clara</p>
-                  </div>
-                </div>
-                <div className="bg-[var(--glass-bg)] border border-[var(--glass-border)] rounded-xl p-3 flex items-start gap-3 shadow-sm hover:-translate-y-1 transition-transform">
-                  <ShieldCheck className="text-primary mt-0.5 flex-shrink-0" size={20} />
-                  <div>
-                    <h4 className="text-xs font-bold text-[var(--text-contrast)]">Trazabilidad</h4>
-                    <p className="text-[10px] text-[var(--text-muted)] mt-0.5">Control y seguimiento</p>
-                  </div>
-                </div>
-                <div className="bg-[var(--glass-bg)] border border-[var(--glass-border)] rounded-xl p-3 flex items-start gap-3 shadow-sm hover:-translate-y-1 transition-transform">
-                  <BarChart3 className="text-primary mt-0.5 flex-shrink-0" size={20} />
-                  <div>
-                    <h4 className="text-xs font-bold text-[var(--text-contrast)]">Eficiencia</h4>
-                    <p className="text-[10px] text-[var(--text-muted)] mt-0.5">Mejores decisiones</p>
-                  </div>
-                </div>
-                <div className="bg-[var(--glass-bg)] border border-[var(--glass-border)] rounded-xl p-3 flex items-start gap-3 shadow-sm hover:-translate-y-1 transition-transform">
-                  <TrendingUp className="text-primary mt-0.5 flex-shrink-0" size={20} />
-                  <div>
-                    <h4 className="text-xs font-bold text-[var(--text-contrast)]">Productividad</h4>
-                    <p className="text-[10px] text-[var(--text-muted)] mt-0.5">Resultados sostenibles</p>
-                  </div>
-                </div>
-              </div>
-            </div>
-          )}
+          </div>
         </div>
-      </div>
+      )}
+
     </div>
   );
 }

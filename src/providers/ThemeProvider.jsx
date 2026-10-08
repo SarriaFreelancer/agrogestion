@@ -21,16 +21,6 @@ export const hexToRgb = (hex) => {
     ? normalized.split('').map(char => char + char).join('')
     : normalized;
   const parsed = Number.parseInt(value, 16);
-  return `${(parsed >> 16) & 255} ${(parsed >> 8) & 255} ${parsed & 255}`;
-};
-
-// Versión con comas para rgba()
-const hexToRgbComma = (hex) => {
-  const normalized = hex.replace('#', '');
-  const value = normalized.length === 3
-    ? normalized.split('').map(char => char + char).join('')
-    : normalized;
-  const parsed = Number.parseInt(value, 16);
   return `${(parsed >> 16) & 255}, ${(parsed >> 8) & 255}, ${parsed & 255}`;
 };
 
@@ -59,70 +49,83 @@ export function ThemeProvider({ children }) {
     const isPizarra = finalThemeName === 'Tema Principal';
 
     if (isBlanco) {
-      // Tema Blanco Completo: manejo especial
-      root.style.setProperty('--primary-rgb', isLightMode ? '15 23 42' : '255 255 255');
-      root.style.setProperty('--primary-light-rgb', isLightMode ? '30 41 59' : '200 200 200');
-      root.style.setProperty('--bg-gradient', isLightMode ? '#ffffff' : '#000000');
-      root.style.setProperty('--sidebar-bg', isLightMode ? '#f9fafb' : '#050505');
-      root.style.setProperty('--glass-bg', isLightMode ? 'rgba(255, 255, 255, 0.9)' : 'rgba(10, 10, 10, 0.8)');
-      root.style.setProperty('--glass-border', isLightMode ? 'rgba(0, 0, 0, 0.15)' : 'rgba(255, 255, 255, 0.15)');
-      root.style.setProperty('--input-bg', isLightMode ? '#ffffff' : 'rgba(255, 255, 255, 0.05)');
-      root.style.setProperty('--text-main', isLightMode ? '#000000' : '#ffffff');
-      root.style.setProperty('--text-muted', isLightMode ? '#4b5563' : '#9ca3af');
-      root.style.setProperty('--sidebar-text', isLightMode ? '#000000' : '#ffffff');
-      root.style.setProperty('--sidebar-text-muted', isLightMode ? '#4b5563' : '#9ca3af');
+      // Tema Blanco Completo
+      root.style.setProperty('--primary-rgb', isLightMode ? '15, 23, 42' : '248, 250, 252');
+      root.style.setProperty('--primary-light-rgb', isLightMode ? '30, 41, 59' : '203, 213, 225');
+      root.style.setProperty('--bg-gradient', isLightMode ? '#f8fafc' : '#020617');
+      root.style.setProperty('--sidebar-bg', isLightMode ? '#ffffff' : '#0f172a');
+      root.style.setProperty('--glass-bg', isLightMode ? 'rgba(255, 255, 255, 0.95)' : 'rgba(15, 23, 42, 0.85)');
+      root.style.setProperty('--glass-border', isLightMode ? 'rgba(203, 213, 225, 0.8)' : 'rgba(255, 255, 255, 0.12)');
+      root.style.setProperty('--input-bg', isLightMode ? '#ffffff' : 'rgba(15, 23, 42, 0.6)');
+      root.style.setProperty('--table-row-bg', isLightMode ? '#ffffff' : 'rgba(15, 23, 42, 0.4)');
+      root.style.setProperty('--text-main', isLightMode ? '#0f172a' : '#f8fafc');
+      root.style.setProperty('--text-contrast', isLightMode ? '#0f172a' : '#ffffff');
+      root.style.setProperty('--text-muted', isLightMode ? '#475569' : '#94a3b8');
+      root.style.setProperty('--sidebar-text', isLightMode ? '#0f172a' : '#ffffff');
+      root.style.setProperty('--sidebar-text-muted', isLightMode ? '#475569' : '#94a3b8');
     } else if (isNoche) {
-      // Tema Noche Clásica: manejo especial
-      root.style.setProperty('--primary-rgb', isLightMode ? '15 23 42' : '0 0 0');
-      root.style.setProperty('--primary-light-rgb', isLightMode ? '30 41 59' : '26 26 26');
-      root.style.setProperty('--bg-gradient', isLightMode ? '#e5e7eb' : '#000000');
-      root.style.setProperty('--sidebar-bg', isLightMode ? '#ffffff' : '#000000');
-      root.style.setProperty('--glass-bg', isLightMode ? 'rgba(255, 255, 255, 0.7)' : '#050505');
-      root.style.setProperty('--glass-border', isLightMode ? 'rgba(0, 0, 0, 0.1)' : 'rgba(255, 255, 255, 0.1)');
-      root.style.setProperty('--input-bg', isLightMode ? 'rgba(255, 255, 255, 0.9)' : 'rgba(255, 255, 255, 0.05)');
-      root.style.setProperty('--text-main', isLightMode ? '#111827' : '#F9FAFB');
-      root.style.setProperty('--text-muted', isLightMode ? '#6b7280' : '#9ca3af');
-      root.style.setProperty('--sidebar-text', isLightMode ? '#111827' : '#ffffff');
-      root.style.setProperty('--sidebar-text-muted', isLightMode ? '#4b5563' : 'rgba(255, 255, 255, 0.7)');
+      // Tema Noche Clásica
+      root.style.setProperty('--primary-rgb', isLightMode ? '15, 23, 42' : '16, 185, 129');
+      root.style.setProperty('--primary-light-rgb', isLightMode ? '30, 41, 59' : '52, 211, 153');
+      root.style.setProperty('--bg-gradient', isLightMode ? '#f1f5f9' : '#000000');
+      root.style.setProperty('--sidebar-bg', isLightMode ? '#ffffff' : '#050505');
+      root.style.setProperty('--glass-bg', isLightMode ? 'rgba(255, 255, 255, 0.92)' : '#0f1117');
+      root.style.setProperty('--glass-border', isLightMode ? 'rgba(203, 213, 225, 0.8)' : 'rgba(255, 255, 255, 0.12)');
+      root.style.setProperty('--input-bg', isLightMode ? '#ffffff' : 'rgba(255, 255, 255, 0.05)');
+      root.style.setProperty('--table-row-bg', isLightMode ? '#ffffff' : 'rgba(255, 255, 255, 0.02)');
+      root.style.setProperty('--text-main', isLightMode ? '#0f172a' : '#f8fafc');
+      root.style.setProperty('--text-contrast', isLightMode ? '#0f172a' : '#ffffff');
+      root.style.setProperty('--text-muted', isLightMode ? '#475569' : '#94a3b8');
+      root.style.setProperty('--sidebar-text', isLightMode ? '#0f172a' : '#ffffff');
+      root.style.setProperty('--sidebar-text-muted', isLightMode ? '#475569' : 'rgba(255, 255, 255, 0.7)');
     } else {
       // Temas normales (Verde Agro, Azul Océano, Tierra Café, etc.)
       if (isLightMode) {
-        // Modo claro: fondo suave con gradiente del primario, sidebar con mezcla del primario oscuro
-        root.style.setProperty('--bg-gradient', 'linear-gradient(135deg, rgb(var(--primary-rgb) / 0.05) 0%, rgb(var(--primary-rgb) / 0.15) 100%)');
-        root.style.setProperty('--sidebar-bg', isPizarra ? '#111827' : 'color-mix(in srgb, var(--primary-dark) 50%, #000000)');
-        root.style.setProperty('--glass-bg', 'rgba(255, 255, 255, 0.7)');
-        root.style.setProperty('--glass-border', 'rgb(var(--primary-rgb) / 0.2)');
-        root.style.setProperty('--input-bg', 'rgba(255, 255, 255, 0.9)');
-        root.style.setProperty('--text-main', '#374151');
-        root.style.setProperty('--text-muted', '#6b7280');
+        // Modo claro: fondo suave, texto oscuro de máximo contraste
+        root.style.setProperty('--bg-gradient', 'linear-gradient(135deg, #f8fafc 0%, #eef2f6 100%)');
+        root.style.setProperty('--sidebar-bg', '#0f172a');
+        root.style.setProperty('--glass-bg', 'rgba(255, 255, 255, 0.92)');
+        root.style.setProperty('--glass-border', 'rgba(203, 213, 225, 0.85)');
+        root.style.setProperty('--input-bg', '#ffffff');
+        root.style.setProperty('--table-row-bg', '#ffffff');
+        root.style.setProperty('--text-main', '#0f172a');
+        root.style.setProperty('--text-contrast', '#0f172a');
+        root.style.setProperty('--text-muted', '#475569');
         root.style.setProperty('--sidebar-text', '#ffffff');
-        root.style.setProperty('--sidebar-text-muted', 'rgba(255, 255, 255, 0.7)');
+        root.style.setProperty('--sidebar-text-muted', 'rgba(255, 255, 255, 0.75)');
       } else {
-        // Modo oscuro: fondo oscuro con tinte del color primario del tema
-        root.style.setProperty('--bg-gradient', `linear-gradient(135deg, #0a0a0f 0%, color-mix(in srgb, ${themeData.dark} 20%, #0a0a0f) 100%)`);
-        root.style.setProperty('--sidebar-bg', isPizarra ? '#111827' : `color-mix(in srgb, ${themeData.dark} 40%, #000000)`);
-        root.style.setProperty('--glass-bg', `color-mix(in srgb, ${themeData.dark} 15%, rgba(18, 20, 30, 0.85))`);
-        root.style.setProperty('--glass-border', `color-mix(in srgb, ${themeData.primary} 20%, rgba(255, 255, 255, 0.08))`);
-        root.style.setProperty('--input-bg', `color-mix(in srgb, ${themeData.dark} 10%, rgba(255, 255, 255, 0.04))`);
-        root.style.setProperty('--text-main', themeData.text);
-        root.style.setProperty('--text-muted', themeData.muted);
+        // Modo oscuro: fondo oscuro profundo con texto blanco nítido
+        root.style.setProperty('--bg-gradient', `linear-gradient(135deg, #090d16 0%, color-mix(in srgb, ${themeData.dark} 25%, #090d16) 100%)`);
+        root.style.setProperty('--sidebar-bg', isPizarra ? '#0f172a' : `color-mix(in srgb, ${themeData.dark} 45%, #000000)`);
+        root.style.setProperty('--glass-bg', `color-mix(in srgb, ${themeData.dark} 18%, rgba(15, 23, 42, 0.88))`);
+        root.style.setProperty('--glass-border', 'rgba(255, 255, 255, 0.12)');
+        root.style.setProperty('--input-bg', 'rgba(15, 23, 42, 0.6)');
+        root.style.setProperty('--table-row-bg', 'rgba(15, 23, 42, 0.35)');
+        root.style.setProperty('--text-main', '#f8fafc');
+        root.style.setProperty('--text-contrast', '#ffffff');
+        root.style.setProperty('--text-muted', '#94a3b8');
         root.style.setProperty('--sidebar-text', '#ffffff');
-        root.style.setProperty('--sidebar-text-muted', 'rgba(255, 255, 255, 0.7)');
+        root.style.setProperty('--sidebar-text-muted', 'rgba(255, 255, 255, 0.75)');
       }
     }
 
-    const isBlackBg = (isNoche && !isLightMode) || (isBlanco && !isLightMode);
-    root.style.setProperty('--text-contrast', isBlackBg ? '#ffffff' : (isLightMode ? '#1f2937' : '#ffffff'));
-
-    root.style.setProperty('--color-surface', isLightMode ? 'rgba(255, 255, 255, 0.7)' : themeData.glass);
+    root.style.setProperty('--color-surface', isLightMode ? 'rgba(255, 255, 255, 0.9)' : themeData.glass);
     root.style.setProperty('--color-primary', themeData.primary);
+    root.style.setProperty('--color-foreground', isLightMode ? '#0f172a' : '#f8fafc');
+    root.style.setProperty('--color-muted', isLightMode ? '#475569' : '#94a3b8');
 
     setCurrentThemeId(finalThemeName);
     setModoOscuroGlobal(!isLightMode);
   };
 
+  const toggleThemeMode = () => {
+    const nextIsDark = !modoOscuroGlobal;
+    applyTheme(currentThemeId, nextIsDark);
+    return nextIsDark;
+  };
+
   return (
-    <ThemeContext.Provider value={{ currentThemeId, applyTheme, modoOscuroGlobal, setModoOscuroGlobal }}>
+    <ThemeContext.Provider value={{ currentThemeId, applyTheme, modoOscuroGlobal, setModoOscuroGlobal, toggleThemeMode }}>
       {children}
     </ThemeContext.Provider>
   );

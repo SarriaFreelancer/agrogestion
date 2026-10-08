@@ -20,6 +20,8 @@ import Mantenimiento from '@/modules/production/presentation/mantenimiento/Mante
 import Sincronizacion from '@/modules/core/presentation/sincronizacion/Sincronizacion';
 import MapaCalor from '@/modules/farms/presentation/mapas/MapaCalor';
 import GestionClientes from '@/modules/configuration/presentation/configuraciones/GestionClientes';
+import AgroAICopilot from '@/modules/production/presentation/ai/AgroAICopilot';
+import Auditoria from '@/modules/audit/presentation/Auditoria';
 import InstallPWA from '@/components/InstallPWA';
 import MainLayout from './shared/components/layout/MainLayout';
 import Sidebar from './shared/components/layout/Sidebar';
@@ -64,9 +66,11 @@ function AppContent() {
       'ejecucion': 'Ejecucion',
       'reportes': 'Reportes',
       'monitoreo': 'Monitoreo',
+      'aiCopilot': 'Monitoreo',
       'mantenimiento': 'Mantenimiento',
       'sincronizacion': 'Sincronizacion',
       'mapas': 'Mapas',
+      'auditoria': 'Configuraciones',
       'gestionClientes': 'Dashboard',
       'configuraciones': 'Configuraciones' 
     };
@@ -76,11 +80,11 @@ function AppContent() {
   const renderView = () => {
     // Si la vista actual no tiene permiso, volver al dashboard (excepto superadmin)
     if (!isAdminUser && currentView !== 'dashboard' && !hasPermission(getViewPermission(currentView))) {
-       return <Dashboard />;
+       return <Dashboard onNavigate={handleNavClick} />;
     }
 
     switch(currentView) {
-      case 'dashboard': return <Dashboard />;
+      case 'dashboard': return <Dashboard onNavigate={handleNavClick} />;
       case 'estructura': return <Estructura />;
       case 'maestros': return <Maestros />;
       case 'usuarios': return <Usuarios />;
@@ -88,12 +92,14 @@ function AppContent() {
       case 'ejecucion': return <Ejecucion />;
       case 'reportes': return <Reportes />;
       case 'monitoreo': return <Monitoreo />;
+      case 'aiCopilot': return <AgroAICopilot />;
       case 'mantenimiento': return <Mantenimiento />;
       case 'sincronizacion': return <Sincronizacion />;
       case 'mapas': return <MapaCalor />;
+      case 'auditoria': return <Auditoria />;
       case 'gestionClientes': return <GestionClientes />;
       case 'configuraciones': return <Configuraciones />;
-      default: return <Dashboard />;
+      default: return <Dashboard onNavigate={handleNavClick} />;
     }
   };
 

@@ -11,6 +11,7 @@ import { useEstructura } from './hooks/useEstructura';
 import { useEmpresas } from './hooks/useEmpresas';
 import { useMonitoreo } from './hooks/useMonitoreo';
 import { useOperaciones } from './hooks/useOperaciones';
+import { useAuditoria } from './hooks/useAuditoria';
 import { useHydration } from './hooks/useHydration';
 
 // Hooks de Maestros
@@ -55,6 +56,9 @@ export function AgroProvider({ children }) {
   // 5. Monitoreo
   const monitoreo = useMonitoreo(syncToDatabase);
 
+  // 5.5. Auditoria & Trazabilidad
+  const auditoria = useAuditoria(syncToDatabase);
+
   // 6. Sincronizacion
   // Necesitamos pasar los setters a useHydration para que cargue desde la DB al inicio
   const setters = {
@@ -77,7 +81,8 @@ export function AgroProvider({ children }) {
     setPlanificaciones: operaciones.setPlanificaciones,
     setUsuarios: config.setUsuarios,
     setCategoriasAcceso: config.setCategoriasAcceso,
-    setEmpresas: empresasHook.setEmpresas
+    setEmpresas: empresasHook.setEmpresas,
+    setAuditLogs: auditoria.setAuditLogs
   };
 
   const { isHydrating, isHydratingRef } = useHydration(currentClient, setters);
@@ -123,11 +128,13 @@ export function AgroProvider({ children }) {
     ...unidades,
     ...operaciones,
     ...monitoreo,
+    ...auditoria,
     isHydrating,
     isHydratingRef,
     
     // Auth & Sync exports for backwards compatibility
     currentUser,
+    hasActionPermission: () => true, // Fallback for components still using it from useAgro
     currentClient, clients, setCurrentClient, switchClient,
     addClient, updateClient, editClient, suspendClient, reactivateClient, deleteClient, resetClientData,
     syncQueue, isOnline, processSync, setSyncQueue, lastSync,

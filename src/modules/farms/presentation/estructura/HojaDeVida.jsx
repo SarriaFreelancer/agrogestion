@@ -1,5 +1,21 @@
-import { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useAgro } from '@/providers/AgroContext';
+import { 
+  Sprout, 
+  MapPin, 
+  Layers, 
+  Edit3, 
+  Save, 
+  X, 
+  Trash2, 
+  Compass, 
+  Activity, 
+  Calendar, 
+  Grid,
+  Droplets,
+  Trees
+} from 'lucide-react';
+import { notifySuccess } from '@/utils/swal';
 
 export default function HojaDeVida({ node, onUpdate }) {
   const [editMode, setEditMode] = useState(false);
@@ -8,6 +24,11 @@ export default function HojaDeVida({ node, onUpdate }) {
   const [saveStatus, setSaveStatus] = useState('');
 
   const { deleteEstructura, cultivos, unidades } = useAgro();
+
+  useEffect(() => {
+    setFormData(node || {});
+    setEditMode(false);
+  }, [node?.id]);
 
   const handleChange = (e) => {
     const { name, value, type } = e.target;
@@ -18,7 +39,7 @@ export default function HojaDeVida({ node, onUpdate }) {
   };
 
   const addOtraUnidad = () => {
-    const unidadPorDefecto = unidades[0]?.name || '';
+    const unidadPorDefecto = unidades[0]?.name || 'Hectáreas';
     setFormData(prev => ({
       ...prev,
       otrasUnidades: [
@@ -46,9 +67,10 @@ export default function HojaDeVida({ node, onUpdate }) {
   };
 
   const handleSave = () => {
-    onUpdate(node.id, formData);
+    onUpdate(node.id, formData, node.type);
     setEditMode(false);
     setSaveStatus('Cambios guardados con éxito');
+    notifySuccess('Información actualizada correctamente');
     setTimeout(() => setSaveStatus(''), 3000);
   };
 
@@ -59,215 +81,316 @@ export default function HojaDeVida({ node, onUpdate }) {
   if (!node) return null;
 
   return (
-    <div className="glass-card" style={{ marginTop: '1.5rem', border: editMode ? '2px solid var(--primary-color)' : '1px solid var(--glass-border)' }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '2px solid var(--primary-light)', paddingBottom: '0.5rem', marginBottom: '1rem' }}>
+    <div className="glass-card !p-6 border-[var(--glass-border)] shadow-xl space-y-6">
+      
+      {/* Header */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-[var(--glass-border)] pb-4">
         <div>
-          <h3 style={{ color: 'var(--text-main)', margin: 0 }}>
-            {node.type}: <span style={{ fontWeight: 'bold' }}>{node.id}</span> - {node.name}
-          </h3>
-          <small style={{ color: 'var(--text-muted)' }}>ID Interno: {node.id}</small>
-          {saveStatus && <span style={{ marginLeft: '1rem', color: 'var(--primary-color)', fontWeight: 'bold', fontSize: '0.85rem' }}>{saveStatus}</span>}
+          <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-primary">
+            <Layers size={14} />
+            <span>Nivel: {node.type}</span>
+          </div>
+          <h2 className="text-xl font-extrabold text-[var(--text-contrast)] mt-0.5">
+            {node.id} - {node.name}
+          </h2>
+          {saveStatus && (
+            <span className="text-xs text-primary font-bold">{saveStatus}</span>
+          )}
         </div>
-        <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
+
+        <div className="flex items-center gap-2">
           {editMode ? (
             <>
-              <button type="button" onClick={handleSave} className="btn-primary" style={{ padding: '0.4rem 1.2rem', fontSize: '0.85rem' }}>GUARDAR</button>
-              <button type="button" onClick={() => { setEditMode(false); setFormData({ ...node }); }} className="btn-secondary" style={{ padding: '0.4rem 0.8rem', fontSize: '0.85rem' }}>CANCELAR</button>
+              <button 
+                type="button" 
+                onClick={handleSave} 
+                className="btn-primary !py-2 !px-4 text-xs font-bold flex items-center gap-1.5"
+              >
+                <Save size={14} /> Guardar
+              </button>
+              <button 
+                type="button" 
+                onClick={() => { setEditMode(false); setFormData({ ...node }); }} 
+                className="btn-secondary !py-2 !px-3 text-xs font-semibold flex items-center gap-1.5"
+              >
+                <X size={14} /> Cancelar
+              </button>
             </>
           ) : (
-            <button type="button" onClick={() => setEditMode(true)} className="btn-primary" style={{ padding: '0.4rem 1rem', fontSize: '0.85rem' }}>
-              EDITAR INFORMACIÓN
+            <button 
+              type="button" 
+              onClick={() => setEditMode(true)} 
+              className="btn-primary !py-2 !px-4 text-xs font-bold flex items-center gap-1.5"
+            >
+              <Edit3 size={14} /> Editar Información
             </button>
           )}
-          <button type="button" onClick={handleDelete} className="btn-secondary" style={{ padding: '0.4rem 1rem', fontSize: '0.85rem', background: '#ff5252', color: 'white', border: 'none' }}>
-            ELIMINAR
+
+          <button 
+            type="button" 
+            onClick={handleDelete} 
+            className="px-3 py-2 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/30 text-rose-400 font-semibold text-xs transition-all flex items-center gap-1.5"
+          >
+            <Trash2 size={14} /> Eliminar
           </button>
         </div>
       </div>
 
+      {/* Form / Details */}
       {editMode ? (
-        <div className="grid-2" style={{ gap: '1rem' }}>
-          <div className="input-group"><label className="input-label">Código</label><input name="codigo" className="input-field" value={formData.id || ''} onChange={handleChange} /></div>
-          <div className="input-group"><label className="input-label">Nombre</label><input name="name" className="input-field" value={formData.name || ''} onChange={handleChange} /></div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div className="input-group">
+            <label className="input-label">Código</label>
+            <input 
+              name="id" 
+              className="input-field" 
+              value={formData.id || ''} 
+              onChange={handleChange} 
+            />
+          </div>
+          <div className="input-group">
+            <label className="input-label">Nombre</label>
+            <input 
+              name="name" 
+              className="input-field" 
+              value={formData.name || ''} 
+              onChange={handleChange} 
+            />
+          </div>
 
-          {node.type === 'Sector' && (
+          {(node.type === 'Sector' || node.type === 'Zona') && (
             <>
-              <div className="input-group" style={{ gridColumn: 'span 2' }}><label className="input-label">Planta o Cliente</label><input name="plantaCliente" className="input-field" value={formData.plantaCliente || ''} onChange={handleChange} /></div>
-              <div className="input-group" style={{ gridColumn: 'span 2' }}><label className="input-label">Descripción</label><input name="description" className="input-field" value={formData.description || ''} onChange={handleChange} /></div>
+              <div className="input-group sm:col-span-2">
+                <label className="input-label">Planta / Central Asignada</label>
+                <input 
+                  name="plantaCliente" 
+                  className="input-field" 
+                  value={formData.plantaCliente || ''} 
+                  onChange={handleChange} 
+                />
+              </div>
+              <div className="input-group sm:col-span-2">
+                <label className="input-label">Descripción</label>
+                <input 
+                  name="description" 
+                  className="input-field" 
+                  value={formData.description || ''} 
+                  onChange={handleChange} 
+                />
+              </div>
             </>
           )}
 
           {node.type === 'Finca' && (
-            <div className="input-group"><label className="input-label">Ubicación / Coordenadas</label><input name="location" className="input-field" value={formData.location || ''} onChange={handleChange} /></div>
+            <div className="input-group sm:col-span-2">
+              <label className="input-label">Ubicación / Coordenadas GPS</label>
+              <input 
+                name="location" 
+                className="input-field" 
+                value={formData.location || ''} 
+                onChange={handleChange} 
+                placeholder="Ej: 3.5284, -76.2981" 
+              />
+            </div>
           )}
 
           {node.type === 'Lote' && (
-            <div className="input-group">
-              <label className="input-label">Topografía</label>
-              <select name="topography" className="input-field" value={formData.topography || ''} onChange={handleChange}>
-                <option value="">Seleccionar...</option>
-                <option value="Plana">Plana</option>
-                <option value="Ondulada">Ondulada</option>
-                <option value="Quebrada">Quebrada</option>
+            <div className="input-group sm:col-span-2">
+              <label className="input-label">Topografía del Suelo</label>
+              <select 
+                name="topography" 
+                className="input-field" 
+                value={formData.topography || ''} 
+                onChange={handleChange}
+              >
+                <option value="">Seleccionar topografía...</option>
+                <option value="Plana">Plana (0 - 3% pendiente)</option>
+                <option value="Ondulada">Ondulada (3 - 12% pendiente)</option>
+                <option value="Quebrada">Quebrada / Ladera (&gt; 12% pendiente)</option>
               </select>
             </div>
           )}
 
-          {node.type === 'Suerte' && (
+          {(node.type === 'Suerte' || node.type === 'Surco' || node.type === 'Seccion') && (
             <>
-              <div className="input-group">
-                <label className="input-label">Cultivo</label>
-                <select name="cultivo" className="input-field" value={formData.cultivo || ''} onChange={handleChange}>
-                  <option value="">Seleccionar...</option>
-                  {cultivos.filter(c => c.estado !== 'Inactivo').map(c => (
-                    <option key={c.id} value={c.name}>{c.name}</option>
-                  ))}
-                </select>
-              </div>
-              <div className="input-group"><label className="input-label">Área Neta / Efectiva (ha)</label><input type="number" step="any" name="hectareas" className="input-field" value={formData.hectareas ?? ''} onChange={handleChange} /></div>
-              <div className="input-group"><label className="input-label">Área Bruta (ha)</label><input type="number" step="any" name="areaBruta" className="input-field" value={formData.areaBruta ?? ''} onChange={handleChange} /></div>
-              <div className="input-group"><label className="input-label">Espacio entre Surcos (m)</label><input type="number" step="any" name="distanciaSurcos" className="input-field" value={formData.distanciaSurcos ?? ''} onChange={handleChange} /></div>
-
-              <div style={{ gridColumn: '1 / -1', background: '#f4f6f8', padding: '1rem', borderRadius: '8px', marginBottom: '1rem' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', cursor: 'pointer', fontWeight: 'bold' }} onClick={() => setShowOtrasUnidades(!showOtrasUnidades)}>
-                  <span>Otras Unidades</span>
-                  <span>{showOtrasUnidades ? '▲ Ocultar' : '▼ Mostrar'}</span>
-                </div>
-                {showOtrasUnidades && (
-                  <div style={{ marginTop: '1rem' }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.75rem' }}>
-                      <strong>Ingresar Unidad</strong>
-                      <button type="button" className="btn-secondary" onClick={addOtraUnidad} style={{ padding: '0.4rem 0.8rem', fontSize: '0.8rem' }}>
-                        + Agregar unidad
-                      </button>
-                    </div>
-                    {(formData.otrasUnidades || []).map((item, index) => (
-                      <div key={index} style={{ display: 'grid', gridTemplateColumns: '1.5fr 1fr auto', gap: '0.75rem', alignItems: 'end', marginBottom: '0.75rem' }}>
-                        <div className="input-group" style={{ marginBottom: 0 }}>
-                          <label className="input-label">Unidad</label>
-                          <select className="input-field" value={item.unidad} onChange={(e) => updateOtraUnidad(index, 'unidad', e.target.value)}>
-                            {unidades.map(u => <option key={u.id} value={u.name}>{u.name}</option>)}
-                          </select>
-                        </div>
-                        <div className="input-group" style={{ marginBottom: 0 }}>
-                          <label className="input-label">Cantidad</label>
-                          <input type="number" step="any" className="input-field" value={item.cantidad ?? ''} onChange={(e) => updateOtraUnidad(index, 'cantidad', e.target.value)} />
-                        </div>
-                        <button type="button" className="btn-secondary" onClick={() => removeOtraUnidad(index)} style={{ padding: '0.5rem 0.8rem', fontSize: '0.8rem', background: '#ffebee', color: '#b71c1c', border: '1px solid #f8bbd0' }}>
-                          Eliminar
-                        </button>
-                      </div>
+              {node.type === 'Suerte' && (
+                <div className="input-group">
+                  <label className="input-label">Cultivo Principal</label>
+                  <select 
+                    name="cultivo" 
+                    className="input-field" 
+                    value={formData.cultivo || ''} 
+                    onChange={handleChange}
+                  >
+                    <option value="">Seleccionar cultivo...</option>
+                    {(cultivos || []).filter(c => c.estado !== 'Inactivo').map(c => (
+                      <option key={c.id} value={c.name}>{c.name}</option>
                     ))}
-                  </div>
-                )}
+                  </select>
+                </div>
+              )}
+
+              <div className="input-group">
+                <label className="input-label">Área Neta Efectiva (Ha)</label>
+                <input 
+                  type="number" 
+                  step="any" 
+                  name="hectareas" 
+                  className="input-field" 
+                  value={formData.hectareas ?? ''} 
+                  onChange={handleChange} 
+                />
               </div>
 
               <div className="input-group">
-                <label className="input-label">Estado</label>
-                <select name="estado" className="input-field" value={formData.estado || ''} onChange={handleChange}>
-                  <option value="Activo">Activo</option>
-                  <option value="Inactivo">Inactivo</option>
-                </select>
-              </div>
-              <div className="input-group"><label className="input-label">Estado Productivo</label><input name="estadoProductivo" className="input-field" value={formData.estadoProductivo || ''} onChange={handleChange} /></div>
-              <div className="input-group"><label className="input-label">Edad (días)</label><input type="number" name="edadSuerteDias" className="input-field" value={formData.edadSuerteDias ?? ''} onChange={handleChange} /></div>
-              <div className="input-group"><label className="input-label">Edad Última Cosecha</label><input type="number" name="edadUltimaCosechaDias" className="input-field" value={formData.edadUltimaCosechaDias ?? ''} onChange={handleChange} /></div>
-              <div className="input-group"><label className="input-label">Latitud</label><input type="number" step="any" name="lat" className="input-field" value={formData.lat ?? ''} onChange={handleChange} /></div>
-              <div className="input-group"><label className="input-label">Longitud</label><input type="number" step="any" name="lng" className="input-field" value={formData.lng ?? ''} onChange={handleChange} /></div>
-
-              <div className="input-group" style={{ gridColumn: 'span 2' }}>
-                <label className="input-label">Geometría del Polígono (JSON: [[lat,lng], ...])</label>
-                <textarea
-                  name="geometria"
-                  className="input-field"
-                  style={{ minHeight: '80px', fontFamily: 'monospace', fontSize: '0.8rem' }}
-                  value={Array.isArray(formData.geometria) ? JSON.stringify(formData.geometria) : formData.geometria || '[]'}
-                  onChange={(e) => {
-                    try {
-                      const val = JSON.parse(e.target.value);
-                      setFormData({ ...formData, geometria: val });
-                    } catch {
-                      setFormData({ ...formData, geometria: e.target.value });
-                    }
-                  }}
+                <label className="input-label">Número de Plantas / Densidad</label>
+                <input 
+                  type="number" 
+                  name="plantas" 
+                  className="input-field" 
+                  value={formData.plantas ?? ''} 
+                  onChange={handleChange} 
                 />
-                <button
-                  type="button"
-                  className="btn-secondary"
-                  style={{ marginTop: '0.5rem', fontSize: '0.75rem' }}
-                  onClick={() => {
-                    if (!formData.lat || !formData.lng) return alert('Primero ingrese Lat y Lng del centro');
-                    const offset = 0.001;
-                    const sample = [
-                      [formData.lat + offset, formData.lng - offset],
-                      [formData.lat + offset, formData.lng + offset],
-                      [formData.lat - offset, formData.lng + offset],
-                      [formData.lat - offset, formData.lng - offset]
-                    ];
-                    setFormData({ ...formData, geometria: sample });
-                  }}
-                >
-                  Generar Polígono de Prueba
-                </button>
               </div>
+
+              {node.type === 'Suerte' && (
+                <>
+                  <div className="input-group">
+                    <label className="input-label">Estado Operativo</label>
+                    <select 
+                      name="estado" 
+                      className="input-field" 
+                      value={formData.estado || 'Activo'} 
+                      onChange={handleChange}
+                    >
+                      <option value="Activo">Activo</option>
+                      <option value="Inactivo">Inactivo</option>
+                      <option value="En Renovación">En Renovación</option>
+                    </select>
+                  </div>
+
+                  <div className="input-group">
+                    <label className="input-label">Estado Fenológico / Productivo</label>
+                    <input 
+                      name="estadoProductivo" 
+                      className="input-field" 
+                      value={formData.estadoProductivo || ''} 
+                      onChange={handleChange} 
+                      placeholder="Ej: En Crecimiento Vigoroso, Floración, Cosecha"
+                    />
+                  </div>
+
+                  <div className="input-group">
+                    <label className="input-label">Edad (días)</label>
+                    <input 
+                      type="number" 
+                      name="edadSuerteDias" 
+                      className="input-field" 
+                      value={formData.edadSuerteDias ?? ''} 
+                      onChange={handleChange} 
+                    />
+                  </div>
+
+                  <div className="input-group">
+                    <label className="input-label">Latitud Centroide</label>
+                    <input 
+                      type="number" 
+                      step="any" 
+                      name="lat" 
+                      className="input-field" 
+                      value={formData.lat ?? ''} 
+                      onChange={handleChange} 
+                    />
+                  </div>
+
+                  <div className="input-group">
+                    <label className="input-label">Longitud Centroide</label>
+                    <input 
+                      type="number" 
+                      step="any" 
+                      name="lng" 
+                      className="input-field" 
+                      value={formData.lng ?? ''} 
+                      onChange={handleChange} 
+                    />
+                  </div>
+                </>
+              )}
             </>
           )}
 
-          <div className="input-group" style={{ gridColumn: '1 / -1', marginTop: '1rem' }}>
-            <button type="button" className="btn-primary" onClick={handleSave} style={{ width: '100%', padding: '1rem', fontWeight: 'bold', borderRadius: '8px', boxShadow: '0 4px 12px rgba(46, 125, 50, 0.2)' }}>
-              APLICAR Y GUARDAR CAMBIOS EN {node.type.toUpperCase()}
-            </button>
-          </div>
         </div>
       ) : (
-        <div className="grid-2" style={{ gap: '1rem' }}>
-          <div><span style={{ fontWeight: 'bold' }}>Código:</span> {node.id}</div>
-          <div><span style={{ fontWeight: 'bold' }}>Nombre:</span> {node.name}</div>
+        /* Read Mode Cards */
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          
+          <div className="p-4 rounded-2xl bg-white/[0.02] border border-[var(--glass-border)] space-y-1">
+            <span className="text-[11px] font-bold text-[var(--text-muted)] uppercase tracking-wider">Identificador</span>
+            <div className="text-base font-extrabold text-[var(--text-contrast)] font-mono">{node.id}</div>
+            <div className="text-xs text-[var(--text-muted)]">Nivel: {node.type}</div>
+          </div>
 
-          {node.type === 'Sector' && (
-            <>
-              <div><span style={{ fontWeight: 'bold' }}>Planta / Cliente:</span> {node.plantaCliente || 'N/A'}</div>
-              <div style={{ gridColumn: 'span 2' }}><span style={{ fontWeight: 'bold' }}>Descripción:</span> {node.description || 'N/A'}</div>
-            </>
-          )}
+          <div className="p-4 rounded-2xl bg-white/[0.02] border border-[var(--glass-border)] space-y-1">
+            <span className="text-[11px] font-bold text-[var(--text-muted)] uppercase tracking-wider">Nombre Oficial</span>
+            <div className="text-base font-bold text-[var(--text-contrast)]">{node.name}</div>
+            <div className="text-xs text-primary font-medium">{node.cultivo || node.plantaCliente || 'Agrícola'}</div>
+          </div>
 
-          {node.type === 'Finca' && <div><span style={{ fontWeight: 'bold' }}>Ubicación:</span> {node.location || 'N/A'}</div>}
-
-          {node.type === 'Lote' && <div><span style={{ fontWeight: 'bold' }}>Topografía:</span> {node.topography || 'N/A'}</div>}
-
-          {node.type === 'Suerte' && (
-            <>
-              <div><span style={{ fontWeight: 'bold' }}>Área Neta:</span> {node.hectareas} ha</div>
-              <div><span style={{ fontWeight: 'bold' }}>Área Bruta:</span> {node.areaBruta || 0} ha</div>
-              <div><span style={{ fontWeight: 'bold' }}>Espacio Surcos:</span> {node.distanciaSurcos || 0} m</div>
-
-              <div style={{ gridColumn: '1 / -1', background: '#f4f6f8', padding: '1rem', borderRadius: '8px', marginBottom: '1rem' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', cursor: 'pointer', fontWeight: 'bold' }} onClick={() => setShowOtrasUnidades(!showOtrasUnidades)}>
-                  <span>Otras Unidades</span>
-                  <span>{showOtrasUnidades ? '▲ Ocultar' : '▼ Mostrar'}</span>
-                </div>
-                {showOtrasUnidades && (
-                  <div style={{ marginTop: '1rem', display: 'grid', gap: '0.75rem' }}>
-                    {(node.otrasUnidades || []).map((item, index) => (
-                      <div key={index} style={{ display: 'flex', justifyContent: 'space-between', gap: '0.75rem', padding: '0.75rem', background: '#fff', borderRadius: '8px' }}>
-                        <span style={{ fontWeight: 'bold' }}>{item.unidad}:</span>
-                        <span>{item.cantidad ?? 0}</span>
-                      </div>
-                    ))}
-                  </div>
-                )}
+          {(node.hectareas !== undefined || node.surcos?.length > 0) && (
+            <div className="p-4 rounded-2xl bg-white/[0.02] border border-[var(--glass-border)] space-y-1">
+              <span className="text-[11px] font-bold text-[var(--text-muted)] uppercase tracking-wider">Superficie</span>
+              <div className="text-base font-extrabold text-emerald-400">
+                {Number(node.hectareas || 0).toFixed(2)} Ha
               </div>
-              <div><span style={{ fontWeight: 'bold' }}>Cultivo:</span> {node.cultivo}</div>
-              <div><span style={{ fontWeight: 'bold' }}>Estado:</span> <span className={`badge ${node.estado === 'Activo' ? 'badge-active' : 'badge-inactive'}`} style={{ marginLeft: '0.5rem' }}>{node.estado}</span></div>
-              <div><span style={{ fontWeight: 'bold' }}>Estado Prod.:</span> {node.estadoProductivo || 'N/A'}</div>
-              <div><span style={{ fontWeight: 'bold' }}>Edad Suerte:</span> {node.edadSuerteDias || 0} días</div>
-              <div><span style={{ fontWeight: 'bold' }}>Edad Última Cosecha:</span> {node.edadUltimaCosechaDias || 0} días</div>
-              <div><span style={{ fontWeight: 'bold' }}>Ubicación GPS:</span> {node.lat ? `${node.lat}, ${node.lng}` : 'No definida'}</div>
-              <div><span style={{ fontWeight: 'bold' }}>Polígono:</span> {node.geometria?.length > 0 ? `${node.geometria.length} puntos definidos` : 'No definido'}</div>
-            </>
+              <div className="text-xs text-[var(--text-muted)]">
+                {node.plantas ? `${node.plantas.toLocaleString()} plantas` : `${node.surcos?.length || 0} surcos/válvulas`}
+              </div>
+            </div>
           )}
+
+          {node.estadoProductivo && (
+            <div className="p-4 rounded-2xl bg-white/[0.02] border border-[var(--glass-border)] space-y-1">
+              <span className="text-[11px] font-bold text-[var(--text-muted)] uppercase tracking-wider">Fase Productiva</span>
+              <div className="text-sm font-bold text-[var(--text-contrast)]">{node.estadoProductivo}</div>
+              <div className="text-xs text-[var(--text-muted)]">Edad: {node.edadSuerteDias || 0} días</div>
+            </div>
+          )}
+
+          {node.topography && (
+            <div className="p-4 rounded-2xl bg-white/[0.02] border border-[var(--glass-border)] space-y-1">
+              <span className="text-[11px] font-bold text-[var(--text-muted)] uppercase tracking-wider">Topografía</span>
+              <div className="text-sm font-bold text-[var(--text-contrast)]">{node.topography}</div>
+            </div>
+          )}
+
+          {node.lat && node.lng && (
+            <div className="p-4 rounded-2xl bg-white/[0.02] border border-[var(--glass-border)] space-y-1">
+              <span className="text-[11px] font-bold text-[var(--text-muted)] uppercase tracking-wider">Geoposicionamiento</span>
+              <div className="text-xs font-mono text-cyan-400">{node.lat.toFixed(4)}, {node.lng.toFixed(4)}</div>
+            </div>
+          )}
+
         </div>
       )}
+
+      {/* Sub-elements summary if has children */}
+      {node.surcos && node.surcos.length > 0 && (
+        <div className="space-y-3 pt-3 border-t border-[var(--glass-border)]">
+          <h4 className="text-xs font-bold uppercase tracking-wider text-[var(--text-muted)] flex items-center gap-1.5">
+            <Droplets size={14} className="text-blue-400" />
+            Válvulas / Surcos Registrados ({node.surcos.length})
+          </h4>
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+            {node.surcos.map(s => (
+              <div key={s.id} className="p-2.5 rounded-xl bg-white/[0.03] border border-[var(--glass-border)] text-xs">
+                <div className="font-bold text-[var(--text-contrast)]">{s.name}</div>
+                <div className="text-[11px] text-emerald-400 font-medium">{s.hectareas} Ha</div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
     </div>
   );
 }
