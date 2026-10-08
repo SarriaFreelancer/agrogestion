@@ -1,13 +1,15 @@
 import React, { useState } from 'react';
 import { useAgro } from '@/providers/AgroContext';
+import ModalReportesGis from '@/modules/farms/presentation/mapas/ModalReportesGis';
 
 export default function Reportes() {
   const { 
-    planificaciones, actividades, maquinarias, sectores, 
+    planificaciones, actividades, maquinarias, sectores, trabajadores,
     productos, registrosControles, movimientosInventario, controlesAgro, cultivos
   } = useAgro();
   
   const [activeTab, setActiveTab] = useState('actividades'); 
+  const [showGisModal, setShowGisModal] = useState(false);
   const [subTabActividades, setSubTabActividades] = useState('insumos'); 
   const [fechaDesde, setFechaDesde] = useState('');
   const [fechaHasta, setFechaHasta] = useState('');
@@ -291,6 +293,7 @@ export default function Reportes() {
         <button className={activeTab === 'inventario' ? 'btn-primary' : 'btn-secondary'} onClick={() => setActiveTab('inventario')}>Inventario Suertes</button>
         <button className={activeTab === 'rentabilidad' ? 'btn-primary' : 'btn-secondary'} onClick={() => setActiveTab('rentabilidad')}>💰 Rentabilidad</button>
         <button className={activeTab === 'kardex' ? 'btn-primary' : 'btn-secondary'} onClick={() => setActiveTab('kardex')}>📦 Kardex</button>
+        <button className={`!m-0 ${activeTab === 'gis' ? 'btn-primary' : 'btn-secondary'}`} onClick={() => setActiveTab('gis')}>📡 Telemetría GIS & Tiempos</button>
       </div>
 
       <div className="glass-card" style={{ marginTop: '1.5rem', marginBottom: '2rem' }}>
@@ -557,7 +560,65 @@ export default function Reportes() {
             </table>
           </>
         )}
+
+        {activeTab === 'gis' && (
+          <div className="space-y-6 py-4">
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-slate-900/90 border border-slate-700/80 p-6 rounded-2xl">
+              <div>
+                <h3 className="text-lg font-bold text-white flex items-center gap-2">
+                  <span className="p-2 rounded-xl bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
+                    🛰️
+                  </span>
+                  Telemetría Geoespacial & Auditoría de Tiempos GPS
+                </h3>
+                <p className="text-xs text-slate-400 mt-1 max-w-2xl">
+                  Genera datasets con coordenadas exactas (latitud/longitud), suertes asignadas, cumplimiento de geocercas, tiempos productivos vs improductivos y alertas por cada minuto o intervalos configurables.
+                </p>
+              </div>
+
+              <button
+                onClick={() => setShowGisModal(true)}
+                className="btn-primary !px-5 !py-3 flex items-center gap-2 text-sm font-bold shadow-xl"
+              >
+                📊 Abrir Generador & Exportador GIS
+              </button>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="p-4 rounded-xl bg-slate-900/60 border border-slate-800">
+                <div className="text-emerald-400 font-bold text-sm mb-1">👷 Personal en Campo</div>
+                <p className="text-xs text-slate-400">
+                  Tracking por minutos de cuadrillas, cruce con órdenes de trabajo planificadas, paradas prolongadas e inactividad de dispositivo.
+                </p>
+              </div>
+              <div className="p-4 rounded-xl bg-slate-900/60 border border-slate-800">
+                <div className="text-blue-400 font-bold text-sm mb-1">🚜 Flota de Maquinaria</div>
+                <p className="text-xs text-slate-400">
+                  Horómetros GPS, velocidad en surco vs traslado en vía, tiempo de ralentí y consumo de combustible en polígono.
+                </p>
+              </div>
+              <div className="p-4 rounded-xl bg-slate-900/60 border border-slate-800">
+                <div className="text-purple-400 font-bold text-sm mb-1">🔬 Sanidad & Catastro</div>
+                <p className="text-xs text-slate-400">
+                  Muestreos de plagas con georreferenciación puntual, severidad fitosanitaria y geometrías de lotes exportables a base de datos.
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
+
+      <ModalReportesGis
+        isOpen={showGisModal}
+        onClose={() => setShowGisModal(false)}
+        trabajadores={trabajadores}
+        maquinarias={maquinarias}
+        sectores={sectores}
+        planificaciones={planificaciones}
+        controlesAgro={controlesAgro}
+        registrosControles={registrosControles}
+        defaultModule="personal"
+      />
     </div>
   );
 }

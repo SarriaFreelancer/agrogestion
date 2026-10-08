@@ -56,6 +56,7 @@ import {
   FileText
 } from 'lucide-react';
 import { notifySuccess, notifyError } from '@/utils/swal';
+import ModalReportesGis from './ModalReportesGis';
 
 export default function MapaCalor() {
   const { 
@@ -114,6 +115,7 @@ export default function MapaCalor() {
   const [showTrails, setShowTrails] = useState(true); // Mostrar trazas de ruta punto a punto
   const [isPanelMinimized, setIsPanelMinimized] = useState(false);
   const [showConfigModal, setShowConfigModal] = useState(false);
+  const [showReportesModal, setShowReportesModal] = useState(false);
   const [selectedTrackingFilter, setSelectedTrackingFilter] = useState('all'); // 'all' or specific entity ID
 
   // Filter states
@@ -1173,11 +1175,20 @@ export default function MapaCalor() {
           {/* Right GIS Controls & Config */}
           <div className="flex items-center gap-2">
             <button
+              onClick={() => setShowReportesModal(true)}
+              className="flex items-center gap-1.5 bg-white/95 dark:bg-slate-900/90 backdrop-blur-md border border-slate-200 dark:border-slate-700/60 px-3 py-2 rounded-2xl text-xs font-bold shadow-2xl text-slate-800 dark:text-white hover:bg-slate-50 dark:hover:bg-slate-800 transition-all pointer-events-auto"
+              title="Generar y Exportar Reportes de Telemetría GIS por Minutos a Base de Datos"
+            >
+              <FileText size={15} className="text-emerald-500" />
+              <span className="hidden sm:inline">Reportes GIS</span>
+            </button>
+
+            <button
               onClick={() => setShowConfigModal(true)}
               className="flex items-center gap-1.5 bg-white/95 dark:bg-slate-900/90 backdrop-blur-md border border-slate-200 dark:border-slate-700/60 px-3 py-2 rounded-2xl text-xs font-bold shadow-2xl text-slate-800 dark:text-white hover:bg-slate-50 dark:hover:bg-slate-800 transition-all pointer-events-auto"
               title="Configuración de Parámetros GIS, Telemetría y Censos"
             >
-              <Settings size={15} className="text-emerald-500" />
+              <Settings size={15} className="text-blue-500" />
               <span className="hidden sm:inline">Configurar GIS</span>
             </button>
 
@@ -1914,6 +1925,19 @@ export default function MapaCalor() {
           </div>
         </div>
       )}
+
+      {/* Modal Generador y Exportador de Reportes GIS por Minutos a BD */}
+      <ModalReportesGis
+        isOpen={showReportesModal}
+        onClose={() => setShowReportesModal(false)}
+        trabajadores={trabajadores}
+        maquinarias={maquinarias}
+        sectores={sectores}
+        planificaciones={planificaciones}
+        controlesAgro={controlesAgro}
+        registrosControles={registrosControles}
+        defaultModule={gisMode}
+      />
 
     </div>
   );

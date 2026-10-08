@@ -14,4 +14,10 @@ router.get('/maquinarias', controller.getMaquinarias);
 router.get('/auditoria', controller.getAuditoria);
 router.get('/dashboard/kpis', controller.getDashboardKpis);
 
+// GIS & Telemetry Reporting
+router.get('/gis/reportes', controller.getGisReportes);
+router.post('/gis/reportes', controller.createGisReporte);
+router.delete('/gis/reportes/:id', controller.deleteGisReporte);
+
 export default router;
+

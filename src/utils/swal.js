@@ -82,6 +82,7 @@ export const swalConfirm = async (message, options = {}) => {
 export const confirmDialog = swalConfirm;
 export const notifySuccess = swalSuccess;
 export const notifyError = swalError;
+export const notifyWarning = (message, title = 'Atención') => swalMessage(message, 'warning', title);
 
 if (typeof window !== 'undefined' && !window.__agroSweetAlertPatched) {
   window.__agroSweetAlertPatched = true;

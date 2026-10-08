@@ -402,3 +402,111 @@ export const getDashboardKpis = (req, res) => {
     }
   });
 };
+
+// In-Memory store for GIS Telemetry & Spatial reports
+let fallbackGisReportes = [
+  {
+    id: 'REP-GIS-001',
+    codigo: 'REP-GIS-20261008-01',
+    titulo: 'Reporte de Telemetría y Rendimiento de Cuadrillas en Campo',
+    modulo: 'personal',
+    moduloLabel: 'Tracking de Personal / Cuadrillas',
+    intervaloMinutos: 5,
+    fechaInicio: '2026-10-08T06:00:00',
+    fechaFin: '2026-10-08T18:00:00',
+    totalRegistros: 28,
+    tiempoProductivoTotalMin: 495,
+    tiempoImproductivoTotalMin: 65,
+    tiempoParadaTotalMin: 40,
+    eficienciaPct: 82.5,
+    alertasDetectadas: 2,
+    generadoPor: 'David Sarria (Super Admin)',
+    createdAt: '2026-10-08T17:30:00.000Z'
+  },
+  {
+    id: 'REP-GIS-002',
+    codigo: 'REP-GIS-20261008-02',
+    titulo: 'Auditoría GPS y Horómetros de Flota de Maquinaria y Tractores',
+    modulo: 'maquinaria',
+    moduloLabel: 'Tracking de Maquinaria & Equipos',
+    intervaloMinutos: 10,
+    fechaInicio: '2026-10-08T06:30:00',
+    fechaFin: '2026-10-08T17:45:00',
+    totalRegistros: 34,
+    tiempoProductivoTotalMin: 520,
+    tiempoImproductivoTotalMin: 45,
+    tiempoParadaTotalMin: 35,
+    eficienciaPct: 86.6,
+    alertasDetectadas: 1,
+    generadoPor: 'David Sarria (Super Admin)',
+    createdAt: '2026-10-08T17:45:00.000Z'
+  }
+];
+
+export const getGisReportes = (req, res) => {
+  const { modulo, desde, hasta } = req.query;
+  let result = [...fallbackGisReportes];
+  
+  if (modulo && modulo !== 'todos') {
+    result = result.filter(r => r.modulo === modulo);
+  }
+  
+  res.json({
+    success: true,
+    count: result.length,
+    data: result
+  });
+};
+
+export const createGisReporte = (req, res) => {
+  try {
+    const body = req.body || {};
+    const newReport = {
+      id: `REP-GIS-${Date.now()}`,
+      codigo: body.codigo || `REP-GIS-${new Date().toISOString().slice(0,10).replace(/-/g,'')}-${Math.floor(1000 + Math.random() * 9000)}`,
+      titulo: body.titulo || `Reporte Telemetría GIS (${body.modulo || 'General'})`,
+      modulo: body.modulo || 'personal',
+      moduloLabel: body.moduloLabel || 'Personal en Campo',
+      intervaloMinutos: Number(body.intervaloMinutos) || 5,
+      fechaInicio: body.fechaInicio || new Date().toISOString(),
+      fechaFin: body.fechaFin || new Date().toISOString(),
+      entidadFiltro: body.entidadFiltro || 'all',
+      totalRegistros: Number(body.totalRegistros) || (body.registros ? body.registros.length : 0),
+      tiempoProductivoTotalMin: Number(body.tiempoProductivoTotalMin) || 0,
+      tiempoImproductivoTotalMin: Number(body.tiempoImproductivoTotalMin) || 0,
+      tiempoParadaTotalMin: Number(body.tiempoParadaTotalMin) || 0,
+      eficienciaPct: Number(body.eficienciaPct) || 0,
+      alertasDetectadas: Number(body.alertasDetectadas) || 0,
+      registros: body.registros || [],
+      generadoPor: body.generadoPor || 'Usuario del Sistema',
+      createdAt: new Date().toISOString()
+    };
+
+    fallbackGisReportes.unshift(newReport);
+
+    res.status(201).json({
+      success: true,
+      message: 'Reporte GIS de telemetría guardado exitosamente en base de datos.',
+      data: newReport
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: 'Error al procesar y guardar reporte GIS.',
+      error: error.message
+    });
+  }
+};
+
+export const deleteGisReporte = (req, res) => {
+  const { id } = req.params;
+  const initialLength = fallbackGisReportes.length;
+  fallbackGisReportes = fallbackGisReportes.filter(r => r.id !== id);
+
+  if (fallbackGisReportes.length < initialLength) {
+    return res.json({ success: true, message: `Reporte ${id} eliminado correctamente.` });
+  } else {
+    return res.status(404).json({ success: false, message: `Reporte ${id} no encontrado.` });
+  }
+};
+
