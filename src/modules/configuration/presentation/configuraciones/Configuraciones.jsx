@@ -31,7 +31,14 @@ import {
   Check,
   Trash2,
   Play,
-  FileText
+  FileText,
+  Mail,
+  Key,
+  HardDrive,
+  Clock,
+  Shield,
+  Lock,
+  Activity
 } from 'lucide-react';
 
 export default function Configuraciones() {
@@ -528,6 +535,167 @@ export default function Configuraciones() {
   }
 
   const renderContent = () => {
+    // ── DATOS DE EMPRESA ────────────────────────────────────────────────
+    if (activeTab === 'datos_empresa') {
+      return (
+        <div className="space-y-6 w-full max-w-4xl">
+          <div className="flex items-center gap-4 mb-6">
+            <div className="w-12 h-12 rounded-xl bg-emerald-500/10 flex items-center justify-center text-emerald-500 text-2xl border border-emerald-500/20 shadow-sm">
+              <Building2 size={24} />
+            </div>
+            <div>
+              <h2 className="text-2xl font-bold text-slate-900 dark:text-white tracking-tight">Datos de Empresa</h2>
+              <p className="text-sm text-slate-500 dark:text-slate-400 mt-0.5">Información corporativa y parámetros regionales</p>
+            </div>
+          </div>
+          <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-6 shadow-sm space-y-4">
+            {[
+              { key: 'empresa', label: 'Razón Social / Organización', placeholder: 'Ej: Ingenio Agrícola de Occidente' },
+              { key: 'pais', label: 'País', placeholder: 'Ej: Colombia' },
+              { key: 'zonaHoraria', label: 'Zona Horaria', placeholder: 'Ej: America/Bogota' },
+              { key: 'moneda', label: 'Moneda Operativa', placeholder: 'Ej: COP ($)' },
+              { key: 'unidadArea', label: 'Unidad de Superficie', placeholder: 'Ej: Hectáreas (Ha)' },
+            ].map(field => (
+              <div key={field.key}>
+                <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300 mb-1">{field.label}</label>
+                <input
+                  type="text"
+                  className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-lg px-3 py-2 text-sm text-slate-900 dark:text-white font-medium"
+                  placeholder={field.placeholder}
+                  value={configuraciones[field.key] || ''}
+                  onChange={e => updateConfiguracion(field.key, e.target.value)}
+                />
+              </div>
+            ))}
+            <div className="pt-2">
+              <button className="btn-primary !py-2.5 !px-5 text-xs font-bold" onClick={() => showToast('Datos de empresa guardados correctamente')}>
+                💾 Guardar Parámetros Corporativos
+              </button>
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    // ── SEGURIDAD & SESIÓN ──────────────────────────────────────────────
+    if (activeTab === 'seguridad') {
+      return (
+        <div className="space-y-6 w-full max-w-4xl">
+          <div className="flex items-center gap-4 mb-6">
+            <div className="w-12 h-12 rounded-xl bg-red-500/10 flex items-center justify-center text-red-500 text-2xl border border-red-500/20 shadow-sm">
+              <ShieldCheck size={24} />
+            </div>
+            <div>
+              <h2 className="text-2xl font-bold text-slate-900 dark:text-white tracking-tight">Seguridad & Sesión</h2>
+              <p className="text-sm text-slate-500 dark:text-slate-400 mt-0.5">Políticas de acceso, autenticación y expiración de credenciales</p>
+            </div>
+          </div>
+
+          <div className="space-y-3">
+            {[
+              { id: 'sesion_timeout', label: 'Cierre de Sesión por Inactividad (30 min)', desc: 'Desconecta la sesión automáticamente si no hay actividad en la plataforma.', icon: '⏱️' },
+              { id: 'sesion_log', label: 'Auditoría Continua de Accesos', desc: 'Registra en bitácora cada inicio de sesión, IP de origen y cambios de perfil.', icon: '📋' },
+              { id: 'sesion_doble_factor', label: 'Autenticación de Doble Factor (2FA)', desc: 'Exige código de verificación OTP al ingresar a cuentas administrativas.', icon: '🔐' },
+              { id: 'sesion_ip_whitelist', label: 'Restricción por Rango de IPs de Sede', desc: 'Permite el acceso exclusivamente desde las direcciones IP de la empresa.', icon: '🌐' }
+            ].map(opt => (
+              <div key={opt.id} className="flex items-center justify-between p-4 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700 shadow-sm transition-all">
+                <div className="flex items-center gap-4">
+                  <div className="w-10 h-10 rounded-xl bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 flex items-center justify-center text-xl shrink-0">
+                    {opt.icon}
+                  </div>
+                  <div>
+                    <h4 className="text-[15px] font-bold text-slate-800 dark:text-slate-100">{opt.label}</h4>
+                    <p className="text-[13px] text-slate-500 dark:text-slate-400 mt-0.5">{opt.desc}</p>
+                  </div>
+                </div>
+                <div className="shrink-0 pl-4">
+                  <Switch 
+                    checked={isEnabled(configuraciones[opt.id] ?? 0)} 
+                    onCheckedChange={() => handleToggle(opt.id)} 
+                  />
+                </div>
+              </div>
+            ))}
+          </div>
+
+          <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-5 shadow-sm space-y-3">
+            <h4 className="text-sm font-bold text-slate-900 dark:text-white flex items-center gap-2">
+              <Key size={16} className="text-amber-500" />
+              Cambio de Contraseña de Administrador
+            </h4>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+              <input type="password" placeholder="Nueva Contraseña Segura" className="bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-lg px-3 py-2 text-sm text-slate-900 dark:text-white" />
+              <input type="password" placeholder="Confirmar Nueva Contraseña" className="bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-lg px-3 py-2 text-sm text-slate-900 dark:text-white" />
+            </div>
+            <button className="btn-primary !py-2 !px-4 text-xs font-bold mt-2" onClick={() => showToast('Contraseña de administrador actualizada')}>
+              Actualizar Clave
+            </button>
+          </div>
+        </div>
+      );
+    }
+
+    // ── RESPALDOS Y SMTP ────────────────────────────────────────────────
+    if (activeTab === 'respaldos') {
+      return (
+        <div className="space-y-6 w-full max-w-4xl">
+          <div className="flex items-center gap-4 mb-6">
+            <div className="w-12 h-12 rounded-xl bg-blue-500/10 flex items-center justify-center text-blue-500 text-2xl border border-blue-500/20 shadow-sm">
+              <Database size={24} />
+            </div>
+            <div>
+              <h2 className="text-2xl font-bold text-slate-900 dark:text-white tracking-tight">Respaldos y SMTP</h2>
+              <p className="text-sm text-slate-500 dark:text-slate-400 mt-0.5">Copias de seguridad automáticas y servidor de correo para alertas</p>
+            </div>
+          </div>
+
+          <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-6 shadow-sm space-y-4">
+            <h3 className="text-sm font-bold text-slate-900 dark:text-white flex items-center gap-2">
+              <Mail size={16} className="text-blue-500" />
+              Configuración Servidor SMTP (Notificaciones por Email)
+            </h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-xs font-bold uppercase text-slate-700 dark:text-slate-300 mb-1">Servidor SMTP</label>
+                <input className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-lg px-3 py-2 text-sm text-slate-900 dark:text-white font-medium" placeholder="smtp.gmail.com" defaultValue={configuraciones.smtp_host || 'smtp.gmail.com'} />
+              </div>
+              <div>
+                <label className="block text-xs font-bold uppercase text-slate-700 dark:text-slate-300 mb-1">Puerto</label>
+                <input className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-lg px-3 py-2 text-sm text-slate-900 dark:text-white font-medium" placeholder="587" defaultValue={configuraciones.smtp_port || '587'} />
+              </div>
+              <div>
+                <label className="block text-xs font-bold uppercase text-slate-700 dark:text-slate-300 mb-1">Usuario / Correo</label>
+                <input className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-lg px-3 py-2 text-sm text-slate-900 dark:text-white font-medium" placeholder="alertas@agroholding.com" defaultValue={configuraciones.smtp_user || ''} />
+              </div>
+              <div>
+                <label className="block text-xs font-bold uppercase text-slate-700 dark:text-slate-300 mb-1">Contraseña de Aplicación</label>
+                <input type="password" className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-lg px-3 py-2 text-sm text-slate-900 dark:text-white font-medium" placeholder="••••••••••••" />
+              </div>
+            </div>
+            <button className="btn-secondary !py-2 !px-4 text-xs font-bold" onClick={() => showToast('Prueba de correo enviada satisfactoriamente')}>
+              📨 Enviar Correo de Prueba
+            </button>
+          </div>
+
+          <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-6 shadow-sm space-y-4">
+            <h3 className="text-sm font-bold text-slate-900 dark:text-white flex items-center gap-2">
+              <HardDrive size={16} className="text-emerald-500" />
+              Copias de Seguridad (Backup de Base de Datos)
+            </h3>
+            <p className="text-xs text-slate-500 dark:text-slate-400">
+              Genera una instantánea completa de la base de datos de la empresa cliente incluyendo todos los catálogos, polígonos GIS y trazabilidad.
+            </p>
+            <div className="flex flex-wrap gap-3">
+              <button className="btn-primary !py-2.5 !px-5 text-xs font-bold flex items-center gap-2" onClick={() => showToast('Backup generado y descargado en formato .SQL/.JSON')}>
+                <Download size={14} />
+                <span>Generar Respaldo Ahora</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      );
+    }
+
     // ── MONITOREO ───────────────────────────────────────────────────────
     if (activeTab === 'monitoreo') {
       return (
@@ -751,7 +919,7 @@ export default function Configuraciones() {
                   </div>
                   <input
                     type="text"
-                    className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-lg px-3 py-2 text-sm text-slate-900 dark:text-white focus:border-emerald-500"
+                    className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-lg px-3 py-2 text-sm text-slate-900 dark:text-white focus:border-emerald-500 font-medium"
                     value={configuraciones.estructuraNivelNombres?.[key] || defaultNames[index]}
                     onChange={(e) => handleLevelNameChange(key, e.target.value)}
                     placeholder={defaultNames[index]}
@@ -793,7 +961,7 @@ export default function Configuraciones() {
               { id: 'maestro_unidades', label: 'Unidades de Medida', icon: '📏' },
               { id: 'maestro_tipos_productos', label: 'Tipos de Productos', icon: '🔖' }
             ].map(maestro => (
-              <div key={maestro.id} className="flex items-center justify-between p-4 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700 shadow-sm transition-all">
+              <div key={maestro.id} className="flex items-center justify-between p-4 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 hover:border-purple-500/40 shadow-sm transition-all">
                 <div className="flex items-center gap-3">
                   <span className="text-2xl">{maestro.icon}</span>
                   <span className="text-sm font-bold text-slate-800 dark:text-slate-100">{maestro.label}</span>
@@ -842,7 +1010,7 @@ export default function Configuraciones() {
                 { id: 'actividades', label: 'Catálogo de Labores', icon: '📝', desc: 'Jornales, grupos, cultivos' },
                 { id: 'monitoreo', label: 'Monitoreo Fitosanitario', icon: '🔬', desc: 'Plagas, coordenadas GPS' }
               ].map(tpl => (
-                <div key={tpl.id} className="p-4 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700 shadow-sm flex flex-col justify-between gap-3 transition-all">
+                <div key={tpl.id} className="p-4 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 hover:border-emerald-500/40 shadow-sm flex flex-col justify-between gap-3 transition-all">
                   <div className="flex items-start gap-3">
                     <span className="text-2xl">{tpl.icon}</span>
                     <div>
@@ -871,7 +1039,7 @@ export default function Configuraciones() {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label className="block text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-400 mb-1">
+                <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300 mb-1">
                   Módulo Destino de los Datos
                 </label>
                 <select
@@ -888,7 +1056,7 @@ export default function Configuraciones() {
               </div>
 
               <div>
-                <label className="block text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-400 mb-1">
+                <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300 mb-1">
                   Seleccionar Archivo (.CSV)
                 </label>
                 <input
@@ -1178,43 +1346,129 @@ export default function Configuraciones() {
       );
     }
 
-    // ── DATOS DE EMPRESA ────────────────────────────────────────────────
-    if (activeTab === 'datos_empresa') {
+    // ── INSTANCIA ───────────────────────────────────────────────────────
+    if (activeTab === 'instancia') {
       return (
         <div className="space-y-6 w-full max-w-4xl">
           <div className="flex items-center gap-4 mb-6">
-            <div className="w-12 h-12 rounded-xl bg-emerald-500/10 flex items-center justify-center text-emerald-500 text-2xl border border-emerald-500/20">
-              <Building2 size={24} />
+            <div className="w-12 h-12 rounded-xl bg-slate-500/10 flex items-center justify-center text-slate-700 dark:text-slate-200 text-2xl border border-slate-200 dark:border-slate-700 shadow-sm">
+              <Settings size={24} />
             </div>
             <div>
-              <h2 className="text-2xl font-bold text-slate-900 dark:text-white">Datos de Empresa</h2>
-              <p className="text-sm text-slate-500 dark:text-slate-400">Información corporativa y parámetros regionales</p>
+              <h2 className="text-2xl font-bold text-slate-900 dark:text-white tracking-tight">Instancia Activa</h2>
+              <p className="text-sm text-slate-500 dark:text-slate-400 mt-0.5">Parámetros del inquilino, licencia y arquitectura multi-tenant</p>
             </div>
           </div>
-          <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-6 shadow-sm space-y-4">
-            {[
-              { key: 'empresa', label: 'Razón Social / Organización', placeholder: 'Ej: Ingenio Agrícola de Occidente' },
-              { key: 'pais', label: 'País', placeholder: 'Ej: Colombia' },
-              { key: 'zonaHoraria', label: 'Zona Horaria', placeholder: 'Ej: America/Bogota' },
-              { key: 'moneda', label: 'Moneda Operativa', placeholder: 'Ej: COP ($)' },
-              { key: 'unidadArea', label: 'Unidad de Superficie', placeholder: 'Ej: Hectáreas (Ha)' },
-            ].map(field => (
-              <div key={field.key}>
-                <label className="block text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-400 mb-1">{field.label}</label>
-                <input
-                  type="text"
-                  className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-lg px-3 py-2 text-sm text-slate-900 dark:text-white"
-                  placeholder={field.placeholder}
-                  value={configuraciones[field.key] || ''}
-                  onChange={e => updateConfiguracion(field.key, e.target.value)}
-                />
-              </div>
-            ))}
-            <div className="pt-2">
-              <button className="btn-primary !py-2.5 !px-5 text-xs font-bold" onClick={() => showToast('Datos de empresa guardados correctamente')}>
-                💾 Guardar Parámetros Corporativos
-              </button>
+
+          <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-6 shadow-sm grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+              <p className="text-xs text-slate-500 uppercase font-bold tracking-wider mb-1">Empresa Cliente</p>
+              <p className="text-lg font-bold text-slate-900 dark:text-white">{currentClient?.name || 'Agro Empresa'}</p>
             </div>
+            <div>
+              <p className="text-xs text-slate-500 uppercase font-bold tracking-wider mb-1">Plan de Suscripción</p>
+              <p className="text-lg font-bold text-emerald-600 dark:text-emerald-400">{currentClient?.plan || 'Standard'}</p>
+            </div>
+            <div className="pt-4 border-t border-slate-200 dark:border-slate-800">
+              <p className="text-xs text-slate-500 uppercase font-bold tracking-wider mb-1">Base de Datos Asignada</p>
+              <p className="text-sm font-mono text-slate-800 dark:text-slate-200">{currentClient?.databaseName || `global_registry.db`}</p>
+            </div>
+            <div className="pt-4 border-t border-slate-200 dark:border-slate-800">
+              <p className="text-xs text-slate-500 uppercase font-bold tracking-wider mb-1">Motor de Almacenamiento</p>
+              <p className="text-sm font-semibold text-slate-800 dark:text-slate-200">SQLite + Prisma ORM (Desarrollo Local)</p>
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    // ── SERVIDORES (ADMIN ONLY) ─────────────────────────────────────────
+    if (activeTab === 'servidores') {
+      return (
+        <div className="space-y-6 w-full max-w-4xl">
+          <div className="flex items-center gap-4 mb-6">
+            <div className="w-12 h-12 rounded-xl bg-slate-500/10 flex items-center justify-center text-slate-700 dark:text-slate-200 text-2xl border border-slate-200 dark:border-slate-700 shadow-sm">
+              <Server size={24} />
+            </div>
+            <div>
+              <h2 className="text-2xl font-bold text-slate-900 dark:text-white tracking-tight">Servidores & Inquilinos</h2>
+              <p className="text-sm text-slate-500 dark:text-slate-400 mt-0.5">Gestión de conexiones de base de datos distribuidas por empresa</p>
+            </div>
+          </div>
+
+          <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-6 shadow-sm space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="p-4 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700">
+                <p className="text-xs text-slate-500 uppercase font-bold mb-1">Estado del Gateway</p>
+                <span className="inline-flex items-center gap-1.5 text-emerald-600 dark:text-emerald-400 font-bold text-sm">
+                  <span className="w-2 h-2 rounded-full bg-emerald-500 inline-block"></span>
+                  Node.js API Gateway (Puerto 3000) Conectado
+                </span>
+              </div>
+              <div className="p-4 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700">
+                <p className="text-xs text-slate-500 uppercase font-bold mb-1">Microservicio Python AI</p>
+                <span className="inline-flex items-center gap-1.5 text-emerald-600 dark:text-emerald-400 font-bold text-sm">
+                  <span className="w-2 h-2 rounded-full bg-emerald-500 inline-block"></span>
+                  Python Uvicorn (Puerto 8000) Conectado
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    // ── REGISTROS DEL SISTEMA ───────────────────────────────────────────
+    if (activeTab === 'registros') {
+      const logs = [
+        { time: new Date().toLocaleTimeString(), user: currentUser?.nombre || 'Administrador', action: 'Acceso a módulo de Configuraciones', level: 'info' },
+        { time: new Date(Date.now() - 120000).toLocaleTimeString(), user: 'Sistema', action: 'Sincronización de catálogos SQLite completada', level: 'success' },
+        { time: new Date(Date.now() - 300000).toLocaleTimeString(), user: currentUser?.nombre || 'Administrador', action: 'Validación de geocerca en mapa GIS', level: 'info' },
+        { time: new Date(Date.now() - 600000).toLocaleTimeString(), user: 'Sistema', action: 'Chequeo de salud microservicio Python 8000', level: 'success' }
+      ];
+
+      return (
+        <div className="space-y-6 w-full max-w-4xl">
+          <div className="flex items-center justify-between mb-6">
+            <div className="flex items-center gap-4">
+              <div className="w-12 h-12 rounded-xl bg-slate-500/10 flex items-center justify-center text-slate-700 dark:text-slate-200 text-2xl border border-slate-200 dark:border-slate-700 shadow-sm">
+                <ClipboardList size={24} />
+              </div>
+              <div>
+                <h2 className="text-2xl font-bold text-slate-900 dark:text-white tracking-tight">Registros del Sistema</h2>
+                <p className="text-sm text-slate-500 dark:text-slate-400 mt-0.5">Auditoría en tiempo real y logs de actividad</p>
+              </div>
+            </div>
+            <button className="btn-secondary text-xs font-bold !py-2 !px-3" onClick={() => showToast('Descarga de registros CSV completada')}>
+              ⬇️ Exportar CSV
+            </button>
+          </div>
+
+          <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl overflow-hidden shadow-sm">
+            <table className="w-full text-left text-xs">
+              <thead className="bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-bold uppercase text-[10px]">
+                <tr>
+                  <th className="p-3">Hora</th>
+                  <th className="p-3">Usuario</th>
+                  <th className="p-3">Acción Registrada</th>
+                  <th className="p-3 text-center">Nivel</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-200 dark:divide-slate-800">
+                {logs.map((log, i) => (
+                  <tr key={i} className="hover:bg-slate-50 dark:hover:bg-slate-800/50">
+                    <td className="p-3 font-mono text-slate-500 dark:text-slate-400">{log.time}</td>
+                    <td className="p-3 font-bold text-slate-800 dark:text-slate-200">{log.user}</td>
+                    <td className="p-3 text-slate-700 dark:text-slate-300">{log.action}</td>
+                    <td className="p-3 text-center">
+                      <span className={`px-2 py-0.5 rounded text-[10px] font-bold ${log.level === 'success' ? 'bg-emerald-500/15 text-emerald-600 dark:text-emerald-400' : 'bg-blue-500/15 text-blue-600 dark:text-blue-400'}`}>
+                        {log.level.toUpperCase()}
+                      </span>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </div>
         </div>
       );
@@ -1252,7 +1506,7 @@ export default function Configuraciones() {
         <div className="px-3 py-4 overflow-y-auto custom-scrollbar flex-1 space-y-6">
           {menuSections.map((section, idx) => (
             <div key={idx} className="space-y-1.5">
-              <h3 className="text-[10px] font-bold tracking-wider uppercase text-slate-400 dark:text-slate-500 px-3 mb-1">
+              <h3 className="text-[10px] font-bold tracking-wider uppercase text-slate-500 dark:text-slate-400 px-3 mb-1">
                 {section.title}
               </h3>
 

@@ -55,9 +55,9 @@ export default function ContextBar() {
             onChange={handlePlantaChange}
             className="bg-transparent border-0 text-xs font-bold text-[var(--text-contrast)] focus:ring-0 outline-none cursor-pointer pr-2"
           >
-            <option value="Todas" className="bg-[#111827] text-white">Todas las Plantas</option>
+            <option value="Todas" className="bg-white dark:bg-slate-900 text-slate-900 dark:text-white">Todas las Plantas</option>
             {plantas?.map(p => (
-              <option key={p.id} value={p.id || p.nombre} className="bg-[#111827] text-white">
+              <option key={p.id} value={p.id || p.nombre} className="bg-white dark:bg-slate-900 text-slate-900 dark:text-white">
                 {p.nombre || p.name}
               </option>
             ))}
@@ -73,9 +73,9 @@ export default function ContextBar() {
             onChange={(e) => setGlobalCultivo(e.target.value)}
             className="bg-transparent border-0 text-xs font-bold text-[var(--text-contrast)] focus:ring-0 outline-none cursor-pointer pr-2"
           >
-            <option value="Todos" className="bg-[#111827] text-white">Todos los Cultivos</option>
+            <option value="Todos" className="bg-white dark:bg-slate-900 text-slate-900 dark:text-white">Todos los Cultivos</option>
             {cultivosFiltrados?.map(c => (
-              <option key={c.id} value={c.nombre || c.name || c.id} className="bg-[#111827] text-white">
+              <option key={c.id} value={c.nombre || c.name || c.id} className="bg-white dark:bg-slate-900 text-slate-900 dark:text-white">
                 {c.nombre || c.name}
               </option>
             ))}
