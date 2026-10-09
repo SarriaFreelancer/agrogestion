@@ -114,6 +114,12 @@ export function ThemeProvider({ children }) {
     root.style.setProperty('--color-foreground', isLightMode ? '#0f172a' : '#f8fafc');
     root.style.setProperty('--color-muted', isLightMode ? '#475569' : '#94a3b8');
 
+    if (isLightMode) {
+      root.classList.remove('dark');
+    } else {
+      root.classList.add('dark');
+    }
+
     setCurrentThemeId(finalThemeName);
     setModoOscuroGlobal(!isLightMode);
   };

@@ -26,7 +26,7 @@ export default function CuadrillasTab({ data, trabajadores, addCuadrilla, editCu
     <div>
       <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '1.5rem' }}>
         <h3>Catálogo de Cuadrillas</h3>
-        <button className="btn-primary" onClick={() => {setIsCreating(!isCreating); setEditingId(null); setFormData({ id: '', nombre: ''});}}>
+        <button className="btn-primary text-white font-bold" onClick={() => {setIsCreating(!isCreating); setEditingId(null); setFormData({ id: '', nombre: ''});}}>
           {(isCreating || editingId) ? 'Cancelar' : '+ Nueva Cuadrilla'}
         </button>
       </div>
@@ -44,7 +44,7 @@ export default function CuadrillasTab({ data, trabajadores, addCuadrilla, editCu
               <input className="input-field" value={formData.nombre} onChange={e=>setFormData({...formData, nombre: e.target.value})} placeholder="Ej. Cuadrilla de Cosecha"/>
             </div>
             <div className="input-group" style={{ display: 'flex', alignItems: 'flex-end' }}>
-              <button className="btn-primary" onClick={handleSave} style={{width: '100%'}}>Guardar</button>
+              <button className="btn-primary text-white font-bold" onClick={handleSave} style={{width: '100%'}}>Guardar</button>
             </div>
           </div>
         </div>
@@ -54,10 +54,10 @@ export default function CuadrillasTab({ data, trabajadores, addCuadrilla, editCu
         <table style={{width: '100%', borderCollapse: 'collapse', textAlign: 'left'}}>
           <thead>
             <tr style={{borderBottom: '2px solid var(--primary-light)'}}>
-              <th style={{padding: '0.8rem 0.5rem'}}>Código</th>
-              <th style={{padding: '0.8rem 0.5rem'}}>Descripción</th>
-              <th style={{padding: '0.8rem 0.5rem'}}>N° Trabajadores</th>
-              <th style={{padding: '0.8rem 0.5rem'}}>Acciones</th>
+              <th style={{padding: '0.8rem 0.5rem', color: 'var(--text-contrast)'}}>Código</th>
+              <th style={{padding: '0.8rem 0.5rem', color: 'var(--text-contrast)'}}>Descripción</th>
+              <th style={{padding: '0.8rem 0.5rem', color: 'var(--text-contrast)'}}>N° Trabajadores</th>
+              <th style={{padding: '0.8rem 0.5rem', color: 'var(--text-contrast)'}}>Acciones</th>
             </tr>
           </thead>
           <tbody>
@@ -65,12 +65,12 @@ export default function CuadrillasTab({ data, trabajadores, addCuadrilla, editCu
               const count = trabajadores.filter(t => t.cuadrillaId === c.id).length;
               return (
                 <tr key={c.id} style={{borderBottom: '1px solid var(--glass-border)'}}>
-                  <td style={{padding: '0.8rem 0.5rem', fontWeight: 'bold'}}>{c.id}</td>
-                  <td style={{padding: '0.8rem 0.5rem'}}>{c.nombre}</td>
+                  <td style={{padding: '0.8rem 0.5rem', fontWeight: 'bold', color: 'var(--text-contrast)'}}>{c.id}</td>
+                  <td style={{padding: '0.8rem 0.5rem', color: 'var(--text-contrast)'}}>{c.nombre}</td>
                   <td style={{padding: '0.8rem 0.5rem'}}><span className="badge badge-info">{count} Trabajadores</span></td>
                   <td style={{padding: '0.8rem 0.5rem', display: 'flex', gap: '0.5rem'}}>
-                    <button className="btn-secondary" style={{padding: '0.3rem 0.6rem', fontSize: '0.8rem'}} onClick={()=>handleEdit(c)}>Editar</button>
-                    <button className="btn-secondary" style={{padding: '0.3rem 0.6rem', fontSize: '0.8rem', background: '#ff5252', color: 'white', border: 'none'}} onClick={()=>deleteCuadrilla(c.id)}>Eliminar</button>
+                    <button className="btn-secondary text-slate-800 dark:text-slate-100 font-semibold" style={{padding: '0.3rem 0.6rem', fontSize: '0.8rem'}} onClick={()=>handleEdit(c)}>Editar</button>
+                    <button className="btn-danger text-white font-bold" style={{padding: '0.3rem 0.6rem', fontSize: '0.8rem'}} onClick={()=>deleteCuadrilla(c.id)}>Eliminar</button>
                   </td>
                 </tr>
               );

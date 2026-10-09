@@ -59,7 +59,7 @@ export default function ActividadesTab({ data, grupos, unidades, cultivos, addAc
             onChange={e => setSearchQuery(e.target.value)}
           />
         </div>
-        <button className="btn-primary" onClick={() => { setIsCreating(!isCreating); setEditingId(null); setFormData({code: '', name: '', groupId: '', cultivo: globalCultivo !== 'Todos' ? globalCultivo : (cultivos[0]?.name || ''), tipo: 'Manual', clasificacion: 'N/A', unidadProduccion: 'Hectáreas', unidadMedida: 'Hectáreas', tarifaBase: 0, productosEstandar: []}); }}>
+        <button className="btn-primary text-white font-bold" onClick={() => { setIsCreating(!isCreating); setEditingId(null); setFormData({code: '', name: '', groupId: '', cultivo: globalCultivo !== 'Todos' ? globalCultivo : (cultivos[0]?.name || ''), tipo: 'Manual', clasificacion: 'N/A', unidadProduccion: 'Hectáreas', unidadMedida: 'Hectáreas', tarifaBase: 0, productosEstandar: []}); }}>
           {isCreating ? 'Cancelar' : '+ Nueva Actividad'}
         </button>
       </div>
@@ -126,7 +126,7 @@ export default function ActividadesTab({ data, grupos, unidades, cultivos, addAc
             )}
             
             <div className="input-group" style={{ display: 'flex', alignItems: 'flex-end' }}>
-              <button className="btn-primary" onClick={handleSave} style={{width: '100%'}}>Guardar Actividad</button>
+              <button className="btn-primary text-white font-bold" onClick={handleSave} style={{width: '100%'}}>Guardar Actividad</button>
             </div>
           </div>
         </div>
@@ -136,29 +136,29 @@ export default function ActividadesTab({ data, grupos, unidades, cultivos, addAc
         <table style={{width: '100%', borderCollapse: 'collapse', textAlign: 'left'}}>
           <thead>
             <tr style={{borderBottom: '2px solid var(--primary-light)'}}>
-              <th style={{padding: '0.8rem 0.5rem'}}>Código</th>
-              <th style={{padding: '0.8rem 0.5rem'}}>Actividad</th>
-              <th style={{padding: '0.8rem 0.5rem'}}>Grupo</th>
-              <th style={{padding: '0.8rem 0.5rem'}}>Cultivo</th>
-              <th style={{padding: '0.8rem 0.5rem'}}>Tipo</th>
-              <th style={{padding: '0.8rem 0.5rem'}}>Clasificación</th>
-              <th style={{padding: '0.8rem 0.5rem'}}>U. Producción</th>
-              <th style={{padding: '0.8rem 0.5rem'}}>Acciones</th>
+              <th style={{padding: '0.8rem 0.5rem', color: 'var(--text-contrast)'}}>Código</th>
+              <th style={{padding: '0.8rem 0.5rem', color: 'var(--text-contrast)'}}>Actividad</th>
+              <th style={{padding: '0.8rem 0.5rem', color: 'var(--text-contrast)'}}>Grupo</th>
+              <th style={{padding: '0.8rem 0.5rem', color: 'var(--text-contrast)'}}>Cultivo</th>
+              <th style={{padding: '0.8rem 0.5rem', color: 'var(--text-contrast)'}}>Tipo</th>
+              <th style={{padding: '0.8rem 0.5rem', color: 'var(--text-contrast)'}}>Clasificación</th>
+              <th style={{padding: '0.8rem 0.5rem', color: 'var(--text-contrast)'}}>U. Producción</th>
+              <th style={{padding: '0.8rem 0.5rem', color: 'var(--text-contrast)'}}>Acciones</th>
             </tr>
           </thead>
           <tbody>
             {filteredData.map(item => (
               <tr key={item.id} style={{borderBottom: '1px solid var(--glass-border)'}}>
-                <td style={{padding: '0.8rem 0.5rem', fontWeight: 'bold'}}>{item.code}</td>
-                <td style={{padding: '0.8rem 0.5rem'}}>{item.name}</td>
-                <td style={{padding: '0.8rem 0.5rem'}}>{grupos.find(g => g.id ===item.groupId)?.name}</td>
+                <td style={{padding: '0.8rem 0.5rem', fontWeight: 'bold', color: 'var(--text-contrast)'}}>{item.code}</td>
+                <td style={{padding: '0.8rem 0.5rem', color: 'var(--text-contrast)'}}>{item.name}</td>
+                <td style={{padding: '0.8rem 0.5rem', color: 'var(--text-contrast)'}}>{grupos.find(g => g.id ===item.groupId)?.name}</td>
                 <td style={{padding: '0.8rem 0.5rem'}}><span className="badge badge-info">{item.cultivo}</span></td>
-                <td style={{padding: '0.8rem 0.5rem'}}>{item.tipo}</td>
-                <td style={{padding: '0.8rem 0.5rem'}}><small>{item.clasificacion}</small></td>
-                <td style={{padding: '0.8rem 0.5rem'}}>{item.unidadProduccion}</td>
+                <td style={{padding: '0.8rem 0.5rem', color: 'var(--text-contrast)'}}>{item.tipo}</td>
+                <td style={{padding: '0.8rem 0.5rem', color: 'var(--text-muted)'}}><small>{item.clasificacion}</small></td>
+                <td style={{padding: '0.8rem 0.5rem', color: 'var(--text-contrast)'}}>{item.unidadProduccion}</td>
                 <td style={{padding: '0.8rem 0.5rem', display: 'flex', gap: '0.5rem'}}>
-                  <button className="btn-secondary" style={{padding: '0.3rem 0.6rem', fontSize: '0.8rem'}} onClick={()=>handleEdit(item)}>Editar</button>
-                  <button className="btn-secondary" style={{padding: '0.3rem 0.6rem', fontSize: '0.8rem', background: '#ff5252', color: 'white', border: 'none'}} onClick={()=>deleteActividad(item.id)}>Eliminar</button>
+                  <button className="btn-secondary text-slate-800 dark:text-slate-100 font-semibold" style={{padding: '0.3rem 0.6rem', fontSize: '0.8rem'}} onClick={()=>handleEdit(item)}>Editar</button>
+                  <button className="btn-danger text-white font-bold" style={{padding: '0.3rem 0.6rem', fontSize: '0.8rem'}} onClick={()=>deleteActividad(item.id)}>Eliminar</button>
                 </td>
               </tr>
             ))}

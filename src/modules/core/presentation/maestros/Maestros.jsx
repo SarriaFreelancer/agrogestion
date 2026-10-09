@@ -118,16 +118,16 @@ export default function Maestros() {
               <button 
                 key={m.id} 
                 onClick={() => { setActiveTab(m.id); setShowTipos(false); }} 
-                className={`flex items-center gap-2 px-4 py-2.5 rounded-xl font-semibold text-sm transition-all duration-200 border ${
+                className={`flex items-center gap-2 px-4 py-2.5 rounded-xl font-bold text-sm transition-all duration-200 border ${
                   isActive 
                     ? 'bg-[var(--primary-color)] text-white border-[var(--primary-color)] shadow-lg shadow-[var(--primary-color)]/25 scale-[1.02]' 
-                    : 'bg-white dark:bg-slate-900 text-[var(--text-contrast)] border-slate-200 dark:border-white/10 hover:border-[var(--primary-color)]/40 hover:bg-[var(--primary-color)]/10'
+                    : 'bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-100 border-slate-200 dark:border-white/10 hover:border-[var(--primary-color)]/40 hover:bg-[var(--primary-color)]/10'
                 }`}
               >
                 <span className={isActive ? 'text-white' : 'text-[var(--primary-color)]'}>
                   {m.icon}
                 </span>
-                <span>{m.label}</span>
+                <span className={isActive ? 'text-white' : 'text-slate-800 dark:text-slate-100'}>{m.label}</span>
                 <span className={`text-[11px] font-extrabold px-2 py-0.5 rounded-full border ${
                   isActive ? 'bg-white/20 text-white border-white/30' : m.badgeColor
                 }`}>
@@ -139,14 +139,14 @@ export default function Maestros() {
           
           <button 
             onClick={() => setShowTipos(!showTipos)} 
-            className={`flex items-center gap-2 px-4 py-2.5 rounded-xl font-semibold text-sm transition-all duration-200 border ${
+            className={`flex items-center gap-2 px-4 py-2.5 rounded-xl font-bold text-sm transition-all duration-200 border ${
               showTipos || typesMasters.some(t => t.id === activeTab)
                 ? 'bg-amber-600 text-white border-amber-500 shadow-lg shadow-amber-600/20' 
-                : 'bg-white dark:bg-slate-900 text-[var(--text-contrast)] border-slate-200 dark:border-white/10 hover:border-amber-500/40 hover:bg-amber-500/10'
+                : 'bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-100 border-slate-200 dark:border-white/10 hover:border-amber-500/40 hover:bg-amber-500/10'
             }`}
           >
             <SlidersHorizontal size={18} className={showTipos || typesMasters.some(t => t.id === activeTab) ? "text-white" : "text-amber-600 dark:text-amber-400"} />
-            <span>Catálogos & Tipos</span>
+            <span className={showTipos || typesMasters.some(t => t.id === activeTab) ? "text-white" : "text-slate-800 dark:text-slate-100"}>Catálogos & Tipos</span>
             <span className="text-[11px] font-extrabold px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-800 dark:text-amber-300 border border-amber-400/30">
               {totalCatalogsCount}
             </span>
@@ -156,7 +156,7 @@ export default function Maestros() {
 
         {/* Submenú de Catálogos & Tipos */}
         {showTipos && (
-          <div className="p-4 rounded-2xl bg-amber-50/80 dark:bg-slate-900/90 border border-amber-200 dark:border-amber-500/20 flex flex-wrap gap-2.5 backdrop-blur-md fade-in shadow-md">
+          <div className="p-4 rounded-2xl bg-amber-50/90 dark:bg-slate-900/90 border border-amber-200 dark:border-amber-500/20 flex flex-wrap gap-2.5 backdrop-blur-md fade-in shadow-md">
             <div className="w-full flex items-center gap-2 text-xs font-bold text-amber-800 dark:text-amber-400 uppercase tracking-wider mb-1">
               <Sparkles size={14} />
               <span>Subcatálogos y Clasificaciones Paramétricas</span>
@@ -170,11 +170,11 @@ export default function Maestros() {
                   className={`flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-bold transition-all duration-200 border ${
                     isActive 
                       ? 'bg-amber-600 text-white border-amber-500 shadow-md scale-[1.02]' 
-                      : 'bg-white dark:bg-slate-800 text-[var(--text-contrast)] border-slate-200 dark:border-white/10 hover:border-amber-400/40 hover:bg-amber-500/10'
+                      : 'bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-100 border-slate-200 dark:border-white/10 hover:border-amber-400/40 hover:bg-amber-500/10'
                   }`}
                 >
                   <span className={isActive ? 'text-white' : 'text-amber-600 dark:text-amber-400'}>{m.icon}</span>
-                  <span>{m.label}</span>
+                  <span className={isActive ? 'text-white' : 'text-slate-800 dark:text-slate-100'}>{m.label}</span>
                   <span className={`px-1.5 py-0.2 rounded-full text-[10px] font-black ${
                     isActive ? 'bg-black/30 text-white' : 'bg-amber-500/20 text-amber-800 dark:text-amber-300 border border-amber-500/30'
                   }`}>

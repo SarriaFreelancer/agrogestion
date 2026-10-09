@@ -49,7 +49,7 @@ export default function SimpleCrudTab({ title, data, onAdd, onEdit, onDelete, fi
           </div>
         </div>
         <button 
-          className={isCreating || editingId ? "btn-secondary !m-0" : "btn-primary !m-0"} 
+          className={isCreating || editingId ? "btn-secondary text-slate-800 dark:text-slate-100 font-semibold !m-0" : "btn-primary text-white font-bold !m-0"} 
           onClick={() => { setIsCreating(!isCreating); setEditingId(null); setFormData({}); }}
         >
           {(isCreating || editingId) ? <X size={17} /> : <Plus size={17} />}
@@ -59,8 +59,8 @@ export default function SimpleCrudTab({ title, data, onAdd, onEdit, onDelete, fi
 
       {/* Form Drawer / Panel */}
       {(isCreating || editingId) && (
-        <div className="p-6 rounded-2xl bg-white/[0.03] border border-primary/30 backdrop-blur-md space-y-4 fade-in">
-          <div className="flex items-center justify-between border-b border-white/10 pb-3">
+        <div className="p-6 rounded-2xl bg-[var(--input-bg)] border border-[var(--primary-color)]/30 backdrop-blur-md space-y-4 fade-in">
+          <div className="flex items-center justify-between border-b border-[var(--glass-border)] pb-3">
             <h4 className="font-bold text-[var(--text-contrast)] text-base">
               {editingId ? `Editar ${title}` : `Nuevo Registro de ${title}`}
             </h4>
@@ -77,9 +77,9 @@ export default function SimpleCrudTab({ title, data, onAdd, onEdit, onDelete, fi
                     value={formData[f.key] || ''} 
                     onChange={e => setFormData({ ...formData, [f.key]: e.target.value })}
                   >
-                    <option value="" disabled className="bg-[#0d131f]">Seleccionar...</option>
+                    <option value="" disabled className="bg-white dark:bg-slate-900 text-slate-900 dark:text-white">Seleccionar...</option>
                     {f.options.map(option => (
-                      <option key={option} value={option} className="bg-[#0d131f]">{option}</option>
+                      <option key={option} value={option} className="bg-white dark:bg-slate-900 text-slate-900 dark:text-white">{option}</option>
                     ))}
                   </select>
                 ) : (
@@ -93,7 +93,7 @@ export default function SimpleCrudTab({ title, data, onAdd, onEdit, onDelete, fi
               </div>
             ))}
             <div className="flex items-end md:col-span-1">
-              <button className="btn-primary !w-full !m-0" onClick={handleSave}>
+              <button className="btn-primary text-white font-bold !w-full !m-0" onClick={handleSave}>
                 <Save size={16} />
                 <span>Guardar Registro</span>
               </button>
@@ -103,12 +103,12 @@ export default function SimpleCrudTab({ title, data, onAdd, onEdit, onDelete, fi
       )}
 
       {/* Table Container */}
-      <div className="overflow-x-auto rounded-xl border border-white/10">
+      <div className="overflow-x-auto rounded-xl border border-[var(--glass-border)]">
         <table className="data-table">
           <thead>
             <tr>
-              {fields.map(f => <th key={f.key}>{f.label}</th>)}
-              <th className="w-28 text-right">Acciones</th>
+              {fields.map(f => <th key={f.key} style={{ color: 'var(--text-contrast)' }}>{f.label}</th>)}
+              <th className="w-28 text-right" style={{ color: 'var(--text-contrast)' }}>Acciones</th>
             </tr>
           </thead>
           <tbody>
@@ -125,14 +125,14 @@ export default function SimpleCrudTab({ title, data, onAdd, onEdit, onDelete, fi
                   <td>
                     <div className="flex items-center justify-end gap-2">
                       <button 
-                        className="btn-secondary !p-2 !m-0 text-[var(--text-muted)] hover:text-[var(--text-contrast)]" 
+                        className="btn-secondary !p-2 !m-0 text-slate-700 dark:text-slate-200 hover:text-[var(--primary-color)] font-semibold" 
                         title="Editar"
                         onClick={() => handleEdit(item)}
                       >
                         <Edit2 size={15} />
                       </button>
                       <button 
-                        className="btn-danger !p-2 !m-0" 
+                        className="btn-danger !p-2 !m-0 text-white font-bold" 
                         title="Eliminar"
                         onClick={() => onDelete(item.id)}
                       >

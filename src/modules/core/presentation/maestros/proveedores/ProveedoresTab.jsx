@@ -49,7 +49,7 @@ export default function ProveedoresTab({ data, addProveedor, editProveedor, dele
             onChange={e => setSearchQuery(e.target.value)}
           />
         </div>
-        <button className="btn-primary" onClick={() => {setIsCreating(!isCreating); setEditingId(null); setFormData({ id: '', nombre: '', tipo: 'Materia Prima', contacto: '', telefono: '', email: '', estado: 'Activo' });}}>
+        <button className="btn-primary text-white font-bold" onClick={() => {setIsCreating(!isCreating); setEditingId(null); setFormData({ id: '', nombre: '', tipo: 'Materia Prima', contacto: '', telefono: '', email: '', estado: 'Activo' });}}>
           {(isCreating || editingId) ? 'Cancelar' : '+ Nuevo Proveedor'}
         </button>
       </div>
@@ -77,7 +77,7 @@ export default function ProveedoresTab({ data, addProveedor, editProveedor, dele
               </select>
             </div>
             <div className="input-group" style={{ display: 'flex', alignItems: 'flex-end' }}>
-              <button className="btn-primary" onClick={handleSave} style={{ width: '100%' }}>Guardar</button>
+              <button className="btn-primary text-white font-bold" onClick={handleSave} style={{ width: '100%' }}>Guardar</button>
             </div>
           </div>
         </div>
@@ -86,29 +86,29 @@ export default function ProveedoresTab({ data, addProveedor, editProveedor, dele
       <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
         <thead>
           <tr style={{ borderBottom: '2px solid var(--primary-light)' }}>
-            <th style={{ padding: '0.8rem 0.5rem' }}>Código</th>
-            <th style={{ padding: '0.8rem 0.5rem' }}>Nombre</th>
-            <th style={{ padding: '0.8rem 0.5rem' }}>Tipo</th>
-            <th style={{ padding: '0.8rem 0.5rem' }}>Contacto</th>
-            <th style={{ padding: '0.8rem 0.5rem' }}>Teléfono</th>
-            <th style={{ padding: '0.8rem 0.5rem' }}>Email</th>
-            <th style={{ padding: '0.8rem 0.5rem' }}>Estado</th>
-            <th style={{ padding: '0.8rem 0.5rem' }}>Acciones</th>
+            <th style={{ padding: '0.8rem 0.5rem', color: 'var(--text-contrast)' }}>Código</th>
+            <th style={{ padding: '0.8rem 0.5rem', color: 'var(--text-contrast)' }}>Nombre</th>
+            <th style={{ padding: '0.8rem 0.5rem', color: 'var(--text-contrast)' }}>Tipo</th>
+            <th style={{ padding: '0.8rem 0.5rem', color: 'var(--text-contrast)' }}>Contacto</th>
+            <th style={{ padding: '0.8rem 0.5rem', color: 'var(--text-contrast)' }}>Teléfono</th>
+            <th style={{ padding: '0.8rem 0.5rem', color: 'var(--text-contrast)' }}>Email</th>
+            <th style={{ padding: '0.8rem 0.5rem', color: 'var(--text-contrast)' }}>Estado</th>
+            <th style={{ padding: '0.8rem 0.5rem', color: 'var(--text-contrast)' }}>Acciones</th>
           </tr>
         </thead>
         <tbody>
           {filteredData.map(p => (
-            <tr key={p.id} style={{ borderBottom: '1px solid var(--glass-border)', background: p.estado === 'Inactivo' ? '#f9f9f9' : 'white' }}>
-              <td style={{ padding: '0.8rem 0.5rem' }}>{p.id || 'N/A'}</td>
-              <td style={{ padding: '0.8rem 0.5rem' }}>{p.nombre}</td>
-              <td style={{ padding: '0.8rem 0.5rem' }}>{p.tipo}</td>
-              <td style={{ padding: '0.8rem 0.5rem' }}>{p.contacto}</td>
-              <td style={{ padding: '0.8rem 0.5rem' }}>{p.telefono}</td>
-              <td style={{ padding: '0.8rem 0.5rem' }}>{p.email}</td>
-              <td style={{ padding: '0.8rem 0.5rem' }}>{p.estado}</td>
+            <tr key={p.id} style={{ borderBottom: '1px solid var(--glass-border)' }}>
+              <td style={{ padding: '0.8rem 0.5rem', fontWeight: 'bold', color: 'var(--text-contrast)' }}>{p.id || 'N/A'}</td>
+              <td style={{ padding: '0.8rem 0.5rem', color: 'var(--text-contrast)' }}>{p.nombre}</td>
+              <td style={{ padding: '0.8rem 0.5rem', color: 'var(--text-contrast)' }}>{p.tipo}</td>
+              <td style={{ padding: '0.8rem 0.5rem', color: 'var(--text-contrast)' }}>{p.contacto}</td>
+              <td style={{ padding: '0.8rem 0.5rem', color: 'var(--text-contrast)' }}>{p.telefono}</td>
+              <td style={{ padding: '0.8rem 0.5rem', color: 'var(--text-contrast)' }}>{p.email}</td>
+              <td style={{ padding: '0.8rem 0.5rem', color: 'var(--text-contrast)' }}>{p.estado}</td>
               <td style={{ padding: '0.8rem 0.5rem', display: 'flex', gap: '0.5rem' }}>
-                <button className="btn-secondary" style={{ padding: '0.3rem 0.6rem', fontSize: '0.8rem' }} onClick={() => handleEdit(p)}>Editar</button>
-                <button className="btn-secondary" style={{ padding: '0.3rem 0.6rem', fontSize: '0.8rem', background: '#ff5252', color: 'white', border: 'none' }} onClick={() => deleteProveedor(p.id)}>Eliminar</button>
+                <button className="btn-secondary text-slate-800 dark:text-slate-100 font-semibold" style={{ padding: '0.3rem 0.6rem', fontSize: '0.8rem' }} onClick={() => handleEdit(p)}>Editar</button>
+                <button className="btn-danger text-white font-bold" style={{ padding: '0.3rem 0.6rem', fontSize: '0.8rem' }} onClick={() => deleteProveedor(p.id)}>Eliminar</button>
               </td>
             </tr>
           ))}

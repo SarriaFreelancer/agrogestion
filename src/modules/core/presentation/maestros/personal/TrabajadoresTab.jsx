@@ -49,7 +49,7 @@ export default function TrabajadoresTab({ data, cuadrillas, addTrabajador, editT
             onChange={e => setSearchQuery(e.target.value)}
           />
         </div>
-        <button className="btn-primary" onClick={() => {setIsCreating(!isCreating); setEditingId(null); setFormData({ identificacion: '', nombre: '', apellido: '', cargo: 'Jornalero', estado: 'Activo', cuadrillaId: '' });}}>
+        <button className="btn-primary text-white font-bold" onClick={() => {setIsCreating(!isCreating); setEditingId(null); setFormData({ identificacion: '', nombre: '', apellido: '', cargo: 'Jornalero', estado: 'Activo', cuadrillaId: '' });}}>
           {(isCreating || editingId) ? 'Cancelar' : '+ Nuevo Trabajador'}
         </button>
       </div>
@@ -73,7 +73,7 @@ export default function TrabajadoresTab({ data, cuadrillas, addTrabajador, editT
                 <option value="Activo">Activo</option><option value="Inactivo">Inactivo</option>
               </select>
             </div>
-            <div className="input-group" style={{ display: 'flex', alignItems: 'flex-end' }}><button className="btn-primary" onClick={handleSave} style={{width: '100%'}}>Guardar</button></div>
+            <div className="input-group" style={{ display: 'flex', alignItems: 'flex-end' }}><button className="btn-primary text-white font-bold" onClick={handleSave} style={{width: '100%'}}>Guardar</button></div>
           </div>
         </div>
       )}
@@ -81,25 +81,25 @@ export default function TrabajadoresTab({ data, cuadrillas, addTrabajador, editT
       <table style={{width: '100%', borderCollapse: 'collapse', textAlign: 'left'}}>
         <thead>
           <tr style={{borderBottom: '2px solid var(--primary-light)'}}>
-            <th style={{padding: '0.8rem 0.5rem'}}>Código / ID</th>
-            <th style={{padding: '0.8rem 0.5rem'}}>Nombres</th>
-            <th style={{padding: '0.8rem 0.5rem'}}>Cargo</th>
-            <th style={{padding: '0.8rem 0.5rem'}}>Cuadrilla</th>
-            <th style={{padding: '0.8rem 0.5rem'}}>Estado</th>
-            <th style={{padding: '0.8rem 0.5rem'}}>Acciones</th>
+            <th style={{padding: '0.8rem 0.5rem', color: 'var(--text-contrast)'}}>Código / ID</th>
+            <th style={{padding: '0.8rem 0.5rem', color: 'var(--text-contrast)'}}>Nombres</th>
+            <th style={{padding: '0.8rem 0.5rem', color: 'var(--text-contrast)'}}>Cargo</th>
+            <th style={{padding: '0.8rem 0.5rem', color: 'var(--text-contrast)'}}>Cuadrilla</th>
+            <th style={{padding: '0.8rem 0.5rem', color: 'var(--text-contrast)'}}>Estado</th>
+            <th style={{padding: '0.8rem 0.5rem', color: 'var(--text-contrast)'}}>Acciones</th>
           </tr>
         </thead>
         <tbody>
           {filteredData.map(item => (
             <tr key={item.id} style={{borderBottom: '1px solid var(--glass-border)'}}>
-              <td style={{padding: '0.8rem 0.5rem', fontWeight: 'bold'}}>{item.identificacion}</td>
-              <td style={{padding: '0.8rem 0.5rem'}}>{item.nombre} {item.apellido}</td>
-              <td style={{padding: '0.8rem 0.5rem'}}>{item.cargo}</td>
-              <td style={{padding: '0.8rem 0.5rem'}}>{cuadrillas.find(c => c.id === item.cuadrillaId)?.nombre || 'N/A'}</td>
+              <td style={{padding: '0.8rem 0.5rem', fontWeight: 'bold', color: 'var(--text-contrast)'}}>{item.identificacion}</td>
+              <td style={{padding: '0.8rem 0.5rem', color: 'var(--text-contrast)'}}>{item.nombre} {item.apellido}</td>
+              <td style={{padding: '0.8rem 0.5rem', color: 'var(--text-contrast)'}}>{item.cargo}</td>
+              <td style={{padding: '0.8rem 0.5rem', color: 'var(--text-contrast)'}}>{cuadrillas.find(c => c.id === item.cuadrillaId)?.nombre || 'N/A'}</td>
               <td style={{padding: '0.8rem 0.5rem'}}><span className={`badge ${item.estado === 'Activo' ? 'badge-active' : 'badge-inactive'}`}>{item.estado}</span></td>
               <td style={{padding: '0.8rem 0.5rem', display: 'flex', gap: '0.5rem'}}>
-                <button className="btn-secondary" style={{padding: '0.3rem 0.6rem', fontSize: '0.8rem'}} onClick={()=>handleEdit(item)}>Editar</button>
-                <button className="btn-secondary" style={{padding: '0.3rem 0.6rem', fontSize: '0.8rem', background: '#ff5252', color: 'white', border: 'none'}} onClick={()=>deleteTrabajador(item.id)}>Eliminar</button>
+                <button className="btn-secondary text-slate-800 dark:text-slate-100 font-semibold" style={{padding: '0.3rem 0.6rem', fontSize: '0.8rem'}} onClick={()=>handleEdit(item)}>Editar</button>
+                <button className="btn-danger text-white font-bold" style={{padding: '0.3rem 0.6rem', fontSize: '0.8rem'}} onClick={()=>deleteTrabajador(item.id)}>Eliminar</button>
               </td>
             </tr>
           ))}

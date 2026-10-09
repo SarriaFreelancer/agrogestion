@@ -70,7 +70,7 @@ export default function MaquinariaTab({ data, tipos, addMaquinaria, editMaquinar
             onChange={e => setSearchQuery(e.target.value)}
           />
         </div>
-        <button className="btn-primary" onClick={handleAddClick}>
+        <button className="btn-primary text-white font-bold" onClick={handleAddClick}>
           {(isCreating || editingId) ? 'Cancelar' : '+ Agregar Maquinaria'}
         </button>
       </div>
@@ -100,7 +100,7 @@ export default function MaquinariaTab({ data, tipos, addMaquinaria, editMaquinar
             <div className="input-group"><label className="input-label">Tarifa (H/K/V)</label><input type="number" className="input-field" value={formData.tarifa} onChange={e => setFormData({ ...formData, tarifa: Number(e.target.value) })} /></div>
             <div className="input-group"><label className="input-label">Horómetro Actual</label><input type="number" step="0.1" className="input-field" value={formData.horometroActual} onChange={e => setFormData({ ...formData, horometroActual: Number(e.target.value) })} /></div>
             <div className="input-group"><label className="input-label">Frecuencia Manto. (Hrs)</label><input type="number" className="input-field" value={formData.frecuenciaMantenimiento} onChange={e => setFormData({ ...formData, frecuenciaMantenimiento: Number(e.target.value) })} /></div>
-            <div className="input-group" style={{ display: 'flex', alignItems: 'flex-end' }}><button className="btn-primary" onClick={handleSave} style={{ width: '100%' }}>Guardar</button></div>
+            <div className="input-group" style={{ display: 'flex', alignItems: 'flex-end' }}><button className="btn-primary text-white font-bold" onClick={handleSave} style={{ width: '100%' }}>Guardar</button></div>
           </div>
         </div>
       )}
@@ -109,31 +109,31 @@ export default function MaquinariaTab({ data, tipos, addMaquinaria, editMaquinar
         <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', minWidth: '800px' }}>
         <thead>
           <tr style={{ borderBottom: '2px solid var(--primary-light)' }}>
-            <th style={{ padding: '0.8rem 0.5rem' }}>Código</th>
-            <th style={{ padding: '0.8rem 0.5rem' }}>Descripción</th>
-            <th style={{ padding: '0.8rem 0.5rem' }}>Tipo</th>
-            <th style={{ padding: '0.8rem 0.5rem' }}>Propia/Alq.</th>
-            <th style={{ padding: '0.8rem 0.5rem' }}>Tarifa</th>
-            <th style={{ padding: '0.8rem 0.5rem' }}>Horómetro</th>
-            <th style={{ padding: '0.8rem 0.5rem' }}>Frec. Manto.</th>
-            <th style={{ padding: '0.8rem 0.5rem' }}>Estado</th>
-            <th style={{ padding: '0.8rem 0.5rem' }}>Acciones</th>
+            <th style={{ padding: '0.8rem 0.5rem', color: 'var(--text-contrast)' }}>Código</th>
+            <th style={{ padding: '0.8rem 0.5rem', color: 'var(--text-contrast)' }}>Descripción</th>
+            <th style={{ padding: '0.8rem 0.5rem', color: 'var(--text-contrast)' }}>Tipo</th>
+            <th style={{ padding: '0.8rem 0.5rem', color: 'var(--text-contrast)' }}>Propia/Alq.</th>
+            <th style={{ padding: '0.8rem 0.5rem', color: 'var(--text-contrast)' }}>Tarifa</th>
+            <th style={{ padding: '0.8rem 0.5rem', color: 'var(--text-contrast)' }}>Horómetro</th>
+            <th style={{ padding: '0.8rem 0.5rem', color: 'var(--text-contrast)' }}>Frec. Manto.</th>
+            <th style={{ padding: '0.8rem 0.5rem', color: 'var(--text-contrast)' }}>Estado</th>
+            <th style={{ padding: '0.8rem 0.5rem', color: 'var(--text-contrast)' }}>Acciones</th>
           </tr>
         </thead>
         <tbody>
           {filteredData.map(item => (
             <tr key={item.id} style={{ borderBottom: '1px solid var(--glass-border)' }}>
-              <td style={{ padding: '0.8rem 0.5rem', fontWeight: 'bold' }}>{item.id}</td>
-              <td style={{ padding: '0.8rem 0.5rem' }}>{item.name}</td>
-              <td style={{ padding: '0.8rem 0.5rem' }}>{tipos.find(t => t.id === item.tipoId)?.nombre || 'N/A'}</td>
-              <td style={{ padding: '0.8rem 0.5rem' }}>{item.propiaAlquilada}</td>
-              <td style={{ padding: '0.8rem 0.5rem' }}>${item.tarifa || 0}</td>
-              <td style={{ padding: '0.8rem 0.5rem' }}><strong>{item.horometroActual || 0}</strong></td>
-              <td style={{ padding: '0.8rem 0.5rem' }}>{item.frecuenciaMantenimiento || 250} hrs</td>
+              <td style={{ padding: '0.8rem 0.5rem', fontWeight: 'bold', color: 'var(--text-contrast)' }}>{item.id}</td>
+              <td style={{ padding: '0.8rem 0.5rem', color: 'var(--text-contrast)' }}>{item.name}</td>
+              <td style={{ padding: '0.8rem 0.5rem', color: 'var(--text-contrast)' }}>{tipos.find(t => t.id === item.tipoId)?.nombre || 'N/A'}</td>
+              <td style={{ padding: '0.8rem 0.5rem', color: 'var(--text-contrast)' }}>{item.propiaAlquilada}</td>
+              <td style={{ padding: '0.8rem 0.5rem', color: 'var(--text-contrast)' }}>${item.tarifa || 0}</td>
+              <td style={{ padding: '0.8rem 0.5rem', color: 'var(--text-contrast)' }}><strong>{item.horometroActual || 0}</strong></td>
+              <td style={{ padding: '0.8rem 0.5rem', color: 'var(--text-muted)' }}>{item.frecuenciaMantenimiento || 250} hrs</td>
               <td style={{ padding: '0.8rem 0.5rem' }}><span className={`badge ${item.status === 'Operativo' ? 'badge-active' : 'badge-inactive'}`}>{item.status}</span></td>
               <td style={{ padding: '0.8rem 0.5rem', display: 'flex', gap: '0.5rem' }}>
-                <button className="btn-secondary" style={{ padding: '0.3rem 0.6rem', fontSize: '0.8rem' }} onClick={() => handleEdit(item)}>Editar</button>
-                <button className="btn-secondary" style={{ padding: '0.3rem 0.6rem', fontSize: '0.8rem', background: '#ff5252', color: 'white', border: 'none' }} onClick={() => deleteMaquinaria(item.id)}>Eliminar</button>
+                <button className="btn-secondary text-slate-800 dark:text-slate-100 font-semibold" style={{ padding: '0.3rem 0.6rem', fontSize: '0.8rem' }} onClick={() => handleEdit(item)}>Editar</button>
+                <button className="btn-danger text-white font-bold" style={{ padding: '0.3rem 0.6rem', fontSize: '0.8rem' }} onClick={() => deleteMaquinaria(item.id)}>Eliminar</button>
               </td>
             </tr>
           ))}
