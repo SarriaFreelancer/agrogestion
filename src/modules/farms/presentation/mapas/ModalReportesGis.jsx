@@ -111,8 +111,8 @@ export default function ModalReportesGis({
               sectorNombre: sec.name,
               cultivo: suerte.cultivo || 'Caña de Azúcar',
               hectareas: suerte.hectareas || 10,
-              lat: suerte.lat || 3.5285,
-              lng: suerte.lng || -76.2980,
+              lat: suerte.lat || 3.472053,
+              lng: suerte.lng || -76.446638,
               geometria: suerte.geometria || []
             });
           });
@@ -145,12 +145,12 @@ export default function ModalReportesGis({
         );
 
         const suerteRef = flattenSuertes[tIdx % (flattenSuertes.length || 1)] || {
-          suerteNombre: 'Suerte A-01 (Tablón Principal)',
-          loteNombre: 'Lote 01',
-          fincaNombre: 'Hacienda El Paraíso',
-          cultivo: 'Caña de Azúcar',
-          lat: 3.5285,
-          lng: -76.2980
+          suerteNombre: 'Suerte 101 (Noroccidente)',
+          loteNombre: 'Lote 01 (Franja Norte)',
+          fincaNombre: 'Hacienda La Manuelita',
+          cultivo: 'Caña de Azúcar (Variedad CC 01-1940)',
+          lat: 3.472053,
+          lng: -76.446638
         };
 
         let currentLat = suerteRef.lat;
@@ -223,12 +223,12 @@ export default function ModalReportesGis({
 
       activeMaquinas.forEach((maq, mIdx) => {
         const suerteRef = flattenSuertes[mIdx % (flattenSuertes.length || 1)] || {
-          suerteNombre: 'Suerte A-01',
-          loteNombre: 'Lote 01',
-          fincaNombre: 'Hacienda El Paraíso',
-          cultivo: 'Caña de Azúcar',
-          lat: 3.5285,
-          lng: -76.2980
+          suerteNombre: 'Suerte 101 (Noroccidente)',
+          loteNombre: 'Lote 01 (Franja Norte)',
+          fincaNombre: 'Hacienda La Manuelita',
+          cultivo: 'Caña de Azúcar (Variedad CC 01-1940)',
+          lat: 3.472053,
+          lng: -76.446638
         };
 
         let currentLat = suerteRef.lat;
@@ -291,19 +291,19 @@ export default function ModalReportesGis({
       });
     } else if (selectedModulo === 'fitosanitario') {
       const muestreos = registrosControles.length > 0 ? registrosControles : [
-        { id: 'MUE-01', plaga: 'Diatraea saccharalis (Barrenador)', severidad: 'Alta', incidencia: '18%', lote: 'Lote 01', suerte: 'Suerte A-01', evaluador: 'Ing. Agrónomo' },
-        { id: 'MUE-02', plaga: 'Aeneolamia varia (Salivazo)', severidad: 'Media', incidencia: '8%', lote: 'Lote 02', suerte: 'Suerte B-01', evaluador: 'Técnico Fitosanitario' },
-        { id: 'MUE-03', plaga: 'Roya Café (Hemileia vastatrix)', severidad: 'Baja', incidencia: '3%', lote: 'Lote 03', suerte: 'Suerte C-01', evaluador: 'Auxiliar Campo' }
+        { id: 'MUE-01', plaga: 'Diatraea saccharalis (Barrenador)', severidad: 'Alta', incidencia: '18%', lote: 'Lote 01', suerte: 'Suerte 101', evaluador: 'Ing. Agrónomo' },
+        { id: 'MUE-02', plaga: 'Aeneolamia varia (Salivazo)', severidad: 'Media', incidencia: '8%', lote: 'Lote 01', suerte: 'Suerte 102', evaluador: 'Técnico Fitosanitario' },
+        { id: 'MUE-03', plaga: 'Roya Café (Hemileia vastatrix)', severidad: 'Baja', incidencia: '3%', lote: 'Lote 02', suerte: 'Suerte 201', evaluador: 'Auxiliar Campo' }
       ];
 
       muestreos.forEach((mue, idx) => {
         const suerteRef = flattenSuertes[idx % (flattenSuertes.length || 1)] || {
-          suerteNombre: mue.suerte || 'Suerte A-01',
-          loteNombre: mue.lote || 'Lote 01',
-          fincaNombre: 'Hacienda El Paraíso',
-          cultivo: 'Caña de Azúcar',
-          lat: 3.5285 + idx * 0.002,
-          lng: -76.2980 - idx * 0.002
+          suerteNombre: mue.suerte || 'Suerte 101 (Noroccidente)',
+          loteNombre: mue.lote || 'Lote 01 (Franja Norte)',
+          fincaNombre: 'Hacienda La Manuelita',
+          cultivo: 'Caña de Azúcar (Variedad CC 01-1940)',
+          lat: 3.472053 + idx * 0.0008,
+          lng: -76.446638 + idx * 0.0008
         };
 
         registros.push({

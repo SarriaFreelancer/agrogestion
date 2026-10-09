@@ -123,7 +123,7 @@ export default function MapaCalor() {
   const [palmFilterStatus, setPalmFilterStatus] = useState('all'); // 'all' | 'Sana' | 'Alerta' | 'Enferma' | 'Vacio'
 
   // Geofence GPS Simulator & Validator state
-  const [testGps, setTestGps] = useState({ lat: '3.5285', lng: '-76.2980' });
+  const [testGps, setTestGps] = useState({ lat: '3.4725', lng: '-76.4450' });
   const [validationResult, setValidationResult] = useState(null);
 
   // Configuration settings for Plant Census & Telemetry
@@ -230,7 +230,7 @@ export default function MapaCalor() {
     if (allSuertes.length > 0 && allSuertes[0].geometria && allSuertes[0].geometria[0]) {
       return allSuertes[0].geometria[0];
     }
-    return [3.5285, -76.2980];
+    return [3.472741, -76.448375];
   }, [allSuertes]);
 
   // Point in Polygon helper for Geofence validation
