@@ -1,12 +1,22 @@
-import React, { useState } from 'react';
-import { ArrowRight, CheckCircle2, Eye, EyeOff, Leaf, Lock, Mail, ShieldCheck, Sun, Moon } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { ArrowRight, CheckCircle2, Eye, EyeOff, Leaf, Lock, Mail, ShieldCheck, Sun, Moon, Clock, AlertTriangle } from 'lucide-react';
 import { useTheme } from '@/providers/ThemeProvider';
 
 export default function Auth({ loginUser }) {
   const [formData, setFormData] = useState({ email: '', password: '' });
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [logoutReason, setLogoutReason] = useState('');
   const { modoOscuroGlobal, toggleThemeMode } = useTheme();
+
+  useEffect(() => {
+    try {
+      const reason = localStorage.getItem('agro_logout_reason');
+      if (reason) {
+        setLogoutReason(reason);
+      }
+    } catch {}
+  }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -84,6 +94,16 @@ export default function Auth({ loginUser }) {
             <span className="auth-card-kicker">Bienvenido de nuevo</span>
             <h2>Ingresa a tu cuenta</h2>
             <p>El sistema detectará tu cliente y acceso automáticamente.</p>
+
+            {logoutReason === 'INACTIVITY' && (
+              <div className="mt-4 p-3.5 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-300 text-xs flex items-start gap-3 text-left animate-in fade-in slide-in-from-top-2">
+                <AlertTriangle className="text-amber-400 shrink-0 mt-0.5" size={18} />
+                <div>
+                  <strong className="font-bold text-amber-200 block text-sm">Sesión finalizada por inactividad</strong>
+                  <span>Tu sesión fue cerrada automáticamente para proteger la seguridad de tus datos agrícolas tras un tiempo sin interacción. Ingresa tus credenciales para reanudar.</span>
+                </div>
+              </div>
+            )}
           </div>
 
           <form onSubmit={handleSubmit} className="auth-form">

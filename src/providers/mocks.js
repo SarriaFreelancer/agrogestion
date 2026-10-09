@@ -275,113 +275,438 @@ export const initialPlantas = [
 ];
 
 // 6 Hierarchical Levels: Zona -> Sector -> Finca -> Lote -> Suerte -> Surco
+// Ubicación Real en Zonas Rurales Agroindustriales (Valle del Cauca: Ingenio Providencia, Mayagüez y Manuelita - El Cerrito / Rozo)
 export const initialData = [
   { 
     id: 'ZON-01', 
-    name: 'Zona Valle del Cauca (Norte)', 
-    type: 'Sector', // Top node container
+    codigo: 'ZON-01',
+    name: 'Zona Valle del Cauca (Valle Geográfico Río Cauca)', 
+    type: 'Sector', 
     plantaId: 'PLN-01',
+    isDemo: true,
+    origen: 'DEMO',
     sectores: [
       {
         id: 'SEC-01',
-        name: 'Sector Cañaverales 1',
+        codigo: 'SEC-01',
+        name: 'Sector Cañaverales Providencia & Mayagüez',
         type: 'Sector',
+        isDemo: true,
+        origen: 'DEMO',
         fincas: [
           { 
             id: 'FIN-01', 
-            name: 'Hacienda El Paraíso', 
+            codigo: 'FIN-01',
+            name: 'Hacienda San Fernando (Ingenio Providencia)', 
             type: 'Finca',
-            location: '3.5284, -76.2981',
+            location: '3.6225, -76.2050',
+            isDemo: true,
+            origen: 'DEMO',
             lotes: [
               { 
                 id: 'LOT-01', 
-                name: 'Lote 01 (Variedad CC 01-1938)', 
+                codigo: 'LOT-01',
+                name: 'Lote 01 (Variedad Caña CC 01-1938)', 
                 type: 'Lote',
-                topography: 'Plana',
+                topography: 'Plana Aluvial',
+                isDemo: true,
+                origen: 'DEMO',
                 suertes: [
                   { 
                     id: 'SUE-01', 
-                    name: 'Suerte A-01 (Tablón Principal)', 
+                    codigo: 'SUE-01',
+                    name: 'Suerte A-01 (Tablón San Fernando 1)', 
                     type: 'Suerte', 
-                    hectareas: 15.5, 
-                    plantas: 18500, 
-                    toneladas: 1750, 
+                    hectareas: 24.5, 
+                    plantas: 29400, 
+                    toneladas: 2800, 
                     cultivo: 'Caña de Azúcar', 
                     estado: 'Activo', 
                     estadoProductivo: 'En Crecimiento Vigoroso', 
                     edadSuerteDias: 140, 
                     edadUltimaCosechaDias: 380, 
-                    lat: 3.5285, 
-                    lng: -76.2980,
+                    lat: 3.6225, 
+                    lng: -76.2050,
+                    isDemo: true,
+                    origen: 'DEMO',
                     geometria: [
-                      [3.5280, -76.2985],
-                      [3.5290, -76.2985],
-                      [3.5290, -76.2975],
-                      [3.5280, -76.2975]
+                      [3.6200, -76.2080],
+                      [3.6250, -76.2080],
+                      [3.6250, -76.2020],
+                      [3.6200, -76.2020]
                     ],
                     surcos: [
-                      { id: 'SUR-01', name: 'Válvula / Surco 1-20', type: 'Surco', hectareas: 4.0, plantas: 4800 },
-                      { id: 'SUR-02', name: 'Válvula / Surco 21-40', type: 'Surco', hectareas: 4.0, plantas: 4800 },
-                      { id: 'SUR-03', name: 'Válvula / Surco 41-60', type: 'Surco', hectareas: 4.0, plantas: 4800 },
-                      { id: 'SUR-04', name: 'Válvula / Surco 61-80 (Cabecera)', type: 'Surco', hectareas: 3.5, plantas: 4100 }
+                      { id: 'SUR-01', name: 'Válvula / Surco 1-25', type: 'Surco', hectareas: 6.2, plantas: 7400, isDemo: true },
+                      { id: 'SUR-02', name: 'Válvula / Surco 26-50', type: 'Surco', hectareas: 6.1, plantas: 7300, isDemo: true },
+                      { id: 'SUR-03', name: 'Válvula / Surco 51-75', type: 'Surco', hectareas: 6.1, plantas: 7300, isDemo: true },
+                      { id: 'SUR-04', name: 'Válvula / Surco 76-100 (Cabecera)', type: 'Surco', hectareas: 6.1, plantas: 7400, isDemo: true }
                     ]
                   },
                   { 
                     id: 'SUE-02', 
-                    name: 'Suerte A-02 (Tablón Ribera)', 
+                    codigo: 'SUE-02',
+                    name: 'Suerte A-02 (Tablón San Fernando 2)', 
                     type: 'Suerte', 
-                    hectareas: 12.0, 
-                    plantas: 14200, 
-                    toneladas: 1320, 
+                    hectareas: 18.0, 
+                    plantas: 21600, 
+                    toneladas: 2100, 
                     cultivo: 'Caña de Azúcar', 
                     estado: 'Activo', 
                     estadoProductivo: 'Plantilla Reciente', 
                     edadSuerteDias: 45, 
                     edadUltimaCosechaDias: 45, 
-                    lat: 3.5265, 
-                    lng: -76.2960,
+                    lat: 3.6225, 
+                    lng: -76.1990,
+                    isDemo: true,
+                    origen: 'DEMO',
                     geometria: [
-                      [3.5260, -76.2965],
-                      [3.5270, -76.2965],
-                      [3.5270, -76.2955],
-                      [3.5260, -76.2955]
+                      [3.6200, -76.2020],
+                      [3.6250, -76.2020],
+                      [3.6250, -76.1960],
+                      [3.6200, -76.1960]
                     ],
                     surcos: [
-                      { id: 'SUR-05', name: 'Válvula R-1', type: 'Surco', hectareas: 6.0, plantas: 7100 },
-                      { id: 'SUR-06', name: 'Válvula R-2', type: 'Surco', hectareas: 6.0, plantas: 7100 }
+                      { id: 'SUR-05', name: 'Válvula R-1 (Línea Principal)', type: 'Surco', hectareas: 9.0, plantas: 10800, isDemo: true },
+                      { id: 'SUR-06', name: 'Válvula R-2 (Línea Drenaje)', type: 'Surco', hectareas: 9.0, plantas: 10800, isDemo: true }
+                    ]
+                  },
+                  { 
+                    id: 'SUE-03', 
+                    codigo: 'SUE-03',
+                    name: 'Suerte A-03 (Tablón Semillero El Vivero)', 
+                    type: 'Suerte', 
+                    hectareas: 15.5, 
+                    plantas: 18600, 
+                    toneladas: 1750, 
+                    cultivo: 'Caña de Azúcar', 
+                    estado: 'Activo', 
+                    estadoProductivo: 'Semillero Básico Certificado', 
+                    edadSuerteDias: 90, 
+                    edadUltimaCosechaDias: 90, 
+                    lat: 3.6225, 
+                    lng: -76.1930,
+                    isDemo: true,
+                    origen: 'DEMO',
+                    geometria: [
+                      [3.6200, -76.1960],
+                      [3.6250, -76.1960],
+                      [3.6250, -76.1900],
+                      [3.6200, -76.1900]
+                    ],
+                    surcos: [
+                      { id: 'SUR-07', name: 'Módulo Semilla Élite 1', type: 'Surco', hectareas: 7.75, plantas: 9300, isDemo: true },
+                      { id: 'SUR-08', name: 'Módulo Semilla Élite 2', type: 'Surco', hectareas: 7.75, plantas: 9300, isDemo: true }
                     ]
                   }
                 ]
               },
               { 
                 id: 'LOT-02', 
-                name: 'Lote 02 (Variedad CC 85-92)', 
+                codigo: 'LOT-02',
+                name: 'Lote 02 (Variedad Caña CC 85-92)', 
                 type: 'Lote',
-                topography: 'Plana',
+                topography: 'Plana Aluvial',
+                isDemo: true,
+                origen: 'DEMO',
                 suertes: [
                   { 
-                    id: 'SUE-03', 
-                    name: 'Suerte B-01 (Maduración Cosecha)', 
+                    id: 'SUE-04', 
+                    codigo: 'SUE-04',
+                    name: 'Suerte B-01 (Tablón La Acequia Real)', 
                     type: 'Suerte', 
-                    hectareas: 22.0, 
-                    plantas: 26400, 
-                    toneladas: 2600, 
+                    hectareas: 28.0, 
+                    plantas: 33600, 
+                    toneladas: 3200, 
                     cultivo: 'Caña de Azúcar', 
                     estado: 'Activo', 
                     estadoProductivo: 'Maduración Precosecha', 
                     edadSuerteDias: 330, 
                     edadUltimaCosechaDias: 330, 
-                    lat: 3.5310, 
-                    lng: -76.2940,
+                    lat: 3.6275, 
+                    lng: -76.2050,
+                    isDemo: true,
+                    origen: 'DEMO',
                     geometria: [
-                      [3.5300, -76.2950],
-                      [3.5320, -76.2950],
-                      [3.5320, -76.2930],
-                      [3.5300, -76.2930]
+                      [3.6250, -76.2080],
+                      [3.6300, -76.2080],
+                      [3.6300, -76.2020],
+                      [3.6250, -76.2020]
                     ],
                     surcos: [
-                      { id: 'SUR-07', name: 'Sección Norte 1-40', type: 'Surco', hectareas: 11.0, plantas: 13200 },
-                      { id: 'SUR-08', name: 'Sección Sur 41-80', type: 'Surco', hectareas: 11.0, plantas: 13200 }
+                      { id: 'SUR-09', name: 'Sección Norte 1-50', type: 'Surco', hectareas: 14.0, plantas: 16800, isDemo: true },
+                      { id: 'SUR-10', name: 'Sección Sur 51-100', type: 'Surco', hectareas: 14.0, plantas: 16800, isDemo: true }
+                    ]
+                  },
+                  { 
+                    id: 'SUE-05', 
+                    codigo: 'SUE-05',
+                    name: 'Suerte B-02 (Tablón El Ingenio Sur)', 
+                    type: 'Suerte', 
+                    hectareas: 22.5, 
+                    plantas: 27000, 
+                    toneladas: 2600, 
+                    cultivo: 'Caña de Azúcar', 
+                    estado: 'Activo', 
+                    estadoProductivo: 'Soca 1 en Macollamiento', 
+                    edadSuerteDias: 210, 
+                    edadUltimaCosechaDias: 560, 
+                    lat: 3.6275, 
+                    lng: -76.1990,
+                    isDemo: true,
+                    origen: 'DEMO',
+                    geometria: [
+                      [3.6250, -76.2020],
+                      [3.6300, -76.2020],
+                      [3.6300, -76.1960],
+                      [3.6250, -76.1960]
+                    ],
+                    surcos: [
+                      { id: 'SUR-11', name: 'Válvula B2-1', type: 'Surco', hectareas: 11.25, plantas: 13500, isDemo: true },
+                      { id: 'SUR-12', name: 'Válvula B2-2', type: 'Surco', hectareas: 11.25, plantas: 13500, isDemo: true }
+                    ]
+                  }
+                ]
+              }
+            ]
+          },
+          { 
+            id: 'FIN-02', 
+            codigo: 'FIN-02',
+            name: 'Hacienda Piedechinche Agroindustrial', 
+            type: 'Finca',
+            location: '3.6325, -76.2020',
+            isDemo: true,
+            origen: 'DEMO',
+            lotes: [
+              { 
+                id: 'LOT-03', 
+                codigo: 'LOT-03',
+                name: 'Lote 03 (Variedad Caña CC 93-4418)', 
+                type: 'Lote',
+                topography: 'Plana',
+                isDemo: true,
+                origen: 'DEMO',
+                suertes: [
+                  { 
+                    id: 'SUE-06', 
+                    codigo: 'SUE-06',
+                    name: 'Suerte C-01 (Tablón Piedechinche Norte)', 
+                    type: 'Suerte', 
+                    hectareas: 32.0, 
+                    plantas: 38400, 
+                    toneladas: 3650, 
+                    cultivo: 'Caña de Azúcar', 
+                    estado: 'Activo', 
+                    estadoProductivo: 'En Crecimiento Vigoroso', 
+                    edadSuerteDias: 160, 
+                    edadUltimaCosechaDias: 420, 
+                    lat: 3.6325, 
+                    lng: -76.2050,
+                    isDemo: true,
+                    origen: 'DEMO',
+                    geometria: [
+                      [3.6300, -76.2080],
+                      [3.6350, -76.2080],
+                      [3.6350, -76.2020],
+                      [3.6300, -76.2020]
+                    ],
+                    surcos: [
+                      { id: 'SUR-13', name: 'Cabecera 1-40', type: 'Surco', hectareas: 16.0, plantas: 19200, isDemo: true },
+                      { id: 'SUR-14', name: 'Cola 41-80', type: 'Surco', hectareas: 16.0, plantas: 19200, isDemo: true }
+                    ]
+                  },
+                  { 
+                    id: 'SUE-07', 
+                    codigo: 'SUE-07',
+                    name: 'Suerte C-02 (Tablón Piedechinche Sur)', 
+                    type: 'Suerte', 
+                    hectareas: 26.5, 
+                    plantas: 31800, 
+                    toneladas: 3050, 
+                    cultivo: 'Caña de Azúcar', 
+                    estado: 'Activo', 
+                    estadoProductivo: 'Soca 2 Maduración', 
+                    edadSuerteDias: 280, 
+                    edadUltimaCosechaDias: 620, 
+                    lat: 3.6325, 
+                    lng: -76.1990,
+                    isDemo: true,
+                    origen: 'DEMO',
+                    geometria: [
+                      [3.6300, -76.2020],
+                      [3.6350, -76.2020],
+                      [3.6350, -76.1960],
+                      [3.6300, -76.1960]
+                    ],
+                    surcos: [
+                      { id: 'SUR-15', name: 'Sector Este Piedechinche', type: 'Surco', hectareas: 13.25, plantas: 15900, isDemo: true },
+                      { id: 'SUR-16', name: 'Sector Oeste Piedechinche', type: 'Surco', hectareas: 13.25, plantas: 15900, isDemo: true }
+                    ]
+                  }
+                ]
+              },
+              { 
+                id: 'LOT-04', 
+                codigo: 'LOT-04',
+                name: 'Lote 04 (Maíz Tecnificado Híbrido Pioneer)', 
+                type: 'Lote',
+                topography: 'Plana',
+                isDemo: true,
+                origen: 'DEMO',
+                suertes: [
+                  { 
+                    id: 'SUE-08', 
+                    codigo: 'SUE-08',
+                    name: 'Suerte C-03 (Lote Maíz Grano Tecnificado)', 
+                    type: 'Suerte', 
+                    hectareas: 16.0, 
+                    plantas: 80000, 
+                    toneladas: 120, 
+                    cultivo: 'Maíz Tecnificado', 
+                    estado: 'Activo', 
+                    estadoProductivo: 'Llenado de Grano y Espiga', 
+                    edadSuerteDias: 75, 
+                    edadUltimaCosechaDias: 75, 
+                    lat: 3.6325, 
+                    lng: -76.1930,
+                    isDemo: true,
+                    origen: 'DEMO',
+                    geometria: [
+                      [3.6300, -76.1960],
+                      [3.6350, -76.1960],
+                      [3.6350, -76.1900],
+                      [3.6300, -76.1900]
+                    ],
+                    surcos: [
+                      { id: 'SUR-17', name: 'Pivote Central Maíz 1', type: 'Surco', hectareas: 8.0, plantas: 40000, isDemo: true },
+                      { id: 'SUR-18', name: 'Pivote Central Maíz 2', type: 'Surco', hectareas: 8.0, plantas: 40000, isDemo: true }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        id: 'SEC-02',
+        codigo: 'SEC-02',
+        name: 'Sector Agroindustrial Rozo & La Manuelita',
+        type: 'Sector',
+        isDemo: true,
+        origen: 'DEMO',
+        fincas: [
+          {
+            id: 'FIN-03',
+            codigo: 'FIN-03',
+            name: 'Hacienda La Manuelita Rozo',
+            type: 'Finca',
+            location: '3.6075, -76.3800',
+            isDemo: true,
+            origen: 'DEMO',
+            lotes: [
+              {
+                id: 'LOT-05',
+                codigo: 'LOT-05',
+                name: 'Lote 05 (Caña CC 93-7510 Tecnificada)',
+                type: 'Lote',
+                topography: 'Plana',
+                isDemo: true,
+                origen: 'DEMO',
+                suertes: [
+                  {
+                    id: 'SUE-09',
+                    codigo: 'SUE-09',
+                    name: 'Suerte D-01 (Tablón Los Samanes)',
+                    type: 'Suerte',
+                    hectareas: 35.0,
+                    plantas: 42000,
+                    toneladas: 4000,
+                    cultivo: 'Caña de Azúcar',
+                    estado: 'Activo',
+                    estadoProductivo: 'Soca 1 en Crecimiento',
+                    edadSuerteDias: 220,
+                    edadUltimaCosechaDias: 520,
+                    lat: 3.6075,
+                    lng: -76.3800,
+                    isDemo: true,
+                    origen: 'DEMO',
+                    geometria: [
+                      [3.6050, -76.3850],
+                      [3.6100, -76.3850],
+                      [3.6100, -76.3750],
+                      [3.6050, -76.3750]
+                    ],
+                    surcos: [
+                      { id: 'SUR-19', name: 'Compuerta Los Samanes A', type: 'Surco', hectareas: 17.5, plantas: 21000, isDemo: true },
+                      { id: 'SUR-20', name: 'Compuerta Los Samanes B', type: 'Surco', hectareas: 17.5, plantas: 21000, isDemo: true }
+                    ]
+                  },
+                  {
+                    id: 'SUE-10',
+                    codigo: 'SUE-10',
+                    name: 'Suerte D-02 (Tablón La Ribera del Río)',
+                    type: 'Suerte',
+                    hectareas: 30.0,
+                    plantas: 36000,
+                    toneladas: 3450,
+                    cultivo: 'Caña de Azúcar',
+                    estado: 'Activo',
+                    estadoProductivo: 'Maduración y Riego de Agoste',
+                    edadSuerteDias: 340,
+                    edadUltimaCosechaDias: 340,
+                    lat: 3.6125,
+                    lng: -76.3800,
+                    isDemo: true,
+                    origen: 'DEMO',
+                    geometria: [
+                      [3.6100, -76.3850],
+                      [3.6150, -76.3850],
+                      [3.6150, -76.3750],
+                      [3.6100, -76.3750]
+                    ],
+                    surcos: [
+                      { id: 'SUR-21', name: 'Válvula Ribera 1', type: 'Surco', hectareas: 15.0, plantas: 18000, isDemo: true },
+                      { id: 'SUR-22', name: 'Válvula Ribera 2', type: 'Surco', hectareas: 15.0, plantas: 18000, isDemo: true }
+                    ]
+                  }
+                ]
+              },
+              {
+                id: 'LOT-06',
+                codigo: 'LOT-06',
+                name: 'Lote 06 (Palma Africana Elaeis Guineensis OxG)',
+                type: 'Lote',
+                topography: 'Plana',
+                isDemo: true,
+                origen: 'DEMO',
+                suertes: [
+                  {
+                    id: 'SUE-11',
+                    codigo: 'SUE-11',
+                    name: 'Suerte D-03 (Bloque Palma Africana Híbrida OxG)',
+                    type: 'Suerte',
+                    hectareas: 42.0,
+                    plantas: 5880,
+                    toneladas: 840,
+                    cultivo: 'Palma de Aceite',
+                    estado: 'Activo',
+                    estadoProductivo: 'Plena Producción y Cosecha',
+                    edadSuerteDias: 2550,
+                    edadUltimaCosechaDias: 25,
+                    lat: 3.6075,
+                    lng: -76.3700,
+                    isDemo: true,
+                    origen: 'DEMO',
+                    geometria: [
+                      [3.6050, -76.3750],
+                      [3.6100, -76.3750],
+                      [3.6100, -76.3650],
+                      [3.6050, -76.3650]
+                    ],
+                    surcos: [
+                      { id: 'SUR-23', name: 'Bloque Microaspersión Palma 1', type: 'Surco', hectareas: 21.0, plantas: 2940, isDemo: true },
+                      { id: 'SUR-24', name: 'Bloque Microaspersión Palma 2', type: 'Surco', hectareas: 21.0, plantas: 2940, isDemo: true }
                     ]
                   }
                 ]
@@ -391,172 +716,176 @@ export const initialData = [
         ]
       }
     ],
-    fincas: [
-      { 
-        id: 'FIN-01', 
-        name: 'Hacienda El Paraíso', 
-        type: 'Finca',
-        location: '3.5284, -76.2981',
-        lotes: [
-          { 
-            id: 'LOT-01', 
-            name: 'Lote 01 (Variedad CC 01-1938)', 
-            type: 'Lote',
-            topography: 'Plana',
-            suertes: [
-              { 
-                id: 'SUE-01', 
-                name: 'Suerte A-01 (Tablón Principal)', 
-                type: 'Suerte', 
-                hectareas: 15.5, 
-                plantas: 18500, 
-                toneladas: 1750, 
-                cultivo: 'Caña de Azúcar', 
-                estado: 'Activo', 
-                estadoProductivo: 'En Crecimiento Vigoroso', 
-                edadSuerteDias: 140, 
-                edadUltimaCosechaDias: 380, 
-                lat: 3.5285, 
-                lng: -76.2980,
-                geometria: [
-                  [3.5280, -76.2985],
-                  [3.5290, -76.2985],
-                  [3.5290, -76.2975],
-                  [3.5280, -76.2975]
-                ],
-                surcos: [
-                  { id: 'SUR-01', name: 'Válvula / Surco 1-20', type: 'Surco', hectareas: 4.0, plantas: 4800 },
-                  { id: 'SUR-02', name: 'Válvula / Surco 21-40', type: 'Surco', hectareas: 4.0, plantas: 4800 },
-                  { id: 'SUR-03', name: 'Válvula / Surco 41-60', type: 'Surco', hectareas: 4.0, plantas: 4800 },
-                  { id: 'SUR-04', name: 'Válvula / Surco 61-80 (Cabecera)', type: 'Surco', hectareas: 3.5, plantas: 4100 }
-                ]
-              },
-              { 
-                id: 'SUE-02', 
-                name: 'Suerte A-02 (Tablón Ribera)', 
-                type: 'Suerte', 
-                hectareas: 12.0, 
-                plantas: 14200, 
-                toneladas: 1320, 
-                cultivo: 'Caña de Azúcar', 
-                estado: 'Activo', 
-                estadoProductivo: 'Plantilla Reciente', 
-                edadSuerteDias: 45, 
-                edadUltimaCosechaDias: 45, 
-                lat: 3.5265, 
-                lng: -76.2960,
-                geometria: [
-                  [3.5260, -76.2965],
-                  [3.5270, -76.2965],
-                  [3.5270, -76.2955],
-                  [3.5260, -76.2955]
-                ],
-                surcos: [
-                  { id: 'SUR-05', name: 'Válvula R-1', type: 'Surco', hectareas: 6.0, plantas: 7100 },
-                  { id: 'SUR-06', name: 'Válvula R-2', type: 'Surco', hectareas: 6.0, plantas: 7100 }
-                ]
-              }
-            ]
-          }
-        ]
-      }
-    ]
+    fincas: []
   },
   { 
     id: 'ZON-02', 
-    name: 'Zona Cordillera Central (Café & Aguacate)', 
+    codigo: 'ZON-02',
+    name: 'Zona Cordillera Central & Piedemonte (Café & Frutales)', 
     type: 'Sector', 
     plantaId: 'PLN-02',
-    fincas: [
-      { 
-        id: 'FIN-02', 
-        name: 'Finca La Esperanza de Altura', 
-        type: 'Finca',
-        location: '4.8140, -75.6944',
-        lotes: [
-          {
-            id: 'LOT-03',
-            name: 'Lote Café Castillo Especial',
-            type: 'Lote',
-            topography: 'Ondulada',
-            suertes: [
-              { 
-                id: 'SUE-04', 
-                name: 'Suerte C-01 (Cafetal Producción)', 
-                type: 'Suerte', 
-                hectareas: 18.4, 
-                plantas: 92000, 
-                toneladas: 46, 
-                cultivo: 'Café Arábica Especial', 
-                estado: 'Activo', 
-                estadoProductivo: 'Floración y Grano Verde', 
-                edadSuerteDias: 780, 
-                edadUltimaCosechaDias: 180, 
-                lat: 4.8145, 
-                lng: -75.6940,
-                geometria: [
-                  [4.8135, -75.6950],
-                  [4.8155, -75.6950],
-                  [4.8155, -75.6930],
-                  [4.8135, -75.6930]
-                ],
-                surcos: [
-                  { id: 'SUR-09', name: 'Sección Ladera Alta', type: 'Surco', hectareas: 9.2, plantas: 46000 },
-                  { id: 'SUR-10', name: 'Sección Ladera Baja', type: 'Surco', hectareas: 9.2, plantas: 46000 }
+    isDemo: true,
+    origen: 'DEMO',
+    sectores: [
+      {
+        id: 'SEC-03',
+        codigo: 'SEC-03',
+        name: 'Sector Especiales Frutales & Café de Altura',
+        type: 'Sector',
+        isDemo: true,
+        origen: 'DEMO',
+        fincas: [
+          { 
+            id: 'FIN-04', 
+            codigo: 'FIN-04',
+            name: 'Hacienda El Porvenir Export (Aguacate)', 
+            type: 'Finca',
+            location: '3.6475, -76.1600',
+            isDemo: true,
+            origen: 'DEMO',
+            lotes: [
+              {
+                id: 'LOT-07',
+                codigo: 'LOT-07',
+                name: 'Lote 07 (Aguacate Hass GlobalGAP)',
+                type: 'Lote',
+                topography: 'Ondulada Suave',
+                isDemo: true,
+                origen: 'DEMO',
+                suertes: [
+                  { 
+                    id: 'SUE-12', 
+                    codigo: 'SUE-12',
+                    name: 'Suerte E-01 (Bloque Aguacate Hass 1)', 
+                    type: 'Suerte', 
+                    hectareas: 14.5, 
+                    plantas: 3625, 
+                    toneladas: 215, 
+                    cultivo: 'Aguacate Hass', 
+                    estado: 'Activo', 
+                    estadoProductivo: 'Llenado de Fruto y Calibre Exportación', 
+                    edadSuerteDias: 1450, 
+                    edadUltimaCosechaDias: 210, 
+                    lat: 3.6475, 
+                    lng: -76.1600,
+                    isDemo: true,
+                    origen: 'DEMO',
+                    geometria: [
+                      [3.6450, -76.1650],
+                      [3.6500, -76.1650],
+                      [3.6500, -76.1550],
+                      [3.6450, -76.1550]
+                    ],
+                    surcos: [
+                      { id: 'SUR-25', name: 'Bloque Microaspersión Aguacate A', type: 'Surco', hectareas: 7.25, plantas: 1812, isDemo: true },
+                      { id: 'SUR-26', name: 'Bloque Microaspersión Aguacate B', type: 'Surco', hectareas: 7.25, plantas: 1813, isDemo: true }
+                    ]
+                  },
+                  { 
+                    id: 'SUE-13', 
+                    codigo: 'SUE-13',
+                    name: 'Suerte E-02 (Bloque Aguacate Hass 2)', 
+                    type: 'Suerte', 
+                    hectareas: 12.0, 
+                    plantas: 3000, 
+                    toneladas: 180, 
+                    cultivo: 'Aguacate Hass', 
+                    estado: 'Activo', 
+                    estadoProductivo: 'Floración y Amarre', 
+                    edadSuerteDias: 1100, 
+                    edadUltimaCosechaDias: 190, 
+                    lat: 3.6525, 
+                    lng: -76.1600,
+                    isDemo: true,
+                    origen: 'DEMO',
+                    geometria: [
+                      [3.6500, -76.1650],
+                      [3.6550, -76.1650],
+                      [3.6550, -76.1550],
+                      [3.6500, -76.1550]
+                    ],
+                    surcos: [
+                      { id: 'SUR-27', name: 'Línea de Goteo 1-20', type: 'Surco', hectareas: 6.0, plantas: 1500, isDemo: true },
+                      { id: 'SUR-28', name: 'Línea de Goteo 21-40', type: 'Surco', hectareas: 6.0, plantas: 1500, isDemo: true }
+                    ]
+                  }
                 ]
               }
             ]
           },
-          {
-            id: 'LOT-04',
-            name: 'Lote Aguacate Hass Exportación',
-            type: 'Lote',
-            topography: 'Ondulada',
-            suertes: [
-              { 
-                id: 'SUE-05', 
-                name: 'Suerte H-01 (Árboles 4 Años)', 
-                type: 'Suerte', 
-                hectareas: 14.0, 
-                plantas: 5600, 
-                toneladas: 168, 
-                cultivo: 'Aguacate Hass', 
-                estado: 'Activo', 
-                estadoProductivo: 'Llenado de Fruto', 
-                edadSuerteDias: 1450, 
-                edadUltimaCosechaDias: 210, 
-                lat: 4.8180, 
-                lng: -75.6910,
-                geometria: [],
-                surcos: [
-                  { id: 'SUR-11', name: 'Bloque Microaspersión 1', type: 'Surco', hectareas: 7.0, plantas: 2800 },
-                  { id: 'SUR-12', name: 'Bloque Microaspersión 2', type: 'Surco', hectareas: 7.0, plantas: 2800 }
+          { 
+            id: 'FIN-05', 
+            codigo: 'FIN-05',
+            name: 'Finca Cafetera La Montaña', 
+            type: 'Finca',
+            location: '3.6475, -76.1500',
+            isDemo: true,
+            origen: 'DEMO',
+            lotes: [
+              {
+                id: 'LOT-08',
+                codigo: 'LOT-08',
+                name: 'Lote 08 (Café Arábica Variedad Castillo Especial)',
+                type: 'Lote',
+                topography: 'Ladera Andina',
+                isDemo: true,
+                origen: 'DEMO',
+                suertes: [
+                  { 
+                    id: 'SUE-14', 
+                    codigo: 'SUE-14',
+                    name: 'Suerte F-01 (Tablón Café Castillo Tambo)', 
+                    type: 'Suerte', 
+                    hectareas: 9.5, 
+                    plantas: 47500, 
+                    toneladas: 28.5, 
+                    cultivo: 'Café Arábica Especial', 
+                    estado: 'Activo', 
+                    estadoProductivo: 'Maduración Grano Rojo', 
+                    edadSuerteDias: 820, 
+                    edadUltimaCosechaDias: 170, 
+                    lat: 3.6475, 
+                    lng: -76.1500,
+                    isDemo: true,
+                    origen: 'DEMO',
+                    geometria: [
+                      [3.6450, -76.1550],
+                      [3.6500, -76.1550],
+                      [3.6500, -76.1450],
+                      [3.6450, -76.1450]
+                    ],
+                    surcos: [
+                      { id: 'SUR-29', name: 'Sección Ladera Alta', type: 'Surco', hectareas: 4.75, plantas: 23750, isDemo: true },
+                      { id: 'SUR-30', name: 'Sección Ladera Baja', type: 'Surco', hectareas: 4.75, plantas: 23750, isDemo: true }
+                    ]
+                  }
                 ]
               }
             ]
           }
         ]
       }
-    ]
+    ],
+    fincas: []
   }
 ];
 
 export const initialGrupos = [
-  { id: 'GRP-01', name: 'Preparación de Suelos & Adecuación' },
-  { id: 'GRP-02', name: 'Siembra & Transplante' },
-  { id: 'GRP-03', name: 'Nutrición & Fertilización Edáfica/Foliar' },
-  { id: 'GRP-04', name: 'Control Fitosanitario (Plagas & Malezas)' },
-  { id: 'GRP-05', name: 'Riego, Drenajes & Balance Hídrico' },
-  { id: 'GRP-06', name: 'Cosecha, Recolección & Alce' }
+  { id: 'GRP-01', name: 'Preparación de Suelos & Adecuación', isDemo: true },
+  { id: 'GRP-02', name: 'Siembra & Transplante', isDemo: true },
+  { id: 'GRP-03', name: 'Nutrición & Fertilización Edáfica/Foliar', isDemo: true },
+  { id: 'GRP-04', name: 'Control Fitosanitario (Plagas & Malezas)', isDemo: true },
+  { id: 'GRP-05', name: 'Riego, Drenajes & Balance Hídrico', isDemo: true },
+  { id: 'GRP-06', name: 'Cosecha, Recolección & Alce', isDemo: true }
 ];
 
 export const initialCultivos = [
-  { id: 'CAN-01', codigo: 'CAN', name: 'Caña de Azúcar', estado: 'Activo', plantaId: 'PLN-01' },
-  { id: 'CAF-01', codigo: 'CAF', name: 'Café Arábica Especial', estado: 'Activo', plantaId: 'PLN-02' },
-  { id: 'AGU-01', codigo: 'AGU', name: 'Aguacate Hass', estado: 'Activo', plantaId: 'PLN-03' },
-  { id: 'PAL-01', codigo: 'PAL', name: 'Palma de Aceite', estado: 'Activo', plantaId: 'PLN-01' },
-  { id: 'MAI-01', codigo: 'MAI', name: 'Maíz Tecnificado', estado: 'Activo', plantaId: 'PLN-01' },
-  { id: 'ARR-01', codigo: 'ARR', name: 'Arroz de Riego', estado: 'Activo', plantaId: 'PLN-02' }
+  { id: 'CAN-01', codigo: 'CAN', name: 'Caña de Azúcar', estado: 'Activo', plantaId: 'PLN-01', isDemo: true },
+  { id: 'CAF-01', codigo: 'CAF', name: 'Café Arábica Especial', estado: 'Activo', plantaId: 'PLN-02', isDemo: true },
+  { id: 'AGU-01', codigo: 'AGU', name: 'Aguacate Hass', estado: 'Activo', plantaId: 'PLN-03', isDemo: true },
+  { id: 'PAL-01', codigo: 'PAL', name: 'Palma de Aceite', estado: 'Activo', plantaId: 'PLN-01', isDemo: true },
+  { id: 'MAI-01', codigo: 'MAI', name: 'Maíz Tecnificado', estado: 'Activo', plantaId: 'PLN-01', isDemo: true },
+  { id: 'ARR-01', codigo: 'ARR', name: 'Arroz de Riego', estado: 'Activo', plantaId: 'PLN-02', isDemo: true }
 ];
 
 export const initialActividades = [
@@ -571,7 +900,8 @@ export const initialActividades = [
     unidadProduccion: 'Hectáreas', 
     unidadMedida: 'Horas', 
     tarifaBase: 85.0, 
-    productosEstandar: [] 
+    productosEstandar: [],
+    isDemo: true
   },
   { 
     id: 'a2', 
@@ -584,7 +914,8 @@ export const initialActividades = [
     unidadProduccion: 'Hectáreas', 
     unidadMedida: 'Hectáreas', 
     tarifaBase: 35.0, 
-    productosEstandar: ['PROD-01', 'PROD-02', 'PROD-03'] 
+    productosEstandar: ['PROD-01', 'PROD-02', 'PROD-03'],
+    isDemo: true
   },
   { 
     id: 'a3', 
@@ -597,7 +928,8 @@ export const initialActividades = [
     unidadProduccion: 'Hectáreas', 
     unidadMedida: 'Hectáreas', 
     tarifaBase: 42.0, 
-    productosEstandar: ['PROD-05', 'PROD-08'] 
+    productosEstandar: ['PROD-05', 'PROD-08'],
+    isDemo: true
   },
   { 
     id: 'a4', 
@@ -610,7 +942,8 @@ export const initialActividades = [
     unidadProduccion: 'Hectáreas', 
     unidadMedida: 'Horas', 
     tarifaBase: 12.0, 
-    productosEstandar: [] 
+    productosEstandar: [],
+    isDemo: true
   },
   { 
     id: 'a5', 
@@ -623,7 +956,8 @@ export const initialActividades = [
     unidadProduccion: 'Toneladas', 
     unidadMedida: 'Toneladas', 
     tarifaBase: 6.8, 
-    productosEstandar: [] 
+    productosEstandar: [],
+    isDemo: true
   },
   { 
     id: 'a6', 
@@ -636,52 +970,53 @@ export const initialActividades = [
     unidadProduccion: 'Kilogramos', 
     unidadMedida: 'Jornales', 
     tarifaBase: 0.28, 
-    productosEstandar: [] 
+    productosEstandar: [],
+    isDemo: true
   }
 ];
 
 export const initialTiposProductos = [
-  { id: 'tp1', nombre: 'Fertilizantes Edáficos (NPK)' },
-  { id: 'tp2', nombre: 'Fertilizantes Foliares & Micronutrientes' },
-  { id: 'tp3', nombre: 'Insecticidas & Acaricidas' },
-  { id: 'tp4', nombre: 'Herbicidas Selectivos & No Selectivos' },
-  { id: 'tp5', nombre: 'Fungicidas & Biocontroladores' },
-  { id: 'tp6', nombre: 'Enmiendas & Acondicionadores de Suelo' },
-  { id: 'tp7', nombre: 'Bioestimulantes & Reguladores' }
+  { id: 'tp1', nombre: 'Fertilizantes Edáficos (NPK)', isDemo: true },
+  { id: 'tp2', nombre: 'Fertilizantes Foliares & Micronutrientes', isDemo: true },
+  { id: 'tp3', nombre: 'Insecticidas & Acaricidas', isDemo: true },
+  { id: 'tp4', nombre: 'Herbicidas Selectivos & No Selectivos', isDemo: true },
+  { id: 'tp5', nombre: 'Fungicidas & Biocontroladores', isDemo: true },
+  { id: 'tp6', nombre: 'Enmiendas & Acondicionadores de Suelo', isDemo: true },
+  { id: 'tp7', nombre: 'Bioestimulantes & Reguladores', isDemo: true }
 ];
 
 export const initialProductos = [
-  { id: 'PROD-01', nombre: 'Urea Granulada 46% Nitrógeno', tipoId: 'tp1', unidadMedida: 'KG', stockActual: 8500, costoUnitario: 2.45 },
-  { id: 'PROD-02', nombre: 'Fosfato Diamónico (DAP) 18-46-0', tipoId: 'tp1', unidadMedida: 'KG', stockActual: 6200, costoUnitario: 3.30 },
-  { id: 'PROD-03', nombre: 'Cloruro de Potasio (KCl) 60% K2O', tipoId: 'tp1', unidadMedida: 'KG', stockActual: 7400, costoUnitario: 2.85 },
-  { id: 'PROD-04', nombre: 'Glifosato 480 SL Herbicida Sistémico', tipoId: 'tp4', unidadMedida: 'Litros', stockActual: 1200, costoUnitario: 9.80 },
-  { id: 'PROD-05', nombre: 'Coragen (Clorantraniliprol 200 SC)', tipoId: 'tp3', unidadMedida: 'Litros', stockActual: 180, costoUnitario: 88.00 },
-  { id: 'PROD-06', nombre: 'Trichoderma harzianum Biocontrol', tipoId: 'tp5', unidadMedida: 'KG', stockActual: 320, costoUnitario: 24.50 },
-  { id: 'PROD-07', nombre: 'Cal Dolomita Enmienda Calcio-Magnesio', tipoId: 'tp6', unidadMedida: 'KG', stockActual: 15000, costoUnitario: 0.18 },
-  { id: 'PROD-08', nombre: 'Bioestimulante Algas Marinas + Aminoácidos', tipoId: 'tp7', unidadMedida: 'Litros', stockActual: 450, costoUnitario: 19.50 }
+  { id: 'PROD-01', codigo: 'PROD-01', nombre: 'Urea Granulada 46% Nitrógeno', tipoId: 'tp1', unidadMedida: 'KG', stockActual: 8500, costoUnitario: 2.45, isDemo: true },
+  { id: 'PROD-02', codigo: 'PROD-02', nombre: 'Fosfato Diamónico (DAP) 18-46-0', tipoId: 'tp1', unidadMedida: 'KG', stockActual: 6200, costoUnitario: 3.30, isDemo: true },
+  { id: 'PROD-03', codigo: 'PROD-03', nombre: 'Cloruro de Potasio (KCl) 60% K2O', tipoId: 'tp1', unidadMedida: 'KG', stockActual: 7400, costoUnitario: 2.85, isDemo: true },
+  { id: 'PROD-04', codigo: 'PROD-04', nombre: 'Glifosato 480 SL Herbicida Sistémico', tipoId: 'tp4', unidadMedida: 'Litros', stockActual: 1200, costoUnitario: 9.80, isDemo: true },
+  { id: 'PROD-05', codigo: 'PROD-05', nombre: 'Coragen (Clorantraniliprol 200 SC)', tipoId: 'tp3', unidadMedida: 'Litros', stockActual: 180, costoUnitario: 88.00, isDemo: true },
+  { id: 'PROD-06', codigo: 'PROD-06', nombre: 'Trichoderma harzianum Biocontrol', tipoId: 'tp5', unidadMedida: 'KG', stockActual: 320, costoUnitario: 24.50, isDemo: true },
+  { id: 'PROD-07', codigo: 'PROD-07', nombre: 'Cal Dolomita Enmienda Calcio-Magnesio', tipoId: 'tp6', unidadMedida: 'KG', stockActual: 15000, costoUnitario: 0.18, isDemo: true },
+  { id: 'PROD-08', codigo: 'PROD-08', nombre: 'Bioestimulante Algas Marinas + Aminoácidos', tipoId: 'tp7', unidadMedida: 'Litros', stockActual: 450, costoUnitario: 19.50, isDemo: true }
 ];
 
 export const initialTrabajadores = [
-  { id: 'TRAB-1', identificacion: '1144123456', nombre: 'Mauricio', apellido: 'Valencia', cargo: 'Ingeniero Agrónomo de Campo', estado: 'Activo', cuadrillaId: 'CUA-1' },
-  { id: 'TRAB-2', identificacion: '94567890', nombre: 'Heriberto', apellido: 'Caicedo', cargo: 'Operador Máster de Cosechadora', estado: 'Activo', cuadrillaId: 'CUA-1' },
-  { id: 'TRAB-3', identificacion: '1130987654', nombre: 'Julián', apellido: 'Rendón', cargo: 'Supervisor de Riego y Válvulas', estado: 'Activo', cuadrillaId: 'CUA-2' },
-  { id: 'TRAB-4', identificacion: '6677889900', nombre: 'Rosa', apellido: 'Guerrero', cargo: 'Líder de Cuadrilla de Cosecha', estado: 'Activo', cuadrillaId: 'CUA-3' },
-  { id: 'TRAB-5', identificacion: '3144556677', nombre: 'Alonso', apellido: 'Morales', cargo: 'Piloto Aplicador de Drone Agrícola', estado: 'Activo', cuadrillaId: 'CUA-2' }
+  { id: 'TRAB-1', identificacion: '1144123456', nombre: 'Mauricio', apellido: 'Valencia', cargo: 'Ingeniero Agrónomo de Campo', estado: 'Activo', cuadrillaId: 'CUA-1', isDemo: true },
+  { id: 'TRAB-2', identificacion: '94567890', nombre: 'Heriberto', apellido: 'Caicedo', cargo: 'Operador Máster de Cosechadora', estado: 'Activo', cuadrillaId: 'CUA-1', isDemo: true },
+  { id: 'TRAB-3', identificacion: '1130987654', nombre: 'Julián', apellido: 'Rendón', cargo: 'Supervisor de Riego y Válvulas', estado: 'Activo', cuadrillaId: 'CUA-2', isDemo: true },
+  { id: 'TRAB-4', identificacion: '6677889900', nombre: 'Rosa', apellido: 'Guerrero', cargo: 'Líder de Cuadrilla de Cosecha', estado: 'Activo', cuadrillaId: 'CUA-3', isDemo: true },
+  { id: 'TRAB-5', identificacion: '3144556677', nombre: 'Alonso', apellido: 'Morales', cargo: 'Piloto Aplicador de Drone Agrícola', estado: 'Activo', cuadrillaId: 'CUA-2', isDemo: true }
 ];
 
 export const initialCuadrillas = [
-  { id: 'CUA-1', nombre: 'Cuadrilla Mecanizada de Cosecha & Preparación', jefe: 'TRAB-2' },
-  { id: 'CUA-2', nombre: 'Cuadrilla Técnica de Riego & Drones', jefe: 'TRAB-5' },
-  { id: 'CUA-3', nombre: 'Cuadrilla de Labores Manuales & Recolección', jefe: 'TRAB-4' }
+  { id: 'CUA-1', nombre: 'Cuadrilla Mecanizada de Cosecha & Preparación', jefe: 'TRAB-2', isDemo: true },
+  { id: 'CUA-2', nombre: 'Cuadrilla Técnica de Riego & Drones', jefe: 'TRAB-5', isDemo: true },
+  { id: 'CUA-3', nombre: 'Cuadrilla de Labores Manuales & Recolección', jefe: 'TRAB-4', isDemo: true }
 ];
 
 export const initialMaquinaria = [
-  { id: 'TRAC-01', name: 'Tractor John Deere 8320R (320 HP)', tipoId: 'tm1', status: 'Operativo', propiaAlquilada: 'Propia', tarifa: 85, horometroActual: 2450.5, ultimoMantenimientoHoras: 2300, frecuenciaMantenimiento: 250 },
-  { id: 'TRAC-02', name: 'Tractor Massey Ferguson 6713 (130 HP)', tipoId: 'tm1', status: 'Operativo', propiaAlquilada: 'Propia', tarifa: 48, horometroActual: 1890.0, ultimoMantenimientoHoras: 1750, frecuenciaMantenimiento: 250 },
-  { id: 'COS-01', name: 'Cosechadora de Caña Case IH Austoft 8810', tipoId: 'tm2', status: 'Operativo', propiaAlquilada: 'Propia', tarifa: 165, horometroActual: 3120.0, ultimoMantenimientoHoras: 3000, frecuenciaMantenimiento: 200 },
-  { id: 'FUM-01', name: 'Fumigadora Autopropulsada John Deere 4730', tipoId: 'tm3', status: 'Operativo', propiaAlquilada: 'Propia', tarifa: 78, horometroActual: 1420.0, ultimoMantenimientoHoras: 1350, frecuenciaMantenimiento: 250 },
-  { id: 'DRN-01', name: 'Drone Agrícola DJI Agras T40 Multiespectral', tipoId: 'tm3', status: 'Operativo', propiaAlquilada: 'Propia', tarifa: 55, horometroActual: 430.0, ultimoMantenimientoHoras: 400, frecuenciaMantenimiento: 100 },
-  { id: 'VAG-01', name: 'Vagón Volquete Cañero 12T (Tándem)', tipoId: 'tm4', status: 'Operativo', propiaAlquilada: 'Propia', tarifa: 22, horometroActual: 0, ultimoMantenimientoHoras: 0, frecuenciaMantenimiento: 500 }
+  { id: 'TRAC-01', codigo: 'TRAC-01', name: 'Tractor John Deere 8320R (320 HP)', tipoId: 'tm1', status: 'Operativo', propiaAlquilada: 'Propia', tarifa: 85, horometroActual: 2450.5, ultimoMantenimientoHoras: 2300, frecuenciaMantenimiento: 250, isDemo: true },
+  { id: 'TRAC-02', codigo: 'TRAC-02', name: 'Tractor Massey Ferguson 6713 (130 HP)', tipoId: 'tm1', status: 'Operativo', propiaAlquilada: 'Propia', tarifa: 48, horometroActual: 1890.0, ultimoMantenimientoHoras: 1750, frecuenciaMantenimiento: 250, isDemo: true },
+  { id: 'COS-01', codigo: 'COS-01', name: 'Cosechadora de Caña Case IH Austoft 8810', tipoId: 'tm2', status: 'Operativo', propiaAlquilada: 'Propia', tarifa: 165, horometroActual: 3120.0, ultimoMantenimientoHoras: 3000, frecuenciaMantenimiento: 200, isDemo: true },
+  { id: 'FUM-01', codigo: 'FUM-01', name: 'Fumigadora Autopropulsada John Deere 4730', tipoId: 'tm3', status: 'Operativo', propiaAlquilada: 'Propia', tarifa: 78, horometroActual: 1420.0, ultimoMantenimientoHoras: 1350, frecuenciaMantenimiento: 250, isDemo: true },
+  { id: 'DRN-01', codigo: 'DRN-01', name: 'Drone Agrícola DJI Agras T40 Multiespectral', tipoId: 'tm3', status: 'Operativo', propiaAlquilada: 'Propia', tarifa: 55, horometroActual: 430.0, ultimoMantenimientoHoras: 400, frecuenciaMantenimiento: 100, isDemo: true },
+  { id: 'VAG-01', codigo: 'VAG-01', name: 'Vagón Volquete Cañero 12T (Tándem)', tipoId: 'tm4', status: 'Operativo', propiaAlquilada: 'Propia', tarifa: 22, horometroActual: 0, ultimoMantenimientoHoras: 0, frecuenciaMantenimiento: 500, isDemo: true }
 ];
 
 export const initialUnidades = [
@@ -703,12 +1038,13 @@ export const emptyTiposMaquinaria = [
   { id: 'tm5', nombre: 'Alzadora Hidráulica' },
   { id: 'tm6', nombre: 'Implemento (Rastra/Subsolador)' }
 ];
+export const initialTiposMaquinaria = emptyTiposMaquinaria;
 
 export const initialProveedores = [
-  { id: 'PROV-1', nombre: 'Yara Colombia S.A. (Nutrición Vegetal)', tipo: 'Materia Prima', contacto: 'Andrés Morales', telefono: '+57 310 445 6789', email: 'contacto@yara.com', estado: 'Activo' },
-  { id: 'PROV-2', nombre: 'Syngenta & FMC Agroquímica', tipo: 'Materia Prima', contacto: 'Laura Gómez', telefono: '+57 315 889 1234', email: 'ventas@syngenta.com', estado: 'Activo' },
-  { id: 'PROV-3', nombre: 'Casa Toro John Deere (Maquinaria & Repuestos)', tipo: 'Servicios', contacto: 'Camilo Rodríguez', telefono: '+57 318 900 4567', email: 'repuestos@casatoro.com', estado: 'Activo' },
-  { id: 'PROV-4', nombre: 'AgroAéreo Drones de Colombia', tipo: 'Ambos', contacto: 'Diana Castro', telefono: '+57 301 223 9988', email: 'operaciones@agroaereo.co', estado: 'Activo' }
+  { id: 'PROV-1', nombre: 'Yara Colombia S.A. (Nutrición Vegetal)', tipo: 'Materia Prima', contacto: 'Andrés Morales', telefono: '+57 310 445 6789', email: 'contacto@yara.com', estado: 'Activo', isDemo: true },
+  { id: 'PROV-2', nombre: 'Syngenta & FMC Agroquímica', tipo: 'Materia Prima', contacto: 'Laura Gómez', telefono: '+57 315 889 1234', email: 'ventas@syngenta.com', estado: 'Activo', isDemo: true },
+  { id: 'PROV-3', nombre: 'Casa Toro John Deere (Maquinaria & Repuestos)', tipo: 'Servicios', contacto: 'Camilo Rodríguez', telefono: '+57 318 900 4567', email: 'repuestos@casatoro.com', estado: 'Activo', isDemo: true },
+  { id: 'PROV-4', nombre: 'AgroAéreo Drones de Colombia', tipo: 'Ambos', contacto: 'Diana Castro', telefono: '+57 301 223 9988', email: 'operaciones@agroaereo.co', estado: 'Activo', isDemo: true }
 ];
 
 export const emptyControlesAgro = [
@@ -716,6 +1052,7 @@ export const emptyControlesAgro = [
     id: 'c1', 
     nombre: 'Evaluación de Barrenador (Diatraea spp.) en Caña',
     cultivo: 'Caña de Azúcar',
+    isDemo: true,
     variables: [
       { id: 'v1', nombre: 'Porcentaje de Intensidad de Infestación (%)', tipo: 'numérico', min: 0, max: 100, rangos: [
         { min: 0, max: 2.5, mensaje: 'Nivel Seguro / Aceptable', color: '#10B981' },
@@ -729,6 +1066,7 @@ export const emptyControlesAgro = [
     id: 'c2', 
     nombre: 'Monitoreo de Roya y Broca en Café',
     cultivo: 'Café Arábica Especial',
+    isDemo: true,
     variables: [
       { id: 'v3', nombre: 'Incidencia de Broca en Fruto (%)', tipo: 'numérico', min: 0, max: 100, rangos: [
         { min: 0, max: 2.0, mensaje: 'Bajo Control (<2%)', color: '#10B981' },

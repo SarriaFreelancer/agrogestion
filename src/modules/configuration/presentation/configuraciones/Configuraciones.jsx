@@ -38,8 +38,24 @@ import {
   Clock,
   Shield,
   Lock,
-  Activity
+  Activity,
+  FilterX
 } from 'lucide-react';
+import { 
+  initialData, 
+  initialGrupos, 
+  initialCultivos, 
+  initialActividades, 
+  initialTiposProductos, 
+  initialProductos, 
+  initialTrabajadores, 
+  initialCuadrillas, 
+  initialMaquinaria, 
+  initialProveedores,
+  initialTiposMaquinaria,
+  initialUnidades,
+  emptyControlesAgro
+} from '@/providers/mocks';
 
 export default function Configuraciones() {
   const { 
@@ -90,6 +106,29 @@ export default function Configuraciones() {
   const showToast = (msg) => {
     setToastMessage(msg);
     setTimeout(() => setToastMessage(''), 4000);
+  };
+
+  // Session timeout state
+  const [sessionTimeoutMins, setSessionTimeoutMins] = useState(() => {
+    try {
+      const saved = localStorage.getItem('agro_session_timeout_mins');
+      return saved ? parseInt(saved, 10) : 15;
+    } catch {
+      return 15;
+    }
+  });
+
+  const handleTimeoutChange = (newMins) => {
+    setSessionTimeoutMins(newMins);
+    localStorage.setItem('agro_session_timeout_mins', String(newMins));
+    showToast(`Tiempo de inactividad establecido en ${newMins} minutos.`);
+    if (addAuditLog) {
+      addAuditLog({
+        usuario: currentUser?.nombre || 'Administrador',
+        accion: `Cambio de política de sesión: Inactividad a ${newMins} min`,
+        modulo: 'Seguridad'
+      });
+    }
   };
 
   const isEnabled = (val) => Number(val) === 1;
@@ -273,263 +312,31 @@ export default function Configuraciones() {
   // ── GENERADOR DE DATOS DE PRUEBA REALES ──────────────────────────────
   const handleLoadFullDemoData = () => {
     // 1. Cultivos
-    const demoCultivos = [
-      { id: 'CUL-01', code: 'CUL-01', codigo: 'CUL-01', name: 'Caña de Azúcar', nombre: 'Caña de Azúcar', tipo: 'Gramínea Industrial', ciclo: '12-14 Meses', variedad: 'CC 01-1940 / CC 85-92', estado: 'Activo', activo: true, descripcion: 'Variedades Cenicaña de alto rendimiento en sacarosa' },
-      { id: 'CUL-02', code: 'CUL-02', codigo: 'CUL-02', name: 'Aguacate Hass', nombre: 'Aguacate Hass', tipo: 'Frutal Perenne', ciclo: 'Permanente', variedad: 'Hass Criollo Export', estado: 'Activo', activo: true, descripcion: 'Cultivo para exportación con certificación GlobalGAP' },
-      { id: 'CUL-03', code: 'CUL-03', codigo: 'CUL-03', name: 'Café Especial', nombre: 'Café Especial', tipo: 'Arábica Suave', ciclo: 'Permanente', variedad: 'Castillo Naranjal / Cenicafé 1', estado: 'Activo', activo: true, descripcion: 'Variedades Castillo y Cenicafé 1 resistentes a roya' },
-      { id: 'CUL-04', code: 'CUL-04', codigo: 'CUL-04', name: 'Palma de Aceite', nombre: 'Palma de Aceite', tipo: 'Oleaginosa', ciclo: 'Permanente', variedad: 'Híbrido OxG Coari x La Mé', estado: 'Activo', activo: true, descripcion: 'Híbridos OxG con alta tasa de extracción de aceite' },
-      { id: 'CUL-05', code: 'CUL-05', codigo: 'CUL-05', name: 'Cacao Fino y de Aroma', nombre: 'Cacao Fino y de Aroma', tipo: 'Frutal Agroforestal', ciclo: 'Permanente', variedad: 'CCN-51 / TCH-565', estado: 'Activo', activo: true, descripcion: 'Variedades seleccionadas CCN-51 y clones regionales' },
-      { id: 'CUL-06', code: 'CUL-06', codigo: 'CUL-06', name: 'Maíz Tecnificado', nombre: 'Maíz Tecnificado', tipo: 'Cereal / Grano', ciclo: '4 Meses', variedad: 'Híbrido Pioneer P30F35', estado: 'Activo', activo: true, descripcion: 'Híbridos de alta densidad y rotación de suelos' }
-    ];
+    const demoCultivos = initialCultivos;
 
     // 2. Grupos de Actividades
-    const demoGrupos = [
-      { id: 'GRP-01', code: 'GRP-01', codigo: 'GRP-01', name: 'Adecuación y Preparación de Suelos', nombre: 'Adecuación y Preparación de Suelos', descripcion: 'Arada profunda, subsolado, rastrillado y caballoneo', estado: 'Activo' },
-      { id: 'GRP-02', code: 'GRP-02', codigo: 'GRP-02', name: 'Siembra y Establecimiento', nombre: 'Siembra y Establecimiento', descripcion: 'Trazado, ahoyado, desinfección de semilla y siembra', estado: 'Activo' },
-      { id: 'GRP-03', code: 'GRP-03', codigo: 'GRP-03', name: 'Nutrición Vegetal y Fertilización', nombre: 'Nutrición Vegetal y Fertilización', descripcion: 'Fertilización edáfica en corona, drench y aplicaciones foliares', estado: 'Activo' },
-      { id: 'GRP-04', code: 'GRP-04', codigo: 'GRP-04', name: 'Manejo Integrado Fitosanitario (MIPE)', nombre: 'Manejo Integrado Fitosanitario (MIPE)', descripcion: 'Control químico y biológico de plagas, malezas y patógenos', estado: 'Activo' },
-      { id: 'GRP-05', code: 'GRP-05', codigo: 'GRP-05', name: 'Labores Culturales y Mantenimiento', nombre: 'Labores Culturales y Mantenimiento', descripcion: 'Podas de aclareo, deschuponado, plateos y desyerbes', estado: 'Activo' },
-      { id: 'GRP-06', code: 'GRP-06', codigo: 'GRP-06', name: 'Riego, Drenaje y Manejo Hídrico', nombre: 'Riego, Drenaje y Manejo Hídrico', descripcion: 'Operación de fertirriego por goteo, compuertas y purga de líneas', estado: 'Activo' },
-      { id: 'GRP-07', code: 'GRP-07', codigo: 'GRP-07', name: 'Cosecha, Recolección y Alce', nombre: 'Cosecha, Recolección y Alce', descripcion: 'Corte manual, cosecha mecanizada y cargue a transporte', estado: 'Activo' },
-      { id: 'GRP-08', code: 'GRP-08', codigo: 'GRP-08', name: 'Postcosecha, Beneficio y Despacho', nombre: 'Postcosecha, Beneficio y Despacho', descripcion: 'Lavado, clasificación, empaque y despacho a báscula', estado: 'Activo' }
-    ];
+    const demoGrupos = initialGrupos;
 
-    // 3. Actividades Maestras (Con todos los campos de ActividadesTab)
-    const demoActividades = [
-      { 
-        id: 'ACT-01', code: 'ACT-01', codigo: 'ACT-01',
-        name: 'Arada profunda con cincel vibratorio', nombre: 'Arada profunda con cincel vibratorio',
-        groupId: 'GRP-01', grupo: 'Adecuación y Preparación de Suelos',
-        cultivo: 'Caña de Azúcar', tipo: 'Mecánica', clasificacion: 'Labores de siembra',
-        unidadProduccion: 'Hectáreas', unidadMedida: 'Hectáreas', unidad: 'Ha',
-        tarifaBase: 130000, costoBase: 130000,
-        estado: 'Activo', activo: true, productosEstandar: []
-      },
-      { 
-        id: 'ACT-02', code: 'ACT-02', codigo: 'ACT-02',
-        name: 'Rastrillado y nivelación láser', nombre: 'Rastrillado y nivelación láser',
-        groupId: 'GRP-01', grupo: 'Adecuación y Preparación de Suelos',
-        cultivo: 'Caña de Azúcar', tipo: 'Mecánica', clasificacion: 'Labores de siembra',
-        unidadProduccion: 'Hectáreas', unidadMedida: 'Hectáreas', unidad: 'Ha',
-        tarifaBase: 95000, costoBase: 95000,
-        estado: 'Activo', activo: true, productosEstandar: []
-      },
-      { 
-        id: 'ACT-03', code: 'ACT-03', codigo: 'ACT-03',
-        name: 'Siembra manual de esquejes con semilla tratada', nombre: 'Siembra manual de esquejes con semilla tratada',
-        groupId: 'GRP-02', grupo: 'Siembra y Establecimiento',
-        cultivo: 'Caña de Azúcar', tipo: 'Manual', clasificacion: 'Labores de siembra',
-        unidadProduccion: 'Hectáreas', unidadMedida: 'Hectáreas', unidad: 'Ha',
-        tarifaBase: 160000, costoBase: 160000,
-        estado: 'Activo', activo: true, productosEstandar: []
-      },
-      { 
-        id: 'ACT-04', code: 'ACT-04', codigo: 'ACT-04',
-        name: 'Siembra en hoyos con micorrizas y compost', nombre: 'Siembra en hoyos con micorrizas y compost',
-        groupId: 'GRP-02', grupo: 'Siembra y Establecimiento',
-        cultivo: 'Aguacate Hass', tipo: 'Manual', clasificacion: 'Labores de siembra',
-        unidadProduccion: 'Plantas', unidadMedida: 'Plantas', unidad: 'Planta',
-        tarifaBase: 3500, costoBase: 3500,
-        estado: 'Activo', activo: true, productosEstandar: []
-      },
-      { 
-        id: 'ACT-05', code: 'ACT-05', codigo: 'ACT-05',
-        name: 'Fertilización edáfica mayor (NPK) mecanizada', nombre: 'Fertilización edáfica mayor (NPK) mecanizada',
-        groupId: 'GRP-03', grupo: 'Nutrición Vegetal y Fertilización',
-        cultivo: 'Todos', tipo: 'Mecánica', clasificacion: 'Aplicación de fertilizantes',
-        unidadProduccion: 'Hectáreas', unidadMedida: 'Hectáreas', unidad: 'Ha',
-        tarifaBase: 70000, costoBase: 70000,
-        estado: 'Activo', activo: true, productosEstandar: []
-      },
-      { 
-        id: 'ACT-06', code: 'ACT-06', codigo: 'ACT-06',
-        name: 'Aplicación foliar de microelementos y boro-zinc', nombre: 'Aplicación foliar de microelementos y boro-zinc',
-        groupId: 'GRP-03', grupo: 'Nutrición Vegetal y Fertilización',
-        cultivo: 'Café Especial', tipo: 'Mixta', clasificacion: 'Aplicación de fertilizantes',
-        unidadProduccion: 'Hectáreas', unidadMedida: 'Hectáreas', unidad: 'Ha',
-        tarifaBase: 80000, costoBase: 80000,
-        estado: 'Activo', activo: true, productosEstandar: []
-      },
-      { 
-        id: 'ACT-07', code: 'ACT-07', codigo: 'ACT-07',
-        name: 'Control fitosanitario para Diatraea saccharalis', nombre: 'Control fitosanitario para Diatraea saccharalis',
-        groupId: 'GRP-04', grupo: 'Manejo Integrado Fitosanitario (MIPE)',
-        cultivo: 'Caña de Azúcar', tipo: 'Manual', clasificacion: 'Aplicación de insumos',
-        unidadProduccion: 'Hectáreas', unidadMedida: 'Hectáreas', unidad: 'Ha',
-        tarifaBase: 95000, costoBase: 95000,
-        estado: 'Activo', activo: true, productosEstandar: []
-      },
-      { 
-        id: 'ACT-08', code: 'ACT-08', codigo: 'ACT-08',
-        name: 'Tratamiento fitosanitario contra Phytophthora', nombre: 'Tratamiento fitosanitario contra Phytophthora',
-        groupId: 'GRP-04', grupo: 'Manejo Integrado Fitosanitario (MIPE)',
-        cultivo: 'Aguacate Hass', tipo: 'Manual', clasificacion: 'Aplicación de insumos',
-        unidadProduccion: 'Plantas', unidadMedida: 'Plantas', unidad: 'Planta',
-        tarifaBase: 2900, costoBase: 2900,
-        estado: 'Activo', activo: true, productosEstandar: []
-      },
-      { 
-        id: 'ACT-09', code: 'ACT-09', codigo: 'ACT-09',
-        name: 'Poda sanitaria de aclareo y formación', nombre: 'Poda sanitaria de aclareo y formación',
-        groupId: 'GRP-05', grupo: 'Labores Culturales y Mantenimiento',
-        cultivo: 'Aguacate Hass', tipo: 'Manual', clasificacion: 'N/A',
-        unidadProduccion: 'Plantas', unidadMedida: 'Plantas', unidad: 'Planta',
-        tarifaBase: 3200, costoBase: 3200,
-        estado: 'Activo', activo: true, productosEstandar: []
-      },
-      { 
-        id: 'ACT-10', code: 'ACT-10', codigo: 'ACT-10',
-        name: 'Desyerbe manual y plateo con azadón', nombre: 'Desyerbe manual y plateo con azadón',
-        groupId: 'GRP-05', grupo: 'Labores Culturales y Mantenimiento',
-        cultivo: 'Café Especial', tipo: 'Manual', clasificacion: 'N/A',
-        unidadProduccion: 'Hectáreas', unidadMedida: 'Jornales', unidad: 'Jor',
-        tarifaBase: 58000, costoBase: 58000,
-        estado: 'Activo', activo: true, productosEstandar: []
-      },
-      { 
-        id: 'ACT-11', code: 'ACT-11', codigo: 'ACT-11',
-        name: 'Mantenimiento y purga de líneas de goteo', nombre: 'Mantenimiento y purga de líneas de goteo',
-        groupId: 'GRP-06', grupo: 'Riego, Drenaje y Manejo Hídrico',
-        cultivo: 'Todos', tipo: 'Manual', clasificacion: 'Riego',
-        unidadProduccion: 'Hectáreas', unidadMedida: 'Horas', unidad: 'Hr',
-        tarifaBase: 45000, costoBase: 45000,
-        estado: 'Activo', activo: true, productosEstandar: []
-      },
-      { 
-        id: 'ACT-12', code: 'ACT-12', codigo: 'ACT-12',
-        name: 'Corte de caña y alce mecanizado a vagón', nombre: 'Corte de caña y alce mecanizado a vagón',
-        groupId: 'GRP-07', grupo: 'Cosecha, Recolección y Alce',
-        cultivo: 'Caña de Azúcar', tipo: 'Mecánica', clasificacion: 'Corte',
-        unidadProduccion: 'Toneladas', unidadMedida: 'Toneladas', unidad: 'Ton',
-        tarifaBase: 34000, costoBase: 34000,
-        estado: 'Activo', activo: true, productosEstandar: []
-      }
-    ];
+    // 3. Actividades Maestras
+    const demoActividades = initialActividades;
 
     // 4. Proveedores
-    const demoProveedores = [
-      { id: 'PROV-01', codigo: 'PROV-01', name: 'Monómeros Colombo Venezolanos S.A.', nombre: 'Monómeros Colombo Venezolanos S.A.', nit: '890101234-5', tipo: 'Materia Prima', categoria: 'Fertilizantes y Nutrición', contacto: 'Ing. Roberto Mendoza', telefono: '(605) 3718000', email: 'ventas@monomeros.com.co', estado: 'Activo', activo: true },
-      { id: 'PROV-02', codigo: 'PROV-02', name: 'Yara Colombia S.A.S.', nombre: 'Yara Colombia S.A.S.', nit: '860002345-1', tipo: 'Materia Prima', categoria: 'Nutrición de Precisión', contacto: 'Dra. Claudia Benítez', telefono: '(602) 6902000', email: 'servicio.cliente@yara.com', estado: 'Activo', activo: true },
-      { id: 'PROV-03', codigo: 'PROV-03', name: 'Syngenta Crop Protection', nombre: 'Syngenta Crop Protection', nit: '830056789-2', tipo: 'Materia Prima', categoria: 'Protección de Cultivos', contacto: 'Dr. Fernando Salazar', telefono: '(601) 6589000', email: 'agro.colombia@syngenta.com', estado: 'Activo', activo: true },
-      { id: 'PROV-04', codigo: 'PROV-04', name: 'Bayer CropScience Colombia', nombre: 'Bayer CropScience Colombia', nit: '860001928-3', tipo: 'Materia Prima', categoria: 'Bioinsumos y Fitosanitarios', contacto: 'Ing. Marcela Pardo', telefono: '(604) 4443210', email: 'bayer.agrotech@bayer.com', estado: 'Activo', activo: true },
-      { id: 'PROV-05', codigo: 'PROV-05', name: 'Casa Toro Automotriz (John Deere)', nombre: 'Casa Toro Automotriz (John Deere)', nit: '860004567-8', tipo: 'Maquinaria y Servicios', categoria: 'Tractores y Repuestos', contacto: 'Juan Camilo Ortiz', telefono: '(602) 2859000', email: 'maquinaria@casatoro.com', estado: 'Activo', activo: true },
-      { id: 'PROV-06', codigo: 'PROV-06', name: 'Jacto Colombia & Equipos de Riego', nombre: 'Jacto Colombia & Equipos de Riego', nit: '900123987-4', tipo: 'Maquinaria y Servicios', categoria: 'Pulverizadoras y Tecnología', contacto: 'Gustavo Echeverri', telefono: '(602) 2254321', email: 'ventas@jactocolombia.com', estado: 'Activo', activo: true }
-    ];
+    const demoProveedores = initialProveedores;
 
-    // 5. Controles Agronómicos (Con variables completas y rangos para ControlesTab)
-    const demoControles = [
-      { 
-        id: 'CTRL-01', codigo: 'CTRL-01',
-        name: 'Diatraea saccharalis (Barrenador del Tallo)', nombre: 'Diatraea saccharalis (Barrenador del Tallo)',
-        tipo: 'Plaga', cultivo: 'Caña de Azúcar', frecuencia: 'Semanal', activo: true, estado: 'Activo',
-        descripcion: 'Monitoreo de entrenudos perforados y presencia de larvas en tallos de caña.',
-        variables: [
-          {
-            id: 'VAR-01', nombre: 'Porcentaje de Entrenudos Barrenados', tipo: 'numérico', unidad: '% Incidencia',
-            descripcion: 'Evaluación de 100 tallos al azar', requerida: true, sumarMuestras: false,
-            rangos: [
-              { id: 'RNG-01', min: 0, max: 3, mensaje: 'Bajo / Nivel Seguro', color: '#10b981' },
-              { id: 'RNG-02', min: 3.1, max: 6, mensaje: 'Moderado / Alerta Fitosanitaria', color: '#f59e0b' },
-              { id: 'RNG-03', min: 6.1, max: 100, mensaje: 'Crítico / Aplicar Control', color: '#ef4444' }
-            ]
-          }
-        ]
-      },
-      { 
-        id: 'CTRL-02', codigo: 'CTRL-02',
-        name: 'Mahanarva andicola (Salivazo de la Caña)', nombre: 'Mahanarva andicola (Salivazo de la Caña)',
-        tipo: 'Plaga', cultivo: 'Caña de Azúcar', frecuencia: 'Quincenal', activo: true, estado: 'Activo',
-        descripcion: 'Conteo de ninfas con espuma en la base del tallo y adultos en follaje.',
-        variables: [
-          {
-            id: 'VAR-02', nombre: 'Ninfas por Tallo', tipo: 'numérico', unidad: 'Ninfas/Tallo',
-            descripcion: 'Conteo en base de macollas', requerida: true, sumarMuestras: false,
-            rangos: [
-              { id: 'RNG-04', min: 0, max: 1, mensaje: 'Control Normal', color: '#10b981' },
-              { id: 'RNG-05', min: 1.1, max: 3, mensaje: 'Alerta / Preparar Aplicación', color: '#f59e0b' },
-              { id: 'RNG-06', min: 3.1, max: 50, mensaje: 'Daño Económico Inminente', color: '#ef4444' }
-            ]
-          }
-        ]
-      },
-      { 
-        id: 'CTRL-03', codigo: 'CTRL-03',
-        name: 'Phytophthora cinnamomi (Tristeza del Aguacate)', nombre: 'Phytophthora cinnamomi (Tristeza del Aguacate)',
-        tipo: 'Enfermedad', cultivo: 'Aguacate Hass', frecuencia: 'Semanal', activo: true, estado: 'Activo',
-        descripcion: 'Inspección de clorosis foliar, muerte descendente y necrosis radicular.',
-        variables: [
-          {
-            id: 'VAR-03', nombre: 'Árboles Afectados por Lote', tipo: 'numérico', unidad: 'Árboles',
-            descripcion: 'Árboles con síntomas de marchitez', requerida: true, sumarMuestras: true,
-            rangos: [
-              { id: 'RNG-07', min: 0, max: 0, mensaje: 'Lote Sano', color: '#10b981' },
-              { id: 'RNG-08', min: 1, max: 3, mensaje: 'Foco Inicial / Aislar', color: '#f59e0b' },
-              { id: 'RNG-09', min: 4, max: 500, mensaje: 'Epidemia / Inyectar Fosfito', color: '#ef4444' }
-            ]
-          }
-        ]
-      },
-      { 
-        id: 'CTRL-04', codigo: 'CTRL-04',
-        name: 'Hemileia vastatrix (Roya del Cafeto)', nombre: 'Hemileia vastatrix (Roya del Cafeto)',
-        tipo: 'Enfermedad', cultivo: 'Café Especial', frecuencia: 'Mensual', activo: true, estado: 'Activo',
-        descripcion: 'Monitoreo de pústulas anaranjadas en el envés de hojas de ramas intermedias.',
-        variables: [
-          {
-            id: 'VAR-04', nombre: 'Incidencia de Hojas con Roya', tipo: 'numérico', unidad: '% Hojas',
-            descripcion: 'Muestra de 30 ramas por lote', requerida: true, sumarMuestras: false,
-            rangos: [
-              { id: 'RNG-10', min: 0, max: 5, mensaje: 'Baja Incidencia', color: '#10b981' },
-              { id: 'RNG-11', min: 5.1, max: 10, mensaje: 'Umbral Económico', color: '#f59e0b' },
-              { id: 'RNG-12', min: 10.1, max: 100, mensaje: 'Severo / Aplicar Fungicida', color: '#ef4444' }
-            ]
-          }
-        ]
-      }
-    ];
+    // 5. Controles Agronómicos
+    const demoControles = emptyControlesAgro;
 
     // 6. Tipos de Maquinaria
-    const demoTiposMaquinaria = [
-      { id: 'TMAQ-01', name: 'Tractor Agrícola Doble Tracción (4WD)', nombre: 'Tractor Agrícola Doble Tracción (4WD)', descripcion: 'Tractores de 100 a 160 HP para labores pesadas de arada y siembra', estado: 'Activo' },
-      { id: 'TMAQ-02', name: 'Tractor Utilitario Estándar (2WD)', nombre: 'Tractor Utilitario Estándar (2WD)', descripcion: 'Tractores de 75 a 90 HP para transporte, fumigación y fertilización', estado: 'Activo' },
-      { id: 'TMAQ-03', name: 'Cosechadora Combinada Autopropulsada', nombre: 'Cosechadora Combinada Autopropulsada', descripcion: 'Cosechadoras integrales de caña y granos con picador de paja', estado: 'Activo' },
-      { id: 'TMAQ-04', name: 'Pulverizadora Autopropulsada de Botalón', nombre: 'Pulverizadora Autopropulsada de Botalón', descripcion: 'Equipos hidrostáticos de alto despeje para fumigación de precisión', estado: 'Activo' },
-      { id: 'TMAQ-05', name: 'Alce y Cargador Frontal de Caña', nombre: 'Alce y Cargador Frontal de Caña', descripcion: 'Equipos hidráulicos para levantamiento de caña en campo', estado: 'Activo' },
-      { id: 'TMAQ-06', name: 'Aperos de Preparación (Rastra/Subsolador)', nombre: 'Aperos de Preparación (Rastra/Subsolador)', descripcion: 'Implementos de tiro acoplados al enganche de tres puntos', estado: 'Activo' },
-      { id: 'TMAQ-07', name: 'Vagón Cañero y Remolque Basculante', nombre: 'Vagón Cañero y Remolque Basculante', descripcion: 'Vagones de volteo lateral para transporte de cosecha', estado: 'Activo' }
-    ];
+    const demoTiposMaquinaria = initialTiposMaquinaria;
 
     // 7. Cuadrillas
-    const demoCuadrillas = [
-      { id: 'CUAD-01', name: 'Cuadrilla Mecanizada Occidente', nombre: 'Cuadrilla Mecanizada Occidente', lider: 'Carlos Andrés Restrepo', integrantes: 6, especialidad: 'Operación de Tractores y Cosechadoras', estado: 'Activo' },
-      { id: 'CUAD-02', name: 'Cuadrilla Sanidad Vegetal & MIPE', nombre: 'Cuadrilla Sanidad Vegetal & MIPE', lider: 'María Eugenia Gómez', integrantes: 8, especialidad: 'Monitoreo y Aplicaciones Fitosanitarias', estado: 'Activo' },
-      { id: 'CUAD-03', name: 'Cuadrilla de Riego y Drenaje', nombre: 'Cuadrilla de Riego y Drenaje', lider: 'Luis Fernando Mosquera', integrantes: 5, especialidad: 'Operación de Válvulas y Fertirriego', estado: 'Activo' },
-      { id: 'CUAD-04', name: 'Cuadrilla Técnica de Podas y Labores', nombre: 'Cuadrilla Técnica de Podas y Labores', lider: 'Jorge Iván Caicedo', integrantes: 10, especialidad: 'Podas de Formación y Labores Manuales', estado: 'Activo' },
-      { id: 'CUAD-05', name: 'Cuadrilla de Corte y Recolección', nombre: 'Cuadrilla de Corte y Recolección', lider: 'Hernando Mina', integrantes: 15, especialidad: 'Corte Selectivo y Cosecha', estado: 'Activo' }
-    ];
+    const demoCuadrillas = initialCuadrillas;
 
     // 8. Unidades de Medida
-    const demoUnidades = [
-      { id: 'Ha', name: 'Hectárea', nombre: 'Hectárea', simbolo: 'Ha', tipo: 'Superficie', estado: 'Activo' },
-      { id: 'Kg', name: 'Kilogramo', nombre: 'Kilogramo', simbolo: 'Kg', tipo: 'Masa / Peso', estado: 'Activo' },
-      { id: 'Ton', name: 'Tonelada Métrica', nombre: 'Tonelada Métrica', simbolo: 'Ton', tipo: 'Masa / Peso', estado: 'Activo' },
-      { id: 'Litros', name: 'Litro', nombre: 'Litro', simbolo: 'L', tipo: 'Volumen Líquido', estado: 'Activo' },
-      { id: 'Hr', name: 'Hora Máquina', nombre: 'Hora Máquina', simbolo: 'Hr', tipo: 'Tiempo Operativo', estado: 'Activo' },
-      { id: 'Jor', name: 'Jornal Laboral', nombre: 'Jornal Laboral', simbolo: 'Jor', tipo: 'Trabajo / Nómina', estado: 'Activo' },
-      { id: 'Planta', name: 'Planta / Árbol', nombre: 'Planta / Árbol', simbolo: 'Plt', tipo: 'Unidad Biológica', estado: 'Activo' },
-      { id: 'Bulto', name: 'Bulto (50 Kg)', nombre: 'Bulto (50 Kg)', simbolo: 'Blto', tipo: 'Empaque', estado: 'Activo' }
-    ];
+    const demoUnidades = initialUnidades;
 
     // 9. Tipos de Productos
-    const demoTiposProductos = [
-      { id: 'TP-01', name: 'Fertilizantes Químicos Mayores (NPK)', nombre: 'Fertilizantes Químicos Mayores (NPK)', descripcion: 'Fuentes edáficas de Nitrógeno, Fósforo y Potasio', estado: 'Activo' },
-      { id: 'TP-02', name: 'Fertilizantes Foliares y Quelatos', nombre: 'Fertilizantes Foliares y Quelatos', descripcion: 'Microelementos y bioestimulantes de absorción estomática', estado: 'Activo' },
-      { id: 'TP-03', name: 'Herbicidas Pre y Post-emergentes', nombre: 'Herbicidas Pre y Post-emergentes', descripcion: 'Control selectivo y no selectivo de malezas', estado: 'Activo' },
-      { id: 'TP-04', name: 'Insecticidas y Acaricidas', nombre: 'Insecticidas y Acaricidas', descripcion: 'Control de lepidópteros, hemípteros y coleópteros', estado: 'Activo' },
-      { id: 'TP-05', name: 'Fungicidas Sistémicos y Protectores', nombre: 'Fungicidas Sistémicos y Protectores', descripcion: 'Prevención y curación de hongos fitopatógenos', estado: 'Activo' },
-      { id: 'TP-06', name: 'Bioinsumos y Antagonistas Biológicos', nombre: 'Bioinsumos y Antagonistas Biológicos', descripcion: 'Cepas de Trichoderma, Bacillus y micorrizas', estado: 'Activo' },
-      { id: 'TP-07', name: 'Coadyuvantes y Acondicionadores de Agua', nombre: 'Coadyuvantes y Acondicionadores de Agua', descripcion: 'Surfactantes, adherentes y reguladores de pH', estado: 'Activo' }
-    ];
+    const demoTiposProductos = initialTiposProductos;
 
     // 10. Estructura Territorial (6 niveles)
     const demoSectores = [
@@ -725,36 +532,45 @@ export default function Configuraciones() {
       { id: 'TRAB-04', codigo: 'TRAB-04', identificacion: '94567890', cedula: '94567890', nombre: 'Luis Fernando', apellido: 'Mosquera', cargo: 'Operario de Riego y Drenaje', cuadrillaId: 'CUAD-03', cuadrilla: 'Cuadrilla de Riego y Drenaje', estado: 'Activo', activo: true, telefono: '3123456789' }
     ];
 
-    // 14. Planificaciones con Geocerca
+    // 14. Planificaciones con Geocerca Rural
     const demoPlanificaciones = [
       {
-        id: 'PLAN-2026-001',
-        actividad: 'Fertilización edáfica mayor (NPK) mecanizada',
-        suerteId: 'SUERTE-01',
-        suerteNombre: 'Suerte 1A - Cenicaña CC 01-1940',
-        fecha: new Date().toISOString().split('T')[0],
-        areaPlanificada: 14.5,
-        areaEjecutada: 14.5,
-        estado: 'Completada',
-        latitud: 3.4530,
-        longitud: -76.5330,
-        validoGeocerca: true,
-        maquinaria: 'Tractor John Deere 6125M',
-        operador: 'Carlos Andrés Restrepo'
+        id: 'OT-2026-001',
+        codigo: 'OT-2026-001',
+        actividad: 'Fertilización Edáfica NPK de Fondo (Urea + DAP + KCl)',
+        labor: 'Fertilización Edáfica NPK de Fondo (Urea + DAP + KCl)',
+        cultivo: 'Caña de Azúcar',
+        suerte: 'Suerte A-01 (Tablón Principal)',
+        suerteId: 'SUE-01',
+        finca: 'Hacienda El Paraíso (Ingenio Providencia)',
+        responsable: 'Carlos Andrés Restrepo',
+        trabajadorId: 'TRAB-01',
+        fechaInicio: new Date().toISOString().split('T')[0],
+        fechaFin: new Date(Date.now() + 86400000 * 3).toISOString().split('T')[0],
+        estado: 'En Ejecución',
+        progreso: 65,
+        lat: 3.6225,
+        lng: -76.2050,
+        isDemo: true
       },
       {
-        id: 'PLAN-2026-002',
-        actividad: 'Poda sanitaria de aclareo y formación',
-        suerteId: 'SUERTE-03',
-        suerteNombre: 'Suerte 2A - Aguacate Hass Export',
-        fecha: new Date().toISOString().split('T')[0],
-        areaPlanificada: 9.8,
-        areaEjecutada: 6.2,
-        estado: 'En Progreso',
-        latitud: 3.4528,
-        longitud: -76.5365,
-        validoGeocerca: true,
-        operador: 'Jorge Iván Caicedo'
+        id: 'OT-2026-002',
+        codigo: 'OT-2026-002',
+        actividad: 'Control Fitosanitario Barrenador (Drone DJI T40)',
+        labor: 'Control Fitosanitario Barrenador (Drone DJI T40)',
+        cultivo: 'Caña de Azúcar',
+        suerte: 'Suerte A-02 (Sector Riego Sur)',
+        suerteId: 'SUE-02',
+        finca: 'Hacienda El Paraíso (Ingenio Providencia)',
+        responsable: 'María Eugenia Gómez',
+        trabajadorId: 'TRAB-02',
+        fechaInicio: new Date().toISOString().split('T')[0],
+        fechaFin: new Date(Date.now() + 86400000 * 2).toISOString().split('T')[0],
+        estado: 'Planificada',
+        progreso: 0,
+        lat: 3.6255,
+        lng: -76.2025,
+        isDemo: true
       }
     ];
 
@@ -762,31 +578,18 @@ export default function Configuraciones() {
     const demoMonitoreos = [
       {
         id: 'MON-2026-001',
-        suerteId: 'SUERTE-01',
-        suerteNombre: 'Suerte 1A - Cenicaña CC 01-1940',
+        suerteId: 'SUE-01',
+        suerteNombre: 'Suerte A-01 (Tablón Principal)',
         fecha: new Date().toISOString().split('T')[0],
         plaga: 'Diatraea saccharalis (Barrenador del Tallo)',
         incidencia: 3.8,
         severidad: 'Baja',
-        latitud: 3.4525,
-        longitud: -76.5328,
+        latitud: 3.6225,
+        longitud: -76.2050,
         validoGeocerca: true,
         inspector: 'María Eugenia Gómez',
-        observaciones: 'Nivel poblacional bajo control biológico.'
-      },
-      {
-        id: 'MON-2026-002',
-        suerteId: 'SUERTE-03',
-        suerteNombre: 'Suerte 2A - Aguacate Hass Export',
-        fecha: new Date().toISOString().split('T')[0],
-        plaga: 'Phytophthora cinnamomi (Tristeza del Aguacate)',
-        incidencia: 1.2,
-        severidad: 'Muy Baja',
-        latitud: 3.4535,
-        longitud: -76.5372,
-        validoGeocerca: true,
-        inspector: 'María Eugenia Gómez',
-        observaciones: 'Buen drenaje, sin signos activos de necrosis.'
+        observaciones: 'Nivel poblacional bajo control biológico en zona cañera rural.',
+        isDemo: true
       }
     ];
 
@@ -809,12 +612,41 @@ export default function Configuraciones() {
     if (addAuditLog) {
       addAuditLog({
         usuario: currentUser?.nombre || 'Administrador',
-        accion: 'Carga de datos de prueba completos (Todos los Maestros, Catálogos, Tipos, GIS, Maquinaria, Labores)',
+        accion: 'Carga de dataset demo agrícola rural (isDemo: true)',
         modulo: 'Datos de Prueba'
       });
     }
 
-    showToast('¡Dataset demo completo cargado! Maestros, Catálogos, Tipos, GIS y Operaciones listos.');
+    showToast('¡Dataset demo de ingenios azucareros cargado con éxito! Geocercas rurales listas.');
+  };
+
+  const handleDeleteDemoDataOnly = () => {
+    if (window.confirm('¿Desea eliminar ÚNICAMENTE los datos de prueba / demo (isDemo: true)? Todos los datos reales creados manualmente se conservarán intactos.')) {
+      const isDemoItem = (item) => Boolean(item?.isDemo || item?.origen === 'DEMO');
+
+      if (setSectores) setSectores(prev => (prev || []).filter(item => !isDemoItem(item)));
+      if (setCultivos) setCultivos(prev => (prev || []).filter(item => !isDemoItem(item)));
+      if (setGruposActividades) setGruposActividades(prev => (prev || []).filter(item => !isDemoItem(item)));
+      if (setActividades) setActividades(prev => (prev || []).filter(item => !isDemoItem(item)));
+      if (setProductos) setProductos(prev => (prev || []).filter(item => !isDemoItem(item)));
+      if (setMaquinarias) setMaquinarias(prev => (prev || []).filter(item => !isDemoItem(item)));
+      if (setTrabajadores) setTrabajadores(prev => (prev || []).filter(item => !isDemoItem(item)));
+      if (setCuadrillas) setCuadrillas(prev => (prev || []).filter(item => !isDemoItem(item)));
+      if (setProveedores) setProveedores(prev => (prev || []).filter(item => !isDemoItem(item)));
+      if (setControlesAgro) setControlesAgro(prev => (prev || []).filter(item => !isDemoItem(item)));
+      if (setPlanificaciones) setPlanificaciones(prev => (prev || []).filter(item => !isDemoItem(item)));
+      if (setRegistrosControles) setRegistrosControles(prev => (prev || []).filter(item => !isDemoItem(item)));
+
+      if (addAuditLog) {
+        addAuditLog({
+          usuario: currentUser?.nombre || 'Administrador',
+          accion: 'Eliminación selectiva de datos de prueba (isDemo: true)',
+          modulo: 'Datos de Prueba'
+        });
+      }
+
+      showToast('Datos de demostración eliminados. Todos los datos reales creados se mantuvieron.');
+    }
   };
 
   const handleClearOperationalData = () => {
@@ -934,8 +766,37 @@ export default function Configuraciones() {
           </div>
 
           <div className="space-y-3">
+            <div className="p-4 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+              <div className="flex items-center gap-4">
+                <div className="w-10 h-10 rounded-xl bg-amber-500/10 border border-amber-500/20 text-amber-500 flex items-center justify-center text-xl shrink-0">
+                  ⏱️
+                </div>
+                <div>
+                  <h4 className="text-[15px] font-bold text-slate-800 dark:text-slate-100">Límite de Inactividad de Sesión</h4>
+                  <p className="text-[13px] text-slate-500 dark:text-slate-400 mt-0.5">
+                    Avisa 60 segundos antes con un contador regresivo y cierra la sesión automáticamente si no hay interacción.
+                  </p>
+                </div>
+              </div>
+              <div className="shrink-0">
+                <select
+                  value={sessionTimeoutMins}
+                  onChange={(e) => handleTimeoutChange(Number(e.target.value))}
+                  className="bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-lg px-3 py-2 text-xs font-bold text-slate-900 dark:text-white cursor-pointer"
+                >
+                  <option value={1}>1 Minuto (Prueba Inmediata)</option>
+                  <option value={2}>2 Minutos</option>
+                  <option value={5}>5 Minutos</option>
+                  <option value={10}>10 Minutos</option>
+                  <option value={15}>15 Minutos (Recomendado)</option>
+                  <option value={30}>30 Minutos</option>
+                  <option value={60}>60 Minutos</option>
+                  <option value={120}>2 Horas</option>
+                </select>
+              </div>
+            </div>
+
             {[
-              { id: 'sesion_timeout', label: 'Cierre de Sesión por Inactividad (30 min)', desc: 'Desconecta la sesión automáticamente si no hay actividad en la plataforma.', icon: '⏱️' },
               { id: 'sesion_log', label: 'Auditoría Continua de Accesos', desc: 'Registra en bitácora cada inicio de sesión, IP de origen y cambios de perfil.', icon: '📋' },
               { id: 'sesion_doble_factor', label: 'Autenticación de Doble Factor (2FA)', desc: 'Exige código de verificación OTP al ingresar a cuentas administrativas.', icon: '🔐' },
               { id: 'sesion_ip_whitelist', label: 'Restricción por Rango de IPs de Sede', desc: 'Permite el acceso exclusivamente desde las direcciones IP de la empresa.', icon: '🌐' }
@@ -1484,11 +1345,11 @@ export default function Configuraciones() {
             <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-5 shadow-sm space-y-4 flex flex-col justify-between">
               <div className="space-y-2">
                 <div className="w-10 h-10 rounded-xl bg-emerald-500/15 text-emerald-500 flex items-center justify-center text-xl">
-                  🚀
+                  🌾
                 </div>
-                <h4 className="text-base font-bold text-slate-900 dark:text-white">Cargar Agro-Holding Completo</h4>
+                <h4 className="text-base font-bold text-slate-900 dark:text-white">Inyectar Dataset de Ingenios Azucareros</h4>
                 <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
-                  Genera una estructura de 6 niveles (Caña de Azúcar, Aguacate Hass, Café), insumos con inventario, cuadrillas, maquinaria con horómetros, órdenes con geocercas GPS y registros fitopatológicos.
+                  Carga geocercas rurales en zonas agrícolas reales (Valle del Cauca: Providencia, Manuelita, El Cerrito), 6 niveles topológicos, insumos, maquinaria con horómetros y cuadrillas, todos identificados con <code className="text-emerald-500 font-mono text-[11px]">isDemo: true</code>.
                 </p>
               </div>
               <button
@@ -1496,18 +1357,37 @@ export default function Configuraciones() {
                 className="w-full py-2.5 px-4 rounded-xl text-xs font-bold bg-emerald-600 hover:bg-emerald-700 text-white shadow-md flex items-center justify-center gap-2 transition-colors"
               >
                 <Play size={14} />
-                <span>Inyectar Dataset Agrícola</span>
+                <span>Inyectar Dataset Rural Demo</span>
+              </button>
+            </div>
+
+            <div className="bg-white dark:bg-slate-900 border border-indigo-500/30 rounded-xl p-5 shadow-sm space-y-4 flex flex-col justify-between">
+              <div className="space-y-2">
+                <div className="w-10 h-10 rounded-xl bg-indigo-500/15 text-indigo-500 flex items-center justify-center text-xl">
+                  🧹
+                </div>
+                <h4 className="text-base font-bold text-slate-900 dark:text-white">Eliminar Solo Datos de Prueba (Demo)</h4>
+                <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
+                  Limpia selectivamente todos los lotes, cuadrillas, insumos y labores con la marca de prueba. <strong>Los datos que hayas creado manualmente se conservan 100% intactos.</strong>
+                </p>
+              </div>
+              <button
+                onClick={handleDeleteDemoDataOnly}
+                className="w-full py-2.5 px-4 rounded-xl text-xs font-bold bg-indigo-600 hover:bg-indigo-700 text-white shadow-md flex items-center justify-center gap-2 transition-colors"
+              >
+                <FilterX size={14} />
+                <span>Eliminar Solo Datos Demo</span>
               </button>
             </div>
 
             <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-5 shadow-sm space-y-4 flex flex-col justify-between">
               <div className="space-y-2">
                 <div className="w-10 h-10 rounded-xl bg-amber-500/15 text-amber-500 flex items-center justify-center text-xl">
-                  🧹
+                  📋
                 </div>
-                <h4 className="text-base font-bold text-slate-900 dark:text-white">Limpiar Órdenes y Monitoreo</h4>
+                <h4 className="text-base font-bold text-slate-900 dark:text-white">Limpiar Órdenes y Monitoreos</h4>
                 <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
-                  Elimina todas las órdenes de trabajo planificadas, ejecuciones y monitoreos de campo registrados. Conserva intactos todos los catálogos y la estructura agrícola.
+                  Elimina las órdenes de trabajo planificadas, ejecuciones y monitoreos fitosanitarios registrados. Conserva intactos todos los maestros y la estructura territorial.
                 </p>
               </div>
               <button
@@ -1519,16 +1399,16 @@ export default function Configuraciones() {
               </button>
             </div>
 
-            <div className="bg-white dark:bg-slate-900 border border-red-500/20 rounded-xl p-5 shadow-sm space-y-4 flex flex-col justify-between md:col-span-2">
+            <div className="bg-white dark:bg-slate-900 border border-red-500/20 rounded-xl p-5 shadow-sm space-y-4 flex flex-col justify-between">
               <div className="space-y-2">
                 <div className="flex items-center gap-3">
                   <div className="w-10 h-10 rounded-xl bg-red-500/15 text-red-500 flex items-center justify-center text-xl">
                     🔄
                   </div>
                   <div>
-                    <h4 className="text-base font-bold text-red-500">Restauración de Fábrica</h4>
+                    <h4 className="text-base font-bold text-red-500">Restauración Total de Fábrica</h4>
                     <p className="text-xs text-slate-500 dark:text-slate-400">
-                      Borra la memoria local de la sesión activa y reinicia la plataforma a su estado inicial.
+                      Borra completamente la memoria local y restablece la base de datos a su estado inicial en blanco.
                     </p>
                   </div>
                 </div>

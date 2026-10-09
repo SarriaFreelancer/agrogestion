@@ -26,6 +26,7 @@ import InstallPWA from '@/components/InstallPWA';
 import MainLayout from './shared/components/layout/MainLayout';
 import Sidebar from './shared/components/layout/Sidebar';
 import ContextBar from './shared/components/layout/ContextBar';
+import SessionInactivityGuard from '@/shared/components/session/SessionInactivityGuard';
 
 function AppContent() {
   const [currentView, setCurrentView] = useState('dashboard');
@@ -115,6 +116,7 @@ function AppContent() {
   return (
     <>
       <InstallPWA />
+      <SessionInactivityGuard />
       <MainLayout>
         <Sidebar 
           currentView={currentView}

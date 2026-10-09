@@ -31,6 +31,7 @@ export function AuthProvider({ children }) {
 
   const loginUser = async ({ email, password }) => {
     // Simulando login
+    localStorage.removeItem('agro_logout_reason');
     const normalized = {
       id: `USR-${Date.now()}`,
       code: `USR-${Date.now()}`,
@@ -43,11 +44,15 @@ export function AuthProvider({ children }) {
     setCurrentUser(normalized);
   };
 
-  const logoutUser = () => {
+  const logoutUser = (reason) => {
+    if (reason === 'INACTIVITY') {
+      localStorage.setItem('agro_logout_reason', 'INACTIVITY');
+    } else {
+      localStorage.removeItem('agro_logout_reason');
+    }
     setCurrentUser(null);
     localStorage.removeItem('agro_currentUser');
     localStorage.removeItem('agro_currentClient');
-    window.location.href = '/'; 
   };
 
   return (
